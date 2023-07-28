@@ -4,7 +4,7 @@ After=multi-user.target
 
 [Service]
 Type=idle
-ExecStart=/bin/sh -c 'cd /home/user/market/src && poetry run python3.11 manage.py startbot'>
+ExecStart=/bin/sh -c 'cd /home/user/market/src && poetry run python3.11 manage.py startbot'
 Restart=always
 
 [Install]

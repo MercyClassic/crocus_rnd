@@ -15,7 +15,7 @@ load_dotenv()
 
 logging.basicConfig(
     level='DEBUG',
-    filename=f'src/logs/smtp_log.log',
+    filename=f'../src/logs/smtp_log.log',
     format='{asctime} - {levelname} - {message}',
     style='{',
 )

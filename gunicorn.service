@@ -6,12 +6,13 @@ After=network.target
 [Service]
 User=user
 Group=user
-WorkingDirectory=/home/user/market
+WorkingDirectory=/home/user/market/src
 ExecStart=/home/user/.cache/pypoetry/virtualenvs/market-iOeTngTK-py3.11/bin/gunicorn \
-          --access-logfile - \
+          --access-logfile /var/log/gunicorn/access.log \
+	  --error-logfile /var/log/gunicorn/error.log \
           --workers 3 \
           --bind unix:/run/gunicorn.sock \
-          src.config.wsgi:application
+          config.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
