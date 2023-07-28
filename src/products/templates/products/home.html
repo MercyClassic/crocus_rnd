@@ -1,0 +1,152 @@
+{% extends 'products/base.html' %}
+{% load static %}
+{% load products_tags %}
+
+{% block title %} Цветы в Ростове-на-Дону {% endblock %}
+
+{% block content %}
+    <section class="catalog">
+        <div class="catalog__container">
+            <div class="catalog__body" >
+                <ul class="catalog__list">
+                    {% get_categories as categories %}
+                    {% for category in categories.categories %}
+                        <li class="catalog__item">
+                            <a href="?category={{ category.name }}&catalog" class="catalog__link">
+                                <div class="catalog__image">
+                                    <img src="{{ category.image.url }}" alt="1">
+                                </div>
+                                <p class="catalog__title">{{ category.name }}</p>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </section>
+    <form class="flower__form form-flower">
+        <div class="form-flower__search-wrapper">
+            <button class="form-flower__search-button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 88 88">
+                    <path fill="#b6b6b6"
+                        d="M85 31.1c-.5-8.7-4.4-16.6-10.9-22.3C67.6 3 59.3 0 50.6.6c-8.7.5-16.7 4.4-22.5 11-11.2 12.7-10.7 31.7.6 43.9l-5.3 6.1-2.5-2.2-17.8 20 9 8.1 17.8-20.2-2.1-1.8 5.3-6.1c5.8 4.2 12.6 6.3 19.3 6.3 9 0 18-3.7 24.4-10.9 5.9-6.6 8.8-15 8.2-23.7zM72.4 50.8c-9.7 10.9-26.5 11.9-37.6 2.3-10.9-9.8-11.9-26.6-2.3-37.6 4.7-5.4 11.3-8.5 18.4-8.9h1.6c6.5 0 12.7 2.4 17.6 6.8 5.3 4.7 8.5 11.1 8.9 18.2.5 7-1.9 13.8-6.6 19.2z">
+                    </path>
+                </svg>
+            </button>
+            <input name="search" type="text" placeholder="Искать" class="form-flower__search">
+            <button type="reset" class="form-flower__reset-button">
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        <button type="submit" class="form-flower__button-submit">Найти</button>
+    </form>
+    <section class="delivery">
+        <div class="delivery__body">
+            <h1 class="delivery__title">Доставка <br> свежих цветов <br> <span>в Ростове-на-Дону</span></h1>
+            <p class="delivery__text">
+                Не можете определиться c выбором? <br>
+                Закажите <span> <a style="color:inherit;" href="tel: +7 (918) 521-25-71"> онлайн звонок бесплатно </a> </span>
+            </p>
+            <form id="call_me" class="delivery__form" method="post" action="{% url 'payments:call_me' %}">
+                {% csrf_token %}
+                <input name="phone_number" placeholder="+7 (999) 999 99-99" type="text" class="delivery__number-input" required maxlength="20" minlength="11">
+                <button class="delivery__number-button">Перезвоните мне</button>
+            </form>
+            <a href="{% url 'products:product-list' %}" class="delivery__button">Весь каталог</a>
+        </div>
+    </section>
+    <section class="flower">
+        <div class="flower__container _container">
+            <div class="flower__heading _heading">
+                <h2 id="catalog" class="flower__title _title">АКТУАЛЬНОЕ ПРЕДЛОЖЕНИЕ</h2>
+            </div>
+            <ul class="flower__list">
+            {% for product in products %}
+                <li class="flower__card card-flower">
+                    <a href="{{ product.get_absolute_url }}" class="card-flower__link">
+                        <div class="card-flower__image">
+                            <img src="{{ product.image.url }}" alt="1">
+                        </div>
+                        <div class="card-flower__content">
+                            <h4 class="card-flower__title">{{ product.title }}</h4>
+                            <p class="card-flower__price _card-hot-price">
+                                {{ product.price }} ₽
+                            </p>
+                            <div class="card-flower__actions">
+                                <form name="form-add-to-cart" method="post" class="card-flower__cart" action="{{ product.add_to_session }}">
+                                    {% csrf_token %}
+                                    <button name="add_to_cart_button">
+                                        {% if product.slug in request.session.cart_products %}
+                                           <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+                                             width="64px" height="64px" viewBox="0 0 64 64" enable-background="new 0 0 64 64" xml:space="preserve">
+                                            <g>
+                                            <path d="M52.728,60H11.272L-0.375,24h64.749L52.728,60z M12.728,58h38.545l10.353-32H2.375L12.728,58z"/>
+                                            </g>
+                                            <g>
+                                            <rect x="17" y="4.23" transform="matrix(0.9284 0.3715 -0.3715 0.9284 6.8601 -5.6132)" width="2.001" height="21.541"/>
+                                            </g>
+                                            <g>
+                                            <rect x="35.23" y="14" transform="matrix(0.3714 0.9285 -0.9285 0.3714 42.8432 -33.2808)" width="21.541" height="2.001"/>
+                                            </g>
+                                            <g>
+                                            <polygon points="30.707,48.707 29.293,48.707 22.293,41.707 23.707,40.293 30,46.586 42.293,34.293 43.707,35.707 	"/>
+                                            </g></svg>
+                                        {% else %}
+                                            <svg height="64" width="64" xmlns="http://www.w3.org/2000/svg" viewBox="2 0 30 27">
+                                                <path d="M1.39999 1.70001H6.60001" stroke="#4F4F4F" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"/>
+                                                <path d="M6.60001 1.70001L11 18.9" stroke="#4F4F4F" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"/>
+                                                <path d="M11.8 18.9H28.3" stroke="#4F4F4F" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"/>
+                                                <path d="M13.8 25.7C15.4569 25.7 16.8 24.3569 16.8 22.7C16.8 21.0432 15.4569 19.7 13.8 19.7C12.1431 19.7 10.8 21.0432 10.8 22.7C10.8 24.3569 12.1431 25.7 13.8 25.7Z" stroke="#4F4F4F" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"/>
+                                                <path d="M25.3 25.7C26.9568 25.7 28.3 24.3569 28.3 22.7C28.3 21.0432 26.9568 19.7 25.3 19.7C23.6431 19.7 22.3 21.0432 22.3 22.7C22.3 24.3569 23.6431 25.7 25.3 25.7Z" stroke="#4F4F4F" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"/>
+                                                <path d="M25.7 14.6H11.3C10.7 14.6 10.1 14.2 10 13.6L8.1 6.90001C7.9 6.00001 8.49999 5.20001 9.39999 5.20001H27.5C28.4 5.20001 29.1 6.10001 28.8 6.90001L26.9 13.6C26.9 14.2 26.4 14.6 25.7 14.6Z" stroke="#4F4F4F" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2"/>
+                                            </svg>
+                                        {% endif %}
+                                    </button>
+                                </form>
+                                <form name="form-add-to-favourite" method="post" class="card-flower__favourites" action="{{ product.add_to_session }}">
+                                    {% csrf_token %}
+                                    <button name="like_button">
+                                        {% if product.slug in request.session.favourites %}
+                                            <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+                                             width="1280.000000pt" height="1248.000000pt" viewBox="0 0 1280.000000 1248.000000"
+                                             preserveAspectRatio="xMidYMid meet">
+                                                <g transform="translate(0.000000,1248.000000) scale(0.100000,-0.100000)"
+                                                fill="#f44336" stroke="none">
+                                                    <path d="M2860 11344 c-19 -2 -80 -9 -135 -15 -680 -71 -1336 -412 -1794 -933
+                                                    -381 -434 -661 -983 -826 -1621 -342 -1324 170 -2767 1549 -4365 342 -396 875
+                                                    -927 1361 -1356 705 -622 1556 -1266 2365 -1790 218 -142 414 -264 423 -264
+                                                    20 0 519 323 841 544 1779 1224 3216 2581 4038 3816 533 800 837 1566 908
+                                                    2288 14 149 15 491 0 622 -27 257 -88 526 -181 804 -192 575 -457 1033 -808
+                                                    1398 l-114 119 34 37 c31 34 31 35 4 12 -16 -14 -33 -29 -37 -34 -3 -5 -49 27
+                                                    -102 71 -52 45 -105 88 -116 96 -18 12 -19 18 -10 42 6 15 8 30 6 33 -3 2 -8
+                                                    -7 -12 -22 -3 -14 -9 -26 -12 -26 -3 0 -37 22 -76 49 -379 260 -774 410 -1256
+                                                    478 -173 24 -583 24 -765 0 -515 -69 -982 -241 -1390 -513 -431 -287 -749
+                                                    -666 -915 -1090 -22 -57 -41 -93 -44 -84 -46 125 -64 169 -112 264 -244 487
+                                                    -713 907 -1304 1169 -282 124 -583 208 -910 252 -109 15 -532 28 -610 19z"/>
+                                                    <path d="M10728 10363 c7 -3 16 -2 19 1 4 3 -2 6 -13 5 -11 0 -14 -3 -6 -6z"/>
+                                                </g>
+                                            </svg>
+                                        {% else %}
+                                            <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path
+                                                    d="M12 20L4.3314 12.0474C3.47892 11.1633 3 9.96429 3 8.71405C3 6.11055 5.03517 4 7.54569 4C8.75128 4 9.90749 4.49666 10.76 5.38071L12 6.66667L13.24 5.38071C14.0925 4.49666 15.2487 4 16.4543 4C18.9648 4 21 6.11055 21 8.71405C21 9.96429 20.5211 11.1633 19.6686 12.0474L15.8343 16.0237"
+                                                    stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                                            </svg>
+                                        {% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+            {% if not products %}
+                <h1 style="font-size: 30px"> Ничего не найдено </h1> <br>
+                <a href="{% url 'products:product-list' %}" style="font-size: 30px"> Вернуться на главную страницу </a>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,4 @@
+.git
+../.flake8
+.gitignore
+.env.example

@@ -1,0 +1,17 @@
+[Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+
+[Service]
+User=user
+Group=user
+WorkingDirectory=/home/user/market
+ExecStart=/home/user/.cache/pypoetry/virtualenvs/market-iOeTngTK-py3.11/bin/gunicorn \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/gunicorn.sock \
+          src.config.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

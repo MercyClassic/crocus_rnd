@@ -1,0 +1,93 @@
+.watch-also {
+	margin-bottom: 40px;
+	&__container {
+	}
+
+	&__title {
+		text-align: center;
+	}
+
+	&__list {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 40px;
+		@media (max-width: $md1) {
+			grid-template-columns: repeat(3, 1fr);
+			gap: 30px;
+		}
+		@media (max-width: $md2) {
+			grid-template-columns: repeat(2, 1fr);
+		}
+		@media (max-width: 400px) {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	&__item {
+	}
+}
+
+.watch-also-card {
+	background-color: #fff;
+	text-align: center;
+	transition: all 0.3s ease 0s;
+	@media (any-hover: hover) {
+		&:hover {
+			box-shadow: 0 15px 20px rgba(0, 0, 0, 0.2);
+		}
+	}
+	&__link {
+		color: #323232;
+		display: block;
+	}
+
+	&__image-wrapper {
+		position: relative;
+		padding-bottom: 90%;
+		margin-bottom: 24px;
+		img {
+			position: absolute;
+			top: 0;
+			left: 0;
+			object-fit: cover;
+			height: 100%;
+			width: 100%;
+		}
+	}
+
+	&__title {
+		margin-bottom: 16px;
+		font-size: 18px;
+	}
+
+	&__sizez {
+		font-weight: 300;
+		margin-bottom: 16px;
+		font-size: 14px;
+	}
+
+	&__price {
+		font-size: 20px;
+		margin-bottom: 32px;
+	}
+
+	&__buy-button {
+		display: inline-flex;
+		align-items: center;
+		margin-bottom: 24px;
+		color: #000;
+		font-size: 14px;
+		letter-spacing: 2px;
+		height: 33px;
+		padding: 0 10px;
+		border: 1px dashed #000;
+		transition: all 0.3s ease 0s;
+		text-transform: uppercase;
+		@media (any-hover: hover) {
+			&:hover {
+				background-color: #000;
+				color: #fff;
+			}
+		}
+	}
+}

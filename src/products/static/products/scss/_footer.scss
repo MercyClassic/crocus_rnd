@@ -1,0 +1,135 @@
+.footer {
+	background-color: #000;
+	&__container {
+		padding: 0 15px;
+		text-align: center;
+		@media (max-width: $md2) {
+			padding: 0 10px;
+		}
+	}
+
+	&__list {
+		display: flex;
+		padding: 30px 0px 40px 0px;
+		justify-content: space-around;
+		gap: 30px;
+		@media (max-width: $md2) {
+			flex-wrap: wrap;
+		}
+	}
+
+	&__item {
+	}
+
+	&__content {
+		border-top: 1px dashed #c6c6c6;
+		padding: 0 15px;
+		text-align: center;
+		@media (max-width: $md2) {
+			padding: 0 10px;
+		}
+	}
+
+	&__content-container {
+		padding: 15px 0;
+		display: flex;
+		justify-content: space-between;
+		color: #fff;
+		align-items: center;
+		@media (max-width: $md3) {
+			flex-direction: column;
+			gap: 20px;
+		}
+	}
+
+	&__copy {
+		font-weight: 300;
+		color: #c6c6c6;
+		font-size: 14px;
+		margin: 0px 30px 0px 0px;
+		@media (max-width: $md2) {
+			margin: 0px 15px 0px 0px;
+			font-size: 12px;
+		}
+	}
+}
+.footer-socials {
+	display: flex;
+	&__list {
+		display: flex;
+		align-items: center;
+	}
+
+	&__item {
+		&:not(:last-child) {
+			margin: 0px 8px 0px 0px;
+		}
+	}
+
+	&__link {
+		display: inline-block;
+		svg {
+			path {
+				transition: all 0.3s ease 0s;
+				fill: #bdbdbd;
+			}
+		}
+		@media (any-hover: hover) {
+			&:hover {
+				path {
+					fill: #faaabc;
+				}
+			}
+		}
+	}
+}
+.item-footer {
+	text-align: left;
+	@media (max-width: $md2) {
+		text-align: center;
+	}
+	&__link {
+		font-size: 20px;
+		display: block;
+		color: #fff;
+		text-transform: uppercase;
+		margin: 0px 0px 16px 0px;
+		transition: all 0.3s ease 0s;
+		@media (max-width: $md2) {
+			font-size: 18px;
+		}
+		@media (max-width: $md3) {
+			font-size: 16px;
+		}
+		@media (any-hover: hover) {
+			&:hover {
+				color: #faaabc;
+			}
+		}
+	}
+
+	&__sub-list {
+	}
+
+	&__sub-item {
+		&:not(:last-child) {
+			margin: 0px 0px 16px 0px;
+		}
+	}
+
+	&__sub-link {
+		display: block;
+		font-size: 18px;
+		font-weight: 300;
+		color: #c6c6c6;
+		transition: all 0.3s ease 0s;
+		@media (max-width: $md2) {
+			font-size: 16px;
+		}
+		@media (any-hover: hover) {
+			&:hover {
+				color: #faaabc;
+			}
+		}
+	}
+}

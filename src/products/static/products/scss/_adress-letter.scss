@@ -1,0 +1,29 @@
+.adress-letter {
+	margin-bottom: 50px;
+	@media (max-width: $md2) {
+		margin-bottom: 30px;
+	}
+	&__container {
+		padding: 0 15px;
+		text-align: center;
+		@media (max-width: $md2) {
+			padding: 0 10px;
+		}
+	}
+
+	&__title {
+	}
+
+	&__body {
+	}
+
+	&__text {
+		font-size: 18px;
+		line-height: 1.5;
+		margin: 0px 0px 32px 0px;
+		&:first-child {
+			position: relative;
+		}
+	}
+
+}

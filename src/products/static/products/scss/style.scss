@@ -1,0 +1,52 @@
+@import "fonts";
+//
+$fontSize: 16px;
+$mainColor: #000;
+$fontFamily: "Futura";
+//
+$md1: 991.98px;
+$md2: 767.98px;
+$md3: 479.98px;
+//
+@import "null";
+@import "ui";
+@import "header";
+@import "catalog";
+@import "delivery";
+@import "pion";
+@import "creator-letter";
+@import "accordion";
+@import "adress-letter";
+@import "delivery-price";
+@import "feedback-letter";
+@import "footer";
+@import "product";
+@import "value";
+@import "watch-also";
+@import "cart";
+@import "about-us";
+
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	width: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.main {
+	flex: 1 1 auto;
+}
+
+.overlay {
+	background-color: #000;
+	opacity: 0.5;
+	position: relative;
+	top: 0;
+	left: 0;
+	position: fixed;
+	z-index: 50;
+	height: 100vh;
+	width: 100vw;
+}
