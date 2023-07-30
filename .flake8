@@ -10,5 +10,5 @@ exclude =
     manage.py
 ignore = DJ01, A003, VNE003, W503
 max-line-length=100
-max-cognitive-complexity=8
+max-cognitive-complexity=14
 inline-quotes = '

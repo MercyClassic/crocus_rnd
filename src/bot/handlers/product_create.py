@@ -20,16 +20,6 @@ class ProductState(StatesGroup):
     extra_images = State()
 
 
-async def cancel_handler(message, state):
-    current_state = await state.get_state()
-    if current_state is None:
-        return
-
-    await state.finish()
-
-    await message.reply('Создание отменено')
-
-
 @command_for(permission_level='owner')
 async def create_product_start(message):
     await ProductState.title.set()
@@ -177,7 +167,6 @@ async def set_extra_images(message, state, album=None):
 
 
 def register_product_create_handlers(dp: Dispatcher):
-    dp.register_message_handler(cancel_handler, commands=['cancel'])
     dp.register_message_handler(create_product_start, commands=['createproduct'])
     dp.register_message_handler(set_title, state=ProductState.title)
     dp.register_message_handler(set_description, state=ProductState.description)
