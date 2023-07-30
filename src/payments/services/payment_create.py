@@ -13,7 +13,6 @@ from payments.models import Order, OrderProduct
 from payments.serializers import PaymentCreateSerializer
 from products.models import Product
 
-
 logger = logging.getLogger('payment')
 
 

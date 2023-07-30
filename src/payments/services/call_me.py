@@ -2,7 +2,7 @@ import asyncio
 
 from rest_framework.request import Request
 
-from bot.main import send_notification_about_new_call_me
+from bot.handlers.notifications import send_notification_about_new_call_me
 from utils.pause import check_for_pause_timer, set_pause_timer
 
 

@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
 
-
 phone_regex = RegexValidator(
     regex=r'^+7\d{10}$',
     message='Номер должен начинаться с +7 и состоять из 11 цифр',

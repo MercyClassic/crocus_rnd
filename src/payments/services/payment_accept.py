@@ -1,14 +1,13 @@
 import asyncio
-import logging
 import copy
+import logging
 import os
 from hashlib import sha256
 
 import rollbar
 
-from bot.main import send_notification_about_new_order
+from bot.handlers.notifications import send_notification_about_new_order
 from payments.models import Order
-
 
 logger = logging.getLogger('payment')
 

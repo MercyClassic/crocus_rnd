@@ -4,10 +4,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from utils.pause import check_for_pause_timer, set_pause_timer
+
 from .serializers import CallMeSerializer, PaymentCreateSerializer
+from .services.call_me import create_call_me_request
 from .services.payment_accept import payment_acceptance
 from .services.payment_create import PaymentCreateService
-from .services.call_me import create_call_me_request
 
 
 class CreatePaymentAPIView(CreateAPIView):
