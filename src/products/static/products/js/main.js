@@ -155,6 +155,10 @@ function getCart(event) {
         cart_items.innerHTML = tags;
         document.getElementById('amount').innerHTML = `Сумма: ${amount} ₽`
         document.getElementById('amount').setAttribute('data-amount', amount)
+        let counters = document.querySelectorAll('[data-counter]');
+        if (counters) {
+           setCount(counters);
+        }
     }
     });
 }
@@ -245,9 +249,8 @@ function createPayment(event) {
         items[slug] = counters[0].querySelector('input').value;
     } else {
         let counters = document.querySelectorAll('[data-counter]');
-        if (counters) {
-           setCount(counters);
-        }
+        console.log(counters, 'counters')
+
         if (counters === undefined) {
             alert('Для заказа в корзине должен находиться хотя бы один товар');
             return null;
@@ -269,6 +272,7 @@ function createPayment(event) {
         'delivery_date': target.delivery_date.value,
         'delivery_time': target.querySelector('.popup-cart__time-input').value,
         'note': target.note.value,
+        'cash': target.cash.value,
         'delivering': document.getElementById('delivering').checked
     }
 
@@ -281,16 +285,22 @@ function createPayment(event) {
         if (response.status === 201) {
             response.json()
             .then((data) => {
-		alert('Онлайн оплата временно недоступна, свяжитесь с нами напрямую');
-		return null;
-                // window.open(data.payment_url);
+                alert('Онлайн оплата временно недоступна, свяжитесь с нами напрямую');
+                return null;
+                if (data.payment_url === 'OK') {
+                    alert('Ваш заказ успешно оформлен, начинаем его собирать!');
+                    window.location.href = '/';
+                } else {
+                    window.open(data.payment_url);
+                }
+
            })
         } else if (response.status === 400) {
-            alert('Данные введены неверно, обновите страничку и попробуйте ещё раз')
+            alert('Данные введены неверно, обновите страничку и попробуйте ещё раз');
         } else if (response.status === 500) {
-            alert('Произошла ошибка на стороне сервера, попробуйте обновить страничку и повторить заказ снова')
+            alert('Произошла ошибка на стороне сервера, попробуйте обновить страничку и повторить заказ снова');
         } else if (response.status === 403) {
-            alert('Вы уже сделали заказ, подождите немного, прежде, чем сделать ещё один')
+            alert('Вы уже сделали заказ, подождите немного, прежде, чем сделать ещё один');
         }
         showLoader(false);
     })
@@ -401,8 +411,8 @@ function continuePayment(event) {
     let amount = document.getElementById('amount').getAttribute('data-amount');
     document.getElementById('after_continue').innerHTML =
                         `<div class="popup-cart__adress-lable _label">
-			    <label class="popup-cart__date-label _label">Адрес доставки <p> <span style="font-size:14px">(Выберите пункт "С доставкой" для редактирования)<span></p></label>
-			</div>
+			                <label class="popup-cart__date-label _label">Адрес доставки <p> <span style="font-size:14px">(Выберите пункт "С доставкой" для редактирования)<span></p></label>
+			            </div>
                         <input name='delivery_address' data-disable-before-delivery-checked type="text" disabled placeholder="Пример: ул. Пушкинская 4" class="popup-cart__adress-input _input">
                         <div class="popup-cart__date-wrapper">
                             <label class="popup-cart__date-label _label">Дата доставки / Самовывоза </label>
@@ -429,6 +439,10 @@ function continuePayment(event) {
                             <label class="popup-cart__chekbox-label"> С доставкой (+350 рублей) </label>
                         </div>
                         <div class="popup-cart__checkbox-wrapper">
+                            <input type='checkbox' name='cash' class="popup-cart__checkbox-input">
+                            <label class="popup-cart__chekbox-label"> Оплатить наличными при получении </label>
+                        </div>
+                        <div class="popup-cart__checkbox-wrapper">
                             <input type='checkbox' id='without_calling' class="popup-cart__checkbox-input">
                             <label class="popup-cart__chekbox-label"> Напишите мне в whatsapp/telegram (Не звонить) </label>
                         </div>
@@ -443,6 +457,12 @@ function continuePayment(event) {
                             <button type="submit" class="popup-cart__create-order-button _black-button">Оформить заказ</button>
                         </div>`;
     create_payment_button = document.querySelector('.popup-cart__create-order-button')
+
+    let counters = document.querySelectorAll('[data-counter]');
+    if (counters.length === 0) {
+       alert('Для заказа добавьте в корзину хотя бы один товар')
+       return null;
+    }
     create_payment_button.addEventListener('click', createPayment)
     event.target.remove();
     document.getElementById('delivering').addEventListener('click', isWithDeliver);

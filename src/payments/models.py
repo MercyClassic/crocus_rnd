@@ -62,6 +62,10 @@ class Order(models.Model):
         null=True,
         default='Без примечания',
     )
+    cash = models.BooleanField(
+        'Оплата наличными',
+        default=False,
+    )
 
     products = models.ManyToManyField(
         'products.Product',

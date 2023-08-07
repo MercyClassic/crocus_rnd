@@ -19,6 +19,7 @@ class OrderData:
     delivery_date: datetime.utcnow
     delivery_time: str
     note: str
+    cash: bool
     products: list | dict
 
     def __post_init__(self):

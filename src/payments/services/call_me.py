@@ -14,3 +14,4 @@ def create_call_me_request(request: Request, phone_number: str) -> bool | None:
     asyncio.run(
         send_notification_about_new_call_me(phone_number),
     )
+    return True

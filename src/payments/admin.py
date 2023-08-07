@@ -38,6 +38,7 @@ class OrderAdmin(admin.ModelAdmin):
         'delivery_date',
         'delivery_time',
         'note',
+        'cash',
     )
     list_display_links = ('id', 'user')
     search_fields = ('id', 'uuid', 'amount')
@@ -46,6 +47,7 @@ class OrderAdmin(admin.ModelAdmin):
         'delivering',
         'created_at',
         'done_at',
+        'cash',
     )
     sortable_by = ('amount', )
     inlines = [ProductInline]

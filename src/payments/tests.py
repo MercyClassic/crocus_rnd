@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.core.cache import cache
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
@@ -58,6 +59,7 @@ class PaymentTests(APITestCase):
             'delivery_address': 'улица Пушкина',
             'delivery_date': datetime.utcnow(),
             'note': 'Примечание',
+            'cash': True,
             'delivering': False,
         }
         serializer = PaymentCreateSerializer(data=data)
@@ -73,6 +75,7 @@ class PaymentTests(APITestCase):
             'without_calling': False,
             'delivery_date': datetime.utcnow(),
             'delivering': False,
+            'cash': True,
         }
         serializer = PaymentCreateSerializer(data=data)
         serializer.is_valid()
@@ -87,6 +90,7 @@ class PaymentTests(APITestCase):
             'without_calling': False,
             'delivery_date': datetime.utcnow(),
             'delivering': True,
+            'cash': True,
         }
         serializer = PaymentCreateSerializer(data=data)
         serializer.is_valid()
@@ -101,6 +105,7 @@ class PaymentTests(APITestCase):
             'without_calling': False,
             'delivery_date': datetime.utcnow(),
             'delivering': False,
+            'cash': True,
         }
         serializer = PaymentCreateSerializer(data=data)
         serializer.is_valid()
@@ -116,6 +121,7 @@ class PaymentTests(APITestCase):
             'without_calling': False,
             'delivery_date': datetime.utcnow(),
             'delivering': False,
+            'cash': True,
         }
         serializer = PaymentCreateSerializer(data=data)
         serializer.is_valid()
@@ -131,6 +137,7 @@ class PaymentTests(APITestCase):
             'without_calling': False,
             'delivery_date': datetime.utcnow(),
             'delivering': False,
+            'cash': True,
         }
         serializer = PaymentCreateSerializer(data=data)
         result = serializer.is_valid()
@@ -144,6 +151,7 @@ class PaymentTests(APITestCase):
             'without_calling': False,
             'delivery_date': datetime.utcnow(),
             'delivering': False,
+            'cash': True,
         }
         serializer = PaymentCreateSerializer(data=data)
         result = serializer.is_valid()
@@ -157,6 +165,7 @@ class PaymentTests(APITestCase):
             'without_calling': False,
             'delivery_date': datetime.utcnow(),
             'delivering': False,
+            'cash': True,
         }
         serializer = PaymentCreateSerializer(data=data)
         serializer.is_valid()
@@ -172,6 +181,7 @@ class PaymentTests(APITestCase):
             'without_calling': False,
             'delivery_date': datetime.utcnow(),
             'delivering': False,
+            'cash': True,
         }
         serializer = PaymentCreateSerializer(data=data)
         serializer.is_valid()
@@ -185,6 +195,7 @@ class PaymentTests(APITestCase):
             'without_calling': False,
             'delivery_date': '',
             'delivering': False,
+            'cash': True,
         }
         serializer = PaymentCreateSerializer(data=data)
         result = serializer.is_valid()
@@ -198,8 +209,5 @@ class PaymentTests(APITestCase):
         response = self.client.post(reverse('payments:call_me'), {'phone_number': '+79999999999'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         """ PHONE NUMBER IS VALID BUT TIMEOUT """
-        response = self.client.post(reverse('payments:call_me'), {'phone_number': '+79999999999'})
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        '----------------------------------'
         response = self.client.post(reverse('payments:call_me'), {'phone_number': '+79999999999'})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

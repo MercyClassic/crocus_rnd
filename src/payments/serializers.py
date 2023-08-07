@@ -18,6 +18,7 @@ class PaymentCreateSerializer(serializers.Serializer):
     delivery_date = serializers.DateTimeField()
     delivery_time = serializers.CharField(max_length=200, required=False, allow_blank=True)
     note = serializers.CharField(max_length=300, required=False, allow_blank=True)
+    cash = serializers.BooleanField()
     delivering = serializers.BooleanField()
 
     def validate_delivery_date(self, value):

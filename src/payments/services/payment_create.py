@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import json
 import logging
@@ -9,6 +10,7 @@ import requests
 from django.db.models import QuerySet
 
 from accounts.models import Account
+from bot.handlers.notifications import send_notification_about_new_order
 from payments.models import Order, OrderProduct
 from payments.serializers import PaymentCreateSerializer
 from products.models import Product
@@ -123,6 +125,7 @@ class PaymentCreateService:
             delivery_date=self.delivery_date,
             delivery_time=self.delivery_time,
             note=self.note,
+            cash=self.cash,
             is_paid=False,
             delivering=self.delivering,
         )
@@ -163,7 +166,7 @@ class PaymentCreateService:
             calculated_amount += 350
         if calculated_amount != self.amount:
             return False
-        return 'temporarily unavailable'
+        return 'success payment'
         user_account = self.get_or_create_customer()
 
         order = self.create_order(
@@ -175,6 +178,10 @@ class PaymentCreateService:
             order=order,
             order_products=order_products,
         )
+
+        if self.cash:
+            asyncio.run(send_notification_about_new_order(order.id))
+            return 'OK'
 
         payment_url = self.get_payment_url(
             order_uuid=str(order.uuid),
