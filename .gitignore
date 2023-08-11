@@ -1,11 +1,12 @@
 .env
 
+node_modules
+
 .idea
-idea
 
 dist
 
-media/
-logs/
+media
+logs
 
-__pycache__/
+__pycache__

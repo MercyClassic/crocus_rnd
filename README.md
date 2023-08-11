@@ -10,13 +10,13 @@
 
 **<h2>Stack of this project:</h2>**
 - **<h3> Python 3.11.4 </h3>**
-- **<h3> Django 4.1.6 </h3>**
 - **<h3> Django Rest Framework 3.14.0 </h3>**
 - **<h3> Aiogram 2.25.1 </h3>**
 - **<h3> PostgreSQL </h3>**
 - **<h3> Redis </h3>**
 - **<h3> Nginx </h3>**
 - **<h3> Docker </h3>**
+- **<h3> React </h3>**
 
 **<h2> License  </h2>**
 **<h3> BSD 3-Clause License </h3>**

@@ -1,0 +1,11 @@
+[Unit]
+Description=Telegram bot notifications
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=/bin/sh -c 'cd /home/user/market/backend/src && poetry run python3.11 manage.py startbot'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
