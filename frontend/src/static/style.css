@@ -1306,6 +1306,7 @@ h6 {
   display: flex;
   max-width: 760px;
   margin: 0 auto;
+  padding: 0px 10px;
   margin-bottom: 50px;
 }
 @media (max-width: 767.98px) {

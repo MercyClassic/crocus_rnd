@@ -52,7 +52,7 @@ const Product = ({product, cart_products, favourites}) => {
             setCountCartProducts(count)
 
         } else if (type === 'favourite') {
-            setLikeButton(button);
+            setLikeButton(button.button);
         }
     }
 

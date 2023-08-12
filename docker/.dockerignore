@@ -1,2 +1,4 @@
 .git
-
+.idea
+.env.example
+.flake8

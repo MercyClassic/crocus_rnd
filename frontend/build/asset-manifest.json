@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/static/css/main.5471f1aa.css",
+    "main.js": "/static/js/main.5dc47214.js",
+    "static/media/bg.jpg": "/static/media/bg.9bc273f39186c64e06aa.jpg",
+    "static/media/logo.png": "/static/media/logo.4dc9217dc7d923cbace2.png",
+    "static/media/quality.png": "/static/media/quality.89ceeef815133e48579f.png",
+    "static/media/delivery.png": "/static/media/delivery.e3bde33c5be005264b9a.png",
+    "static/media/paymentOptions.png": "/static/media/paymentOptions.0ce8f63a5799ce40c7b6.png",
+    "static/media/postcard.svg": "/static/media/postcard.a353b6d7a1f78b7e4e3e610856bfd754.svg",
+    "static/media/map.svg": "/static/media/map.d0ba84027f5c9d93cd105b66ad68c853.svg",
+    "static/media/flower.svg": "/static/media/flower.8b5a99b2cd04a07cf5bb652b9c3da9c6.svg",
+    "static/media/delivery_time.svg": "/static/media/delivery_time.9f6a4dffc79a9aec7308ca1c73926d60.svg",
+    "static/media/wrapper.svg": "/static/media/wrapper.a828c12a618e00db76db5c01cd9e8b5e.svg",
+    "static/media/florist.svg": "/static/media/florist.0a180a7ba5827cf245258c99531c73f6.svg",
+    "index.html": "/index.html",
+    "static/media/wallet.svg": "/static/media/wallet.d02e50c2d64333763daa12d6e1919aa4.svg",
+    "static/media/care.svg": "/static/media/care.98fffa4a7ae559f6db69611338f21d6a.svg",
+    "main.5471f1aa.css.map": "/static/css/main.5471f1aa.css.map",
+    "main.5dc47214.js.map": "/static/js/main.5dc47214.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.5471f1aa.css",
+    "static/js/main.5dc47214.js"
+  ]
+}
