@@ -6,7 +6,7 @@ node_modules
 
 dist
 
-media
-logs
+backend/src/media
+backend/src/logs
 
 __pycache__
