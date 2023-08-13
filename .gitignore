@@ -8,5 +8,6 @@ dist
 
 backend/src/media
 backend/src/logs
+frontend/build
 
 __pycache__

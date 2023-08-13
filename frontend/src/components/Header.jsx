@@ -1,9 +1,26 @@
 import {Link} from 'react-router-dom';
+import {isMobile} from 'react-device-detect';
 
 
-const Header = function () {
+const Header = () => {
+
+    const documentActions = (e) => {
+        const targetElement = e.target;
+        if (window.innerWidth > 1200 && isMobile) {
+            if (targetElement.classList.contains('menu__link')) {
+                targetElement.closest('.menu__item').classList.toggle('_hover');
+            }
+        }
+        if (targetElement.classList.contains('icon-menu')) {
+            document.querySelector('.wrapper').classList.toggle('_active');
+            document.querySelector('.icon-menu').classList.toggle('_active');
+            document.querySelector('.menu').classList.toggle('_active');
+            document.querySelector('.actions__tel').classList.toggle('_active');
+        }
+    }
+
     return (
-        <header className="header">
+        <header onClick={(e) => documentActions(e)} className="header">
             <div className="header__container">
                 <div className="header__body">
                     <div className="header__menu menu ">
