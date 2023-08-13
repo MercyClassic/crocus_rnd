@@ -28,7 +28,7 @@ async def set_background_image(message, state):
     image = await download_photo(message.photo[-1].file_id)
     img = Image.open(io.BytesIO(image.file.read()))
     img.thumbnail((2000, 1000))
-    img.save('../../frontend/src/static/img/bg.jpg')
+    img.save('../../frontend/src/static/imgjpg//bg.jpg')
     await bot.send_message(
         message.from_user.id,
         'Главное изображение успешно загружено!',
@@ -37,7 +37,7 @@ async def set_background_image(message, state):
 
 @command_for(permission_level='admin')
 async def send_background_image(message):
-    with open('../../frontend/src/static/img/bg.jpg', 'rb') as buffer:
+    with open('../../frontend/src/static/img/jpg/bg.jpg', 'rb') as buffer:
         await bot.send_photo(
             message.from_user.id,
             buffer,

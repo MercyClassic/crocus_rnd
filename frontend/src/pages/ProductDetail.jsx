@@ -95,7 +95,7 @@ const ProductDetailPage = ({data, setCartVisible}) => {
                                     <button onClick={(e) => changeMainPicture(e)} className="main-product__slider-image-wrapper">
                                         <img src={product.image} alt="Slider" />
                                     </button>
-                                        {product.images.length &&
+                                        {product.images &&
                                             product.images.map((image) =>
                                                 <ProductExtraImage changeMainPicture={changeMainPicture} image={image} key={image.id} />
                                             )

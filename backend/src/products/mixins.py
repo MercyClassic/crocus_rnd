@@ -17,8 +17,8 @@ class ProductResponseMixin(GenericAPIView):
             data={
                 'result': serializer.data,
                 'cart_products': request.session.get('cart_products', []),
-                'favourites': request.session.get('favourites', [])
-            }
+                'favourites': request.session.get('favourites', []),
+            },
         )
 
 

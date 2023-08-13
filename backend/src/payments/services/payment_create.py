@@ -166,7 +166,7 @@ class PaymentCreateService:
             calculated_amount += 350
         if calculated_amount != self.amount:
             return False
-        return 'success payment'
+
         user_account = self.get_or_create_customer()
 
         order = self.create_order(
