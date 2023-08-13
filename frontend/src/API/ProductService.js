@@ -1,6 +1,15 @@
 import axios from 'axios';
 
+
+const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+}
+
 axios.defaults.withCredentials = true
+axios.defaults.headers.post['X-CSRFToken'] = getCookie('csrftoken');
+
 
 export default class PostService {
     static async getProducts(search) {
