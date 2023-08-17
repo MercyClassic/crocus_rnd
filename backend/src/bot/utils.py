@@ -23,7 +23,7 @@ def command_for(permission_level: str):
     return decorator
 
 
-async def create_product(data: dict) -> int:
+async def create_product(data: dict) -> tuple:
     product = await Product.objects.acreate(
         title=data['title'],
         slug=data['slug'],
@@ -37,7 +37,7 @@ async def create_product(data: dict) -> int:
         for image in data['extra_images']:
             product_images.append(ProductImage(image=image, product=product))
         await sync_to_async(ProductImage.objects.bulk_create)(product_images)
-    return product.pk
+    return product.pk, product.slug
 
 
 async def create_category(data: dict) -> int:
@@ -52,14 +52,14 @@ async def create_category(data: dict) -> int:
 def slugify_string(string: str) -> str:
     return string.translate(
         str.maketrans(
-            'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ ',
-            'abvgdeejzijklmnoprstufhzcss_y_euaABVGDEEJZIJKLMNOPRSTUFHZCSS_Y_EUA_',
+            'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ ’',
+            'abvgdeejzijklmnoprstufhzcss_y_euaABVGDEEJZIJKLMNOPRSTUFHZCSS_Y_EUA__',
         ),
     )
 
 
 def validate_title(title: str) -> bool:
-    forbidden_characters = '!@#$%^&*()+=`~;:"[]{}.,m\\/'
+    forbidden_characters = '!@#$%^&*()+=`~;:"[]{}.,\'\\/'
     for char in title:
         if char in forbidden_characters:
             return False

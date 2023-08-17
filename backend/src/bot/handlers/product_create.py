@@ -147,16 +147,16 @@ async def set_extra_images(message, state, album=None):
 
     await state.finish()
 
-    product_id = await create_product(data._data)
+    product_id, product_slug = await create_product(data._data)
 
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton(
         'Перейти в админ панель товара',
         url=''.join((domain, reverse('admin:products_product_change', args=[product_id]))),
-    ))
+        ))
     markup.add(types.InlineKeyboardButton(
         'Посмотреть товар на сайте',
-        url=''.join((domain, reverse('products:product-detail', args=[product_id]))),
+        url=''.join((domain, f'/flower/{product_slug}')),
     ))
 
     await bot.send_message(

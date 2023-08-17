@@ -37,7 +37,7 @@ const createPayment = async (event, oneclick=false) => {
         'delivery_date': form.delivery_date.value,
         'delivery_time': form.delivery_time.value,
         'note': form.note.value,
-        'cash': form.cash.value,
+        'cash': form.cash.checked,
         'delivering': form.delivering.checked
     }
 
@@ -47,11 +47,11 @@ const createPayment = async (event, oneclick=false) => {
             alert('Онлайн оплата временно недоступна, свяжитесь с нами напрямую');
             return null;
             ///////
-            if (data.payment_url === 'OK') {
+            if (response.data.payment_url === 'OK') {
                 alert('Ваш заказ успешно оформлен, начинаем его собирать!');
                 window.location.href = '/';
             } else {
-                window.open(data.payment_url);
+		window.open(response.data.payment_url, "_blank");
             }
         } else if (response.status === 400) {
             alert(JSON.parse(response.responseText));

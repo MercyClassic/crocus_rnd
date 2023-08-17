@@ -1,8 +1,8 @@
 import asyncio
 import copy
 import json
-import logging
 import os
+import re
 from datetime import datetime
 from hashlib import sha256
 
@@ -15,16 +15,26 @@ from payments.models import Order, OrderProduct
 from payments.serializers import PaymentCreateSerializer
 from products.models import Product
 
-logger = logging.getLogger('payment')
-
 
 class PaymentCreateService:
     def __init__(self, serialized_data: dict):
         for key in PaymentCreateSerializer._declared_fields.keys():
             setattr(self, key, serialized_data.get(key))
+        self.customer_phone_number = self.normalize_phone_number(self.customer_phone_number)
+        if self.receiver_phone_number:
+            self.receiver_phone_number = self.normalize_phone_number(self.receiver_phone_number)
         if not self.delivering:
             self.delivery_address = None
             self.delivery_time = None
+
+    @staticmethod
+    def normalize_phone_number(phone_number: str) -> str:
+        phone_number = re.sub(r'[() -]*', '', phone_number)
+
+        if phone_number[0] != '+':
+            phone_number = f'+{phone_number}'
+
+        return f'+7{phone_number[2:]}'
 
     @staticmethod
     def generate_payment_token(data: dict) -> str:

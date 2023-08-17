@@ -11,6 +11,12 @@ from .services.payment_accept import payment_acceptance
 from .services.payment_create import PaymentCreateService
 
 
+bad_request_response = Response(
+    status=status.HTTP_400_BAD_REQUEST,
+    data='Данные введены неверно, обновите страничку и попробуйте ещё раз',
+)
+
+
 class CreatePaymentAPIView(CreateAPIView):
     serializer_class = PaymentCreateSerializer
 
@@ -26,10 +32,7 @@ class CreatePaymentAPIView(CreateAPIView):
                          ' прежде, чем сделать ещё один',
                 )
         else:
-            return Response(
-                status=status.HTTP_400_BAD_REQUEST,
-                data='Данные введены неверно, обновите страничку и попробуйте ещё раз',
-            )
+            return bad_request_response
 
         payment_service = PaymentCreateService(serialized_data)
         payment_url = payment_service.create_payment()
@@ -37,7 +40,7 @@ class CreatePaymentAPIView(CreateAPIView):
         set_pause_timer(request, 'create_order')
 
         if not payment_url:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return bad_request_response
         return Response({'payment_url': payment_url}, status=status.HTTP_201_CREATED)
 
 
@@ -64,7 +67,6 @@ class CallMeAPIView(APIView):
                     data='Вы уже заказывали звонок недавно, '
                          'подождите немного, прежде, чем заказать ещё один',
                 )
-        return Response(
-            status=status.HTTP_400_BAD_REQUEST,
-            data='Данные введены неверно, обновите страничку и попробуйте ещё раз',
-        )
+
+        return bad_request_response
+

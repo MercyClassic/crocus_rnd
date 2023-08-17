@@ -25,7 +25,7 @@ class TestPaymentCreateService(PaymentCreateService):
         token = self.generate_payment_token(data)
         data.setdefault('Token', token)
         data.setdefault('Receipt', receipt)
-        return 'success payment'
+        return 'OK'
 
 
 class PaymentTests(APITestCase):
@@ -65,7 +65,7 @@ class PaymentTests(APITestCase):
         serializer.is_valid()
         payment_service = TestPaymentCreateService(serializer.validated_data)
         result = payment_service.create_payment()
-        self.assertEqual(result, 'success payment')
+        self.assertEqual(result, 'OK')
         data = {
             'items': {'product1': 1, 'product2': 1},
             'amount': 300,
@@ -80,7 +80,7 @@ class PaymentTests(APITestCase):
         serializer.is_valid()
         payment_service = TestPaymentCreateService(serializer.validated_data)
         result = payment_service.create_payment()
-        self.assertEqual(result, 'success payment')
+        self.assertEqual(result, 'OK')
         data = {
             'items': {'product1': 1, 'product2': 1},
             'amount': 650,
@@ -95,7 +95,7 @@ class PaymentTests(APITestCase):
         serializer.is_valid()
         payment_service = TestPaymentCreateService(serializer.validated_data)
         result = payment_service.create_payment()
-        self.assertEqual(result, 'success payment')
+        self.assertEqual(result, 'OK')
         data = {
             'items': {'product1': 2, 'product2': 1},
             'amount': 400,
@@ -110,7 +110,7 @@ class PaymentTests(APITestCase):
         serializer.is_valid()
         payment_service = TestPaymentCreateService(serializer.validated_data)
         result = payment_service.create_payment()
-        self.assertEqual(result, 'success payment')
+        self.assertEqual(result, 'OK')
         """ AMOUNT IS NOT VALID """
         data = {
             'items': {'product1': 1, 'product2': 1},
@@ -131,7 +131,7 @@ class PaymentTests(APITestCase):
         data = {
             'items': {'product1': 1, 'product2': 1},
             'amount': 300,
-            'customer_name': 'i' * 151,
+            'customer_name': 'i' * 201,
             'customer_phone_number': '+79999999999',
             'without_calling': False,
             'delivery_date': datetime.utcnow(),
@@ -202,11 +202,11 @@ class PaymentTests(APITestCase):
 
     def test_call_me(self):
         """ PHONE NUMBER IS NOT VALID """
-        response = self.client.post(reverse('payments:call_me'), {'phone_number': '+19999999999'})
+        response = self.client.post(reverse('api-call-me'), {'phone_number': '+19999999999'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         """ PHONE NUMBER IS VALID """
-        response = self.client.post(reverse('payments:call_me'), {'phone_number': '+79999999999'})
+        response = self.client.post(reverse('api-call-me'), {'phone_number': '+79999999999'})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         """ PHONE NUMBER IS VALID BUT TIMEOUT """
-        response = self.client.post(reverse('payments:call_me'), {'phone_number': '+79999999999'})
+        response = self.client.post(reverse('api-call-me'), {'phone_number': '+79999999999'})
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

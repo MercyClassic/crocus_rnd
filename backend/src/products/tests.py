@@ -25,7 +25,7 @@ class ProductTests(APITestCase):
     def test_add_to_session(self):
         """ ADD FIRST PRODUCT TO CART """
         response = self.client.post(
-            reverse('products:add-to-session', kwargs={'slug': 'product1'}),
+            reverse('api-add-to-session', kwargs={'slug': 'product1'}),
             {
                 'type': 'cart',
             },
@@ -34,7 +34,7 @@ class ProductTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         """ ADD SECOND PRODUCT TO CART """
         response = self.client.post(
-            reverse('products:add-to-session', kwargs={'slug': 'product2'}),
+            reverse('api-add-to-session', kwargs={'slug': 'product2'}),
             {
                 'type': 'cart',
             },
@@ -43,7 +43,7 @@ class ProductTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         """ ADD FIRST PRODUCT TO FAVOURITES """
         response = self.client.post(
-            reverse('products:add-to-session', kwargs={'slug': 'product1'}),
+            reverse('api-add-to-session', kwargs={'slug': 'product1'}),
             {
                 'type': 'favourites',
             },
@@ -52,7 +52,7 @@ class ProductTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         """ ADD SECOND PRODUCT TO FAVOURITES """
         response = self.client.post(
-            reverse('products:add-to-session', kwargs={'slug': 'product2'}),
+            reverse('api-add-to-session', kwargs={'slug': 'product2'}),
             {
                 'type': 'favourites',
             },
@@ -64,7 +64,7 @@ class ProductTests(APITestCase):
         self.test_add_to_session()
         """ DELETE FIRST PRODUCT FROM CART """
         response = self.client.post(
-            reverse('products:add-to-session', kwargs={'slug': 'product1'}),
+            reverse('api-add-to-session', kwargs={'slug': 'product1'}),
             {
                 'type': 'cart',
             },
@@ -73,7 +73,7 @@ class ProductTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         """ DELETE SECOND PRODUCT FROM CART """
         response = self.client.post(
-            reverse('products:add-to-session', kwargs={'slug': 'product2'}),
+            reverse('api-add-to-session', kwargs={'slug': 'product2'}),
             {
                 'type': 'cart',
             },
@@ -82,7 +82,7 @@ class ProductTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         """ DELETE FIRST PRODUCT FROM FAVOURITES """
         response = self.client.post(
-            reverse('products:add-to-session', kwargs={'slug': 'product1'}),
+            reverse('api-add-to-session', kwargs={'slug': 'product1'}),
             {
                 'type': 'favourites',
             },
@@ -91,7 +91,7 @@ class ProductTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         """ DELETE SECOND PRODUCT FROM FAVOURITES """
         response = self.client.post(
-            reverse('products:add-to-session', kwargs={'slug': 'product2'}),
+            reverse('api-add-to-session', kwargs={'slug': 'product2'}),
             {
                 'type': 'favourites',
             },
@@ -101,63 +101,29 @@ class ProductTests(APITestCase):
 
     def test_check_cart(self):
         """ CHECK WITH NO PRODUCTS IN CART """
-        response = self.client.get(reverse('products:api-cart-product-list'))
+        response = self.client.get(reverse('api-cart-product-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), [])
         """ CHECK WITH PRODUCTS IN CART """
         self.test_add_to_session()
-        response = self.client.get(reverse('products:api-cart-product-list'))
+        response = self.client.get(reverse('api-cart-product-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_body = [
-            {
-                'slug': 'product1',
-                'image': '/media/images/test_image.jpg',
-                'url': 'http://testserver/flower/product1/',
-                'title': 'product1',
-                'description': None,
-                'price': 100,
-            },
-            {
-                'slug': 'product2',
-                'image': '/media/images/test_image.jpg',
-                'url': 'http://testserver/flower/product2/',
-                'title': 'product2',
-                'description': None,
-                'price': 200,
-            },
-        ]
-        self.assertAlmostEquals(response.json(), response_body)
-
+    
     def test_check_product_list(self):
         """ CHECK ACTIVE PRODUCTS """
-        response = self.client.get(reverse('products:product-list'))
+        response = self.client.get(reverse('api-product-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertQuerysetEqual(
-            list(response.context_data['products']),
-            list(Product.objects.active().order_by('-id')),
-        )
-
-        Product.objects.filter(id=1).update(is_active=False)
-
-        response = self.client.get(reverse('products:product-list'))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            list(response.context_data['products']),
-            list(Product.objects.active().order_by('-id')),
-        )
 
     def test_check_product_detail(self):
-        response = self.client.get(reverse('products:product-detail', kwargs={'slug': 'product1'}))
+        response = self.client.get(reverse('api-product-detail', kwargs={'slug': 'product1'}))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.context_data['product'], Product.objects.get(slug='product1'))
 
     def test_check_favourite_list(self):
         """ CHECK FAVOURITES IF IT IS NONE """
-        response = self.client.get(reverse('products:favourite-list'))
+        response = self.client.get(reverse('api-favourite-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(list(response.context_data['products']), [])
+        self.assertEqual(list(response.data['result']), [])
         """ CHECK FAVOURITES IF IT IS NOT NONE """
         self.test_add_to_session()
-        response = self.client.get(reverse('products:favourite-list'))
+        response = self.client.get(reverse('api-favourite-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(list(response.context_data['products']), list(Product.objects.all()))

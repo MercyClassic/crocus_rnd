@@ -44,6 +44,6 @@ def get_paid_orders(connection):
         o.delivery_date, o.delivery_time, o.delivery_address, o.note, o.cash,
         json_object_agg(p.title, op.count) as products
         FROM payments_order o INNER JOIN payments_orderproduct op ON o.id=op.order_id
-        INNER JOIN products_product p ON op.product_id=p.id WHERE o.is_paid=false GROUP BY o.id;
+        INNER JOIN products_product p ON op.product_id=p.id WHERE o.is_paid=true GROUP BY o.id;
         """)
         return [schemas.OrderData(**product) for product in dict_fetchall(cursor)]

@@ -3,23 +3,13 @@ from rest_framework import serializers
 from products.models import Product, ProductImage, Category
 
 
-class BaseImageSerializer(serializers.Serializer):
-    # image = serializers.SerializerMethodField()
-
-    class Meta:
-        abstract = True
-    #
-    # def get_image(self, instance):
-    #     return instance.image.url
-
-
-class ProductImageSerializer(BaseImageSerializer, serializers.ModelSerializer):
+class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
         fields = ('id', 'image')
 
 
-class ProductListSerializer(BaseImageSerializer, serializers.ModelSerializer):
+class ProductListSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name='api-product-detail',
         read_only=True,
@@ -38,7 +28,7 @@ class ProductListSerializer(BaseImageSerializer, serializers.ModelSerializer):
         )
 
 
-class ProductDetailSerializer(BaseImageSerializer, serializers.ModelSerializer):
+class ProductDetailSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True)
 
     class Meta:
@@ -55,7 +45,7 @@ class ProductDetailSerializer(BaseImageSerializer, serializers.ModelSerializer):
         )
 
 
-class CategorySerializer(BaseImageSerializer, serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ('id', 'name', 'image')

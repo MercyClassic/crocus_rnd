@@ -2,8 +2,6 @@ import uuid
 
 from django.db import models
 
-from accounts.models import phone_regex
-
 
 class Order(models.Model):
     uuid = models.UUIDField(
@@ -27,15 +25,14 @@ class Order(models.Model):
     without_calling = models.BooleanField('Писать в телеграм/ватсап', default=False)
     receiver_name = models.CharField(
         'Имя получателя',
-        max_length=50,
+        max_length=200,
         blank=True,
         null=True,
         default='Заказчик является получаетелем',
     )
     receiver_phone_number = models.CharField(
         'Номер телефона получателя',
-        max_length=50,
-        validators=[phone_regex],
+        max_length=12,
         blank=True,
         null=True,
         default='Заказчик является получаетелем',
