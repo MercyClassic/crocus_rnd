@@ -10,7 +10,6 @@ from .services.call_me import create_call_me_request
 from .services.payment_accept import payment_acceptance
 from .services.payment_create import PaymentCreateService
 
-
 bad_request_response = Response(
     status=status.HTTP_400_BAD_REQUEST,
     data='Данные введены неверно, обновите страничку и попробуйте ещё раз',
@@ -28,8 +27,7 @@ class CreatePaymentAPIView(CreateAPIView):
             if not check_for_pause_timer(request, 'create_order'):
                 return Response(
                     status=status.HTTP_403_FORBIDDEN,
-                    data='Вы уже сделали заказ, подождите немного,'
-                         ' прежде, чем сделать ещё один',
+                    data='Вы уже сделали заказ, подождите немного,' ' прежде, чем сделать ещё один',
                 )
         else:
             return bad_request_response
@@ -56,7 +54,10 @@ class CallMeAPIView(APIView):
         serializer = CallMeSerializer(data=request.data)
 
         if serializer.is_valid():
-            if create_call_me_request(request, serializer.validated_data.get('phone_number')):
+            if create_call_me_request(
+                request,
+                serializer.validated_data.get('phone_number'),
+            ):
                 return Response(
                     status=status.HTTP_200_OK,
                     data='Спасибо за обращение, скоро мы вам перезвоним!',
@@ -65,8 +66,7 @@ class CallMeAPIView(APIView):
                 return Response(
                     status=status.HTTP_403_FORBIDDEN,
                     data='Вы уже заказывали звонок недавно, '
-                         'подождите немного, прежде, чем заказать ещё один',
+                    'подождите немного, прежде, чем заказать ещё один',
                 )
 
         return bad_request_response
-

@@ -11,10 +11,10 @@ from products.models import Product
 
 class TestPaymentCreateService(PaymentCreateService):
     def get_payment_url(
-            self,
-            order_uuid: str,
-            amount: int,
-            receipt: dict,
+        self,
+        order_uuid: str,
+        amount: int,
+        receipt: dict,
     ) -> str:
         data = {
             'TerminalKey': 'TINKOFF_TERMINAL_KEY',
@@ -46,7 +46,7 @@ class PaymentTests(APITestCase):
         )
 
     def test_create_payment(self):
-        """ ALL DATA IS VALID """
+        """ALL DATA IS VALID"""
         data = {
             'items': {'product1': 1, 'product2': 1},
             'amount': 300,
@@ -201,12 +201,21 @@ class PaymentTests(APITestCase):
         self.assertEqual(result, False)
 
     def test_call_me(self):
-        """ PHONE NUMBER IS NOT VALID """
-        response = self.client.post(reverse('api-call-me'), {'phone_number': '+19999999999'})
+        """PHONE NUMBER IS NOT VALID"""
+        response = self.client.post(
+            reverse('api-call-me'),
+            {'phone_number': '+19999999999'},
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         """ PHONE NUMBER IS VALID """
-        response = self.client.post(reverse('api-call-me'), {'phone_number': '+79999999999'})
+        response = self.client.post(
+            reverse('api-call-me'),
+            {'phone_number': '+79999999999'},
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         """ PHONE NUMBER IS VALID BUT TIMEOUT """
-        response = self.client.post(reverse('api-call-me'), {'phone_number': '+79999999999'})
+        response = self.client.post(
+            reverse('api-call-me'),
+            {'phone_number': '+79999999999'},
+        )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

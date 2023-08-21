@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from products.models import Product, ProductImage, Category
+from products.models import Category, Product, ProductImage
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -30,6 +30,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True)
+    kind = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -43,6 +44,14 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'kind',
             'price',
         )
+
+    def get_kind(self, obj):
+        type_choices = {
+            'bouquet': {'url': 'bouquet', 'humanized': 'Все букеты'},
+            'box': {'url': 'box', 'humanized': 'Все коробки'},
+            'basket': {'url': 'basket', 'humanized': 'Все корзинки'},
+        }
+        return type_choices.get(obj.kind)
 
 
 class CategorySerializer(serializers.ModelSerializer):

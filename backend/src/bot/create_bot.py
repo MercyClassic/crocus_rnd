@@ -16,8 +16,11 @@ dp = Dispatcher(bot, storage=storage)
 
 @dp.errors_handler()
 async def errors_handler(update, exception):
-    logger.error(exception, extra={
-        'user_id': update.message.from_user.id,
-        'message_id': update.message.message_id,
-    })
+    logger.error(
+        exception,
+        extra={
+            'user_id': update.message.from_user.id,
+            'message_id': update.message.message_id,
+        },
+    )
     return True

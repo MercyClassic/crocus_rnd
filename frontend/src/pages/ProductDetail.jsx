@@ -35,7 +35,7 @@ function getLikeButton(slug, favourites) {
 function getKindLink(kind) {
     if (kind) {
         return(
-            <Link to="/?type={kind}" className="product-info__category-button">{kind}</Link>
+            <Link to={`/?type=${kind.url}`} className="product-info__category-button">{kind.humanized}</Link>
         )
     } else {
     return(

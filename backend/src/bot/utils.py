@@ -3,7 +3,7 @@ import os
 from asgiref.sync import sync_to_async
 
 from bot.handlers.others import unknown_command
-from products.models import Product, ProductImage, Category
+from products.models import Category, Product, ProductImage
 
 admin_ids = [int(admin_id) for admin_id in os.getenv('ADMIN_TG_BOT_IDS').split(', ')]
 owner_ids = [int(owner_id) for owner_id in os.getenv('OWNER_TG_BOT_IDS').split(', ')]
@@ -13,13 +13,14 @@ def command_for(permission_level: str):
     def decorator(func):
         def wrapper(*args):
             message = args[0]
-            if (
-                    (permission_level == 'admin' and message.from_user.id in admin_ids)
-                    or (permission_level == 'owner' and message.from_user.id in owner_ids)
+            if (permission_level == 'admin' and message.from_user.id in admin_ids) or (
+                permission_level == 'owner' and message.from_user.id in owner_ids
             ):
                 return func(*args)
             return unknown_command(message)
+
         return wrapper
+
     return decorator
 
 

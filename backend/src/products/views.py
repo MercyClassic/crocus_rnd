@@ -4,13 +4,17 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .mixins import FilterQueryMixin, ProductResponseMixin
-from .models import Product, Category
+from .models import Category, Product
+from .serializers import (
+    CategorySerializer,
+    ProductDetailSerializer,
+    ProductListSerializer,
+)
 from .services import cart_service
-from .serializers import ProductListSerializer, ProductDetailSerializer, CategorySerializer
 
 
 class ProductListAPIView(FilterQueryMixin, ProductResponseMixin):
-    queryset = Product.objects.active().order_by('-id')
+    queryset = Product.objects.active()
     serializer_class = ProductListSerializer
 
 

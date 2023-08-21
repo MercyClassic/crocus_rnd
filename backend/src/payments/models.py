@@ -32,7 +32,7 @@ class Order(models.Model):
     )
     receiver_phone_number = models.CharField(
         'Номер телефона получателя',
-        max_length=12,
+        max_length=30,
         blank=True,
         null=True,
         default='Заказчик является получаетелем',

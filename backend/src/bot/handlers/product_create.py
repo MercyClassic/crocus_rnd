@@ -77,7 +77,7 @@ async def set_price(message, state):
 
     await bot.send_message(
         message.from_user.id,
-        'Введите тип товара либо "-", если у товара нет типа',
+        "Введите тип товара либо '-', если у товара нет типа",
         reply_markup=type_product_markup,
     )
 
@@ -117,7 +117,7 @@ async def set_main_image(message, state):
 
     await bot.send_message(
         message.from_user.id,
-        'Добавьте дополнительные изображения одним сообщением либо напишите "-", если они не нужны',
+        "Добавьте дополнительные изображения одним сообщением либо напишите '-', если они не нужны",
     )
 
 
@@ -134,14 +134,20 @@ async def set_extra_images(message, state, album=None):
             for media_content in album:
                 file_id = media_content.photo[-1].file_id
                 try:
-                    media_group.attach({'media': file_id, 'type': media_content.content_type})
+                    media_group.attach(
+                        {'media': file_id, 'type': media_content.content_type},
+                    )
                 except ValueError:
-                    return await message.answer('Возникла неизвестная ошибка, повторите попытку')
+                    return await message.answer(
+                        'Возникла неизвестная ошибка, повторите попытку',
+                    )
             image_ids = list(map(lambda obj: obj.photo[-1].file_id, album))
         else:
             image_ids = [message.photo[-1].file_id]
 
-        extra_images = await asyncio.gather(*[download_photo(file_id) for file_id in image_ids])
+        extra_images = await asyncio.gather(
+            *[download_photo(file_id) for file_id in image_ids],
+        )
         async with state.proxy() as data:
             data['extra_images'] = extra_images
 
@@ -150,14 +156,20 @@ async def set_extra_images(message, state, album=None):
     product_id, product_slug = await create_product(data._data)
 
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton(
-        'Перейти в админ панель товара',
-        url=''.join((domain, reverse('admin:products_product_change', args=[product_id]))),
-        ))
-    markup.add(types.InlineKeyboardButton(
-        'Посмотреть товар на сайте',
-        url=''.join((domain, f'/flower/{product_slug}')),
-    ))
+    markup.add(
+        types.InlineKeyboardButton(
+            'Перейти в админ панель товара',
+            url=''.join(
+                (domain, reverse('admin:products_product_change', args=[product_id])),
+            ),
+        ),
+    )
+    markup.add(
+        types.InlineKeyboardButton(
+            'Посмотреть товар на сайте',
+            url=''.join((domain, f'/flower/{product_slug}')),
+        ),
+    )
 
     await bot.send_message(
         message.from_user.id,

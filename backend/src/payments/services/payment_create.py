@@ -45,9 +45,9 @@ class PaymentCreateService:
         return sha256(''.join(token_data).encode('utf-8')).hexdigest()
 
     def generate_receipt(
-            self,
-            products: QuerySet,
-            with_delivery: bool = False,
+        self,
+        products: QuerySet,
+        with_delivery: bool = False,
     ) -> dict:
         customer_phone_number = self.customer_phone_number
         if customer_phone_number[0] != '+':
@@ -81,10 +81,10 @@ class PaymentCreateService:
         return receipt
 
     def get_payment_url(
-            self,
-            order_uuid: str,
-            amount: int,
-            receipt: dict,
+        self,
+        order_uuid: str,
+        amount: int,
+        receipt: dict,
     ) -> str | None:
         headers = {'Content-Type': 'application/json'}
         data = {
@@ -121,9 +121,9 @@ class PaymentCreateService:
         return user_account
 
     def create_order(
-            self,
-            user_account: Account,
-            amount: int,
+        self,
+        user_account: Account,
+        amount: int,
     ):
         order = Order.objects.create(
             user=user_account,
@@ -142,30 +142,30 @@ class PaymentCreateService:
         return order
 
     def create_order_products(
-            self,
-            order: Order,
-            order_products: QuerySet,
+        self,
+        order: Order,
+        order_products: QuerySet,
     ) -> None:
         products_to_bulk_create = []
         for product in order_products:
-            products_to_bulk_create.append(OrderProduct(
-                order=order,
-                product=product,
-                count=int(self.items.get(product.slug)),
-            ))
+            products_to_bulk_create.append(
+                OrderProduct(
+                    order=order,
+                    product=product,
+                    count=int(self.items.get(product.slug)),
+                ),
+            )
         OrderProduct.objects.bulk_create(products_to_bulk_create)
 
     def create_payment(self) -> str | bool:
         if (
-                (self.delivery_date.date() < datetime.utcnow().date())
-                or (self.amount > 50350)
-                or (any(int(count) < 1 for count in self.items.values()))
+            (self.delivery_date.date() < datetime.utcnow().date())
+            or (self.amount > 50350)
+            or (any(int(count) < 1 for count in self.items.values()))
         ):
             return False
-        order_products = (
-            Product.objects
-            .only('title', 'slug', 'price')
-            .filter(slug__in=[*self.items.keys()])
+        order_products = Product.objects.only('title', 'slug', 'price').filter(
+            slug__in=[*self.items.keys()],
         )
         if len(order_products) == 0:
             return False

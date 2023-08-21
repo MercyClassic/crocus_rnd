@@ -1,7 +1,7 @@
 from bot.handlers import (
     admin,
-    cancel_state,
     background_image,
+    cancel_state,
     category_create,
     get_order_list,
     notifications,

@@ -5,8 +5,8 @@ from products.serializers import ProductListSerializer
 
 
 def add_to_cart(
-        request: Request,
-        **kwargs,
+    request: Request,
+    **kwargs,
 ) -> int:
     if request.data.get('type') == 'cart':
         add_to = 'cart_products'
@@ -35,5 +35,9 @@ def get_cart(request: Request) -> dict:
     cart_products = request.session.get('cart_products')
     if cart_products:
         cart_products = Product.objects.filter(slug__in=[*cart_products])
-    serializer = ProductListSerializer(cart_products, many=True, context={'request': request})
+    serializer = ProductListSerializer(
+        cart_products,
+        many=True,
+        context={'request': request},
+    )
     return serializer.data

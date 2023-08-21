@@ -10,13 +10,29 @@ class PaymentCreateSerializer(serializers.Serializer):
     items = serializers.DictField(allow_empty=False)
     amount = serializers.IntegerField(max_value=100000)
     customer_name = serializers.CharField(max_length=150)
-    receiver_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    receiver_name = serializers.CharField(
+        max_length=150,
+        required=False,
+        allow_blank=True,
+    )
     customer_phone_number = serializers.CharField(max_length=20)
-    receiver_phone_number = serializers.CharField(max_length=20, required=False, allow_blank=True)
+    receiver_phone_number = serializers.CharField(
+        max_length=20,
+        required=False,
+        allow_blank=True,
+    )
     without_calling = serializers.BooleanField()
-    delivery_address = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    delivery_address = serializers.CharField(
+        max_length=200,
+        required=False,
+        allow_blank=True,
+    )
     delivery_date = serializers.DateTimeField()
-    delivery_time = serializers.CharField(max_length=200, required=False, allow_blank=True)
+    delivery_time = serializers.CharField(
+        max_length=200,
+        required=False,
+        allow_blank=True,
+    )
     note = serializers.CharField(max_length=300, required=False, allow_blank=True)
     cash = serializers.BooleanField()
     delivering = serializers.BooleanField()

@@ -9,11 +9,7 @@ class ProductImageInline(admin.StackedInline):
     readonly_fields = ['thumbnail']
 
     def get_queryset(self, request):
-        return (
-            super().get_queryset(request)
-            .select_related('product')
-            .only('image', 'product_id')
-        )
+        return super().get_queryset(request).select_related('product').only('image', 'product_id')
 
 
 class ProductCategoryInline(admin.StackedInline):
@@ -22,11 +18,13 @@ class ProductCategoryInline(admin.StackedInline):
 
     def get_category_thumbnail(self, obj):
         return obj.category.thumbnail()
+
     get_category_thumbnail.short_description = 'Изображение категории'
 
     def get_queryset(self, request):
         return (
-            super().get_queryset(request)
+            super()
+            .get_queryset(request)
             .select_related('category')
             .select_related('product')
             .only('product__title', 'category__name', 'category__image')
@@ -37,11 +35,21 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'thumbnail', 'slug', 'price', 'kind', 'is_active')
     list_display_links = ('id', 'title', 'slug')
     search_fields = ('title', 'description')
-    list_editable = ('is_active', )
-    list_filter = ('is_active', )
-    fields = ('title', 'slug', 'description', 'image', 'thumbnail', 'price', 'kind', 'is_active')
-    readonly_fields = ('thumbnail', )
-    prepopulated_fields = {'slug': ('title', )}
+    list_editable = ('is_active',)
+    list_filter = ('is_active',)
+    fields = (
+        'title',
+        'slug',
+        'description',
+        'image',
+        'thumbnail',
+        'price',
+        'kind',
+        'important',
+        'is_active',
+    )
+    readonly_fields = ('thumbnail',)
+    prepopulated_fields = {'slug': ('title',)}
     inlines = [ProductImageInline, ProductCategoryInline]
     show_full_result_count = False
 
@@ -57,15 +65,18 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 
     def get_product_title(self, obj):
         return obj.product.title
+
     get_product_title.short_description = 'Название товара'
 
     def get_category_name(self, obj):
         return obj.category.name
+
     get_category_name.short_description = 'Название категории'
 
     def get_queryset(self, request):
         return (
-            super().get_queryset(request)
+            super()
+            .get_queryset(request)
             .select_related('product')
             .select_related('category')
             .only('product__title', 'category__name')
@@ -75,17 +86,18 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'thumbnail', 'is_active')
     fields = ('name', 'image', 'thumbnail', 'is_active')
-    readonly_fields = ('thumbnail', )
+    readonly_fields = ('thumbnail',)
     list_display_links = ('id', 'name', 'thumbnail')
-    search_fields = ('name', )
-    list_editable = ('is_active', )
-    list_filter = ('is_active', )
+    search_fields = ('name',)
+    list_editable = ('is_active',)
+    list_filter = ('is_active',)
     show_full_result_count = False
 
 
 class SessionAdmin(admin.ModelAdmin):
     def _session_data(self, obj):
         return obj.get_decoded()
+
     list_display = ['session_key', '_session_data', 'expire_date']
 
 

@@ -10,7 +10,8 @@ class ProductInline(admin.StackedInline):
 
     def get_queryset(self, request):
         return (
-            super().get_queryset(request)
+            super()
+            .get_queryset(request)
             .select_related('product')
             .only('count', 'product__title', 'product__price', 'order_id')
         )
@@ -49,7 +50,7 @@ class OrderAdmin(admin.ModelAdmin):
         'done_at',
         'cash',
     )
-    sortable_by = ('amount', )
+    sortable_by = ('amount',)
     inlines = [ProductInline]
     show_full_result_count = False
 

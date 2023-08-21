@@ -18,10 +18,15 @@ async def get_order_list(message):
     orders = get_paid_orders()
     markup = types.InlineKeyboardMarkup()
     for order in orders:
-        markup.add(types.InlineKeyboardButton(
-            text=f'{order.id} - {order.created_at} - {order.amount}р',
-            callback_data=callback_order.new(pk=order.id, action='check_order_detail'),
-        ))
+        markup.add(
+            types.InlineKeyboardButton(
+                text=f'{order.id} - {order.created_at} - {order.amount}р',
+                callback_data=callback_order.new(
+                    pk=order.id,
+                    action='check_order_detail',
+                ),
+            ),
+        )
 
     await bot.send_message(
         message.from_user.id,

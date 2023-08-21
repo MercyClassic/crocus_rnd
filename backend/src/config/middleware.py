@@ -12,5 +12,10 @@ class LogUnexpectedErrorMiddleware:
         return response
 
     def process_exception(self, request, exception):
-        logger.error(exception, extra={'view': request.resolver_match._func_path,
-                                       'session_id': request.session._SessionBase__session_key})
+        logger.error(
+            exception,
+            extra={
+                'view': request.resolver_match._func_path,
+                'session_id': request.session._SessionBase__session_key,
+            },
+        )

@@ -44,7 +44,7 @@ async def set_image(message, state):
 
     await bot.send_message(
         message.from_user.id,
-        'Последний этап: будет ли категория активна?\nНапишите "Да" или "Нет"',
+        "Последний этап: будет ли категория активна?\nНапишите 'Да' или 'Нет'",
     )
 
 
@@ -64,10 +64,14 @@ async def set_active(message, state):
     category_id = await create_category(data._data)
 
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton(
-        'Перейти в админ панель товара',
-        url=''.join((domain, reverse('admin:products_category_change', args=[category_id]))),
-    ))
+    markup.add(
+        types.InlineKeyboardButton(
+            'Перейти в админ панель товара',
+            url=''.join(
+                (domain, reverse('admin:products_category_change', args=[category_id])),
+            ),
+        ),
+    )
 
     await bot.send_message(
         message.from_user.id,
@@ -79,5 +83,9 @@ async def set_active(message, state):
 def register_category_create_handlers(dp: Dispatcher):
     dp.register_message_handler(create_category_start, commands=['createcategory'])
     dp.register_message_handler(set_name, state=CategoryState.name)
-    dp.register_message_handler(set_image, state=CategoryState.image, content_types=['photo'])
+    dp.register_message_handler(
+        set_image,
+        state=CategoryState.image,
+        content_types=['photo'],
+    )
     dp.register_message_handler(set_active, state=CategoryState.is_active)

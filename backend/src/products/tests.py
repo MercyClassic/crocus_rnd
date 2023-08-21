@@ -23,7 +23,7 @@ class ProductTests(APITestCase):
         )
 
     def test_add_to_session(self):
-        """ ADD FIRST PRODUCT TO CART """
+        """ADD FIRST PRODUCT TO CART"""
         response = self.client.post(
             reverse('api-add-to-session', kwargs={'slug': 'product1'}),
             {
@@ -100,7 +100,7 @@ class ProductTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_check_cart(self):
-        """ CHECK WITH NO PRODUCTS IN CART """
+        """CHECK WITH NO PRODUCTS IN CART"""
         response = self.client.get(reverse('api-cart-product-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), [])
@@ -108,18 +108,85 @@ class ProductTests(APITestCase):
         self.test_add_to_session()
         response = self.client.get(reverse('api-cart-product-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-    
+        response_body = [
+            {
+                'id': 3,
+                'url': 'http://testserver/api/v1/flowers/product1',
+                'title': 'product1',
+                'slug': 'product1',
+                'image': 'http://testserver/media/images/test_image.jpg',
+                'price': 100,
+            },
+            {
+                'id': 4,
+                'url': 'http://testserver/api/v1/flowers/product2',
+                'title': 'product2',
+                'slug': 'product2',
+                'image': 'http://testserver/media/images/test_image.jpg',
+                'price': 200,
+            },
+        ]
+        self.assertEqual(response.data, response_body)
+
     def test_check_product_list(self):
-        """ CHECK ACTIVE PRODUCTS """
+        """CHECK ACTIVE PRODUCTS"""
         response = self.client.get(reverse('api-product-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_body = [
+            {
+                'id': 10,
+                'url': 'http://testserver/api/v1/flowers/product2',
+                'title': 'product2',
+                'slug': 'product2',
+                'image': 'http://testserver/media/images/test_image.jpg',
+                'price': 200,
+            },
+            {
+                'id': 9,
+                'url': 'http://testserver/api/v1/flowers/product1',
+                'title': 'product1',
+                'slug': 'product1',
+                'image': 'http://testserver/media/images/test_image.jpg',
+                'price': 100,
+            },
+        ]
+        self.assertEqual(response.json().get('result'), response_body)
+
+        Product.objects.filter(id=9).update(is_active=False)
+
+        response = self.client.get(reverse('api-product-list'))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_body = [
+            {
+                'id': 10,
+                'url': 'http://testserver/api/v1/flowers/product2',
+                'title': 'product2',
+                'slug': 'product2',
+                'image': 'http://testserver/media/images/test_image.jpg',
+                'price': 200,
+            },
+        ]
+        self.assertEqual(response.json().get('result'), response_body)
 
     def test_check_product_detail(self):
-        response = self.client.get(reverse('api-product-detail', kwargs={'slug': 'product1'}))
+        response = self.client.get(
+            reverse('api-product-detail', kwargs={'slug': 'product1'}),
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response_body = {
+            'id': 7,
+            'title': 'product1',
+            'slug': 'product1',
+            'image': 'http://testserver/media/images/test_image.jpg',
+            'images': [],
+            'description': None,
+            'kind': None,
+            'price': 100,
+        }
+        self.assertEqual(response.data.get('result'), response_body)
 
     def test_check_favourite_list(self):
-        """ CHECK FAVOURITES IF IT IS NONE """
+        """CHECK FAVOURITES IF IT IS NONE"""
         response = self.client.get(reverse('api-favourite-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(list(response.data['result']), [])

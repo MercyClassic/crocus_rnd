@@ -42,6 +42,7 @@ class Product(PhotoMixin, models.Model):
         null=True,
     )
     is_active = models.BooleanField('В продаже', default=True)
+    important = models.IntegerField('Важность', default=1)
 
     categories = models.ManyToManyField(
         'products.Category',
@@ -52,6 +53,7 @@ class Product(PhotoMixin, models.Model):
     objects = ProductManager()
 
     class Meta:
+        ordering = ['-important', '-id']
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
 
