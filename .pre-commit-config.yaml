@@ -7,14 +7,6 @@ repos:
       - id: debug-statements
         language_version: python3
 
-  - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.74.1
-    hooks:
-      - id: terraform_fmt
-        args:
-          - --args=-write=true
-          - --args=--path=./backend/src
-
   - repo: https://github.com/psf/black
     rev: 23.7.0
     hooks:
