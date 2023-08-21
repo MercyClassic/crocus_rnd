@@ -3,6 +3,7 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from products.models import Product
+from products.serializers import ProductDetailSerializer, ProductListSerializer
 
 
 class ProductTests(APITestCase):
@@ -107,83 +108,51 @@ class ProductTests(APITestCase):
         """ CHECK WITH PRODUCTS IN CART """
         self.test_add_to_session()
         response = self.client.get(reverse('api-cart-product-list'))
+        serializer = ProductListSerializer(
+            Product.objects.filter(slug__in=['product1', 'product2']),
+            many=True,
+            context={'request': response.wsgi_request},
+        )
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_body = [
-            {
-                'id': 3,
-                'url': 'http://testserver/api/v1/flowers/product1',
-                'title': 'product1',
-                'slug': 'product1',
-                'image': 'http://testserver/media/images/test_image.jpg',
-                'price': 100,
-            },
-            {
-                'id': 4,
-                'url': 'http://testserver/api/v1/flowers/product2',
-                'title': 'product2',
-                'slug': 'product2',
-                'image': 'http://testserver/media/images/test_image.jpg',
-                'price': 200,
-            },
-        ]
-        self.assertEqual(response.data, response_body)
+        self.assertEqual(response.json(), serializer.data)
 
     def test_check_product_list(self):
         """CHECK ACTIVE PRODUCTS"""
         response = self.client.get(reverse('api-product-list'))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_body = [
-            {
-                'id': 10,
-                'url': 'http://testserver/api/v1/flowers/product2',
-                'title': 'product2',
-                'slug': 'product2',
-                'image': 'http://testserver/media/images/test_image.jpg',
-                'price': 200,
-            },
-            {
-                'id': 9,
-                'url': 'http://testserver/api/v1/flowers/product1',
-                'title': 'product1',
-                'slug': 'product1',
-                'image': 'http://testserver/media/images/test_image.jpg',
-                'price': 100,
-            },
-        ]
-        self.assertEqual(response.json().get('result'), response_body)
+        serializer = ProductListSerializer(
+            Product.objects.all(),
+            many=True,
+            context={'request': response.wsgi_request},
+        )
 
-        Product.objects.filter(id=9).update(is_active=False)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.json().get('result'), serializer.data)
+
+        product = Product.objects.first()
+        product.is_active = False
+        product.save()
 
         response = self.client.get(reverse('api-product-list'))
+        serializer = ProductListSerializer(
+            Product.objects.active(),
+            many=True,
+            context={'request': response.wsgi_request},
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_body = [
-            {
-                'id': 10,
-                'url': 'http://testserver/api/v1/flowers/product2',
-                'title': 'product2',
-                'slug': 'product2',
-                'image': 'http://testserver/media/images/test_image.jpg',
-                'price': 200,
-            },
-        ]
-        self.assertEqual(response.json().get('result'), response_body)
+        self.assertEqual(response.json().get('result'), serializer.data)
 
     def test_check_product_detail(self):
         response = self.client.get(
             reverse('api-product-detail', kwargs={'slug': 'product1'}),
         )
+        serializer = ProductDetailSerializer(
+            Product.objects.get(slug='product1'),
+            context={'request': response.wsgi_request},
+        )
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        response_body = {
-            'id': 7,
-            'title': 'product1',
-            'slug': 'product1',
-            'image': 'http://testserver/media/images/test_image.jpg',
-            'images': [],
-            'description': None,
-            'kind': None,
-            'price': 100,
-        }
-        self.assertEqual(response.data.get('result'), response_body)
+        self.assertEqual(response.data.get('result'), serializer.data)
 
     def test_check_favourite_list(self):
         """CHECK FAVOURITES IF IT IS NONE"""
