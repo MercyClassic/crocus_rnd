@@ -5,20 +5,7 @@ import setReceiver from '../functions/setReceiver';
 
 
 const FullPaymentForm = ({form, amount, setAmount}) => {
-    const name = form.customer_name.value;
-    const phone = form.customer_phone_number.value;
     const [delivering, setDelivering] = useState(0);
-
-    if (name === '' || phone === '') {
-        alert('Для начала введите имя и номер телефона');
-        return null;
-    }
-
-    const counters = document.querySelectorAll('[data-counter]');
-    if (counters.length === 0) {
-       alert('Для заказа добавьте в корзину хотя бы один товар')
-       return null;
-    }
 
     form.querySelector('.popup-cart__next-button-wrapper').hidden = true;
 
@@ -56,8 +43,8 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
         </div>
         <div className="popup-cart__time-wrapper">
             <label className="popup-cart__time-label _label">
-                Время доставки 
-                <p> 
+                Время доставки
+                <p>
                     <span style={{fontSize: "14px"}}>
                         (Выберите пункт "С доставкой" для редактирования)
                     </span>

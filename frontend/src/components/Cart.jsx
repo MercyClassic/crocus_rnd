@@ -53,7 +53,21 @@ export const CartModal = ({cartProducts=[], visible, setVisible}) => {
         rootClasses.push('non_visible');
     }
 
-    const showFullPaymentCreate = (event) => {
+    const showFullPaymentCreate = (form) => {
+        const name = form.customer_name.value;
+        const phone = form.customer_phone_number.value;
+
+        if (name === '' || phone === '') {
+            alert('Для начала введите имя и номер телефона');
+            return null;
+        }
+
+        const counters = document.querySelectorAll('[data-counter]');
+        if (counters.length === 0) {
+           alert('Для заказа добавьте в корзину хотя бы один товар')
+           return null;
+        }
+
         setContinueForm(true);
     }
 
@@ -89,7 +103,7 @@ export const CartModal = ({cartProducts=[], visible, setVisible}) => {
                             <input onClick={(e) => formatPhoneNumber(e)} type="text" placeholder="Например: +7 (999) 777 77 77" className="popup-cart__phone-input _input" name="customer_phone_number" required maxLength="20" minLength="11" />
                         </div>
                         <div className="popup-cart__next-button-wrapper">
-                            <button onClick={(e) => showFullPaymentCreate(e)} type="button" className="popup-cart__next-button _black-button">Продолжить</button>
+                            <button onClick={() => showFullPaymentCreate(document.querySelector('.popup-cart__form'))} type="button" className="popup-cart__next-button _black-button">Продолжить</button>
                         </div>
 
                         {preContinueForm && <FullPaymentForm form={document.querySelector('.popup-cart__form')} amount={amount} setAmount={setAmount} />}
