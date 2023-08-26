@@ -85,7 +85,7 @@ class ProductCategoryAdmin(admin.ModelAdmin):
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'thumbnail', 'is_active')
-    fields = ('name', 'image', 'thumbnail', 'is_active')
+    fields = ('name', 'image', 'thumbnail', 'is_active', 'important')
     readonly_fields = ('thumbnail',)
     list_display_links = ('id', 'name', 'thumbnail')
     search_fields = ('name',)

@@ -104,8 +104,10 @@ class Category(PhotoMixin, models.Model):
     image = models.ImageField('Изображение', upload_to='images/')
     name = models.CharField('Название', max_length=50, db_index=True)
     is_active = models.BooleanField('Активно', default=True)
+    important = models.IntegerField('Важность', default=1)
 
     class Meta:
+        ordering = ['-important', '-id']
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
 
