@@ -27,7 +27,7 @@ const CartItem = ({product, setAmount}) => {
             <div className="popup-item-cart__image-wrapper">
                 <img src={product.image} alt="product"/>
             </div>
-            <h6 className="popup-item-cart__title"><Link to={product.url}> {product.title} </Link></h6>
+            <h6 className="popup-item-cart__title"><Link to={`/flower/${product.slug}`}> {product.title} </Link></h6>
             <div name="price" data-price={product.price} >{product.price}₽</div>
             <div onClick={(e) => setCount(e)} className="popup-item-cart__count-block" data-counter>
                 <div className="popup-item-cart__minus-button" data-action='minus'>
