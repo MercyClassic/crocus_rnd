@@ -129,6 +129,7 @@ class PaymentCreateService:
             user=user_account,
             amount=amount,
             without_calling=self.without_calling,
+            customer_email=self.customer_email,
             receiver_name=self.receiver_name,
             receiver_phone_number=self.receiver_phone_number,
             delivery_address=self.delivery_address,

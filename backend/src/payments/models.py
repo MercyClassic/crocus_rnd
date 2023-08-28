@@ -23,6 +23,7 @@ class Order(models.Model):
     done_at = models.DateTimeField('Время закрытия заказа', blank=True, null=True)
 
     without_calling = models.BooleanField('Писать в телеграм/ватсап', default=False)
+    customer_email = models.CharField('Email заказчика', max_length=300, blank=True, null=True)
     receiver_name = models.CharField(
         'Имя получателя',
         max_length=200,

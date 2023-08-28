@@ -26,6 +26,17 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
 
     return(
         <>
+        <div class="popup-cart__input-email-wrapper">
+            <label class="popup-cart__email-label _label">
+            Email
+            <p>
+                <span style={{fontSize: "14px"}}>
+                    (Для отправки чека на email)
+                </span>
+            </p>
+            </label>
+            <input type="text" name='email' placeholder="Без указания почты, чек прикрепляется к букету" class="popup-cart__email-input _input" />
+        </div>
         <div className="popup-cart__address-label _label">
             <label className="popup-cart__date-label _label">
                 Адрес доставки

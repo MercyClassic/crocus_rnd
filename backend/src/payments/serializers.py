@@ -10,6 +10,7 @@ class PaymentCreateSerializer(serializers.Serializer):
     items = serializers.DictField(allow_empty=False)
     amount = serializers.IntegerField(max_value=100000)
     customer_name = serializers.CharField(max_length=150)
+    customer_email = serializers.CharField(max_length=300, allow_blank=True)
     receiver_name = serializers.CharField(
         max_length=150,
         required=False,
