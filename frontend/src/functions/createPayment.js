@@ -4,11 +4,16 @@ import PaymentCreateRequest from '../API/PaymentCreateRequest';
 const createPayment = async (event, oneclick=false) => {
     event.preventDefault();
     const form = event.target.closest('form');
-    const isMobilePhone = (str) => /^\+?[7, 8]\s*\(?\d{3}\)?\s*\d{3}-?\d{2}-?\d{2}$/.test(str);
+    const isMobilePhone = (str) => /^\+?[7, 8]-?\s*-?\(?\d{3}\)?-?\s*-?\d{3}-?\s*-?\d{2}-?\s*-?\d{2}$/.test(str);
     if ((isMobilePhone(form.customer_phone_number.value) === false) ||
      (isMobilePhone(form.receiver_phone_number.value) === false)){
         alert('Телефон не соответствует СНГ формату, убедитесь в том, что номер написан верно');
         return null;
+    }
+
+    if(!form.delivery_date.value) {
+        alert('Укажите дату доставки/самовывоза');
+        return null
     }
 
     let items = {};

@@ -1211,6 +1211,7 @@ h6 {
 }
 .card-flower__link {
   display: block;
+ -webkit-tap-highlight-color: transparent;
 }
 .card-flower__image {
   padding: 0px 0px 100% 0px;
@@ -2392,7 +2393,6 @@ h6 {
   border-bottom: 1px solid #aeaeae;
   margin-bottom: 20px;
 }
-
 .popup-cart__accept-button {
   font-size: 14px;
   height: 40px;
@@ -2419,7 +2419,7 @@ h6 {
 .popup-cart__next-button {
   margin-bottom: 30px;
 }
-.popup-cart__adress-label {
+.popup-cart__address-label {
   margin-bottom: 30px;
 }
 .popup-cart__radio-wrapper {
@@ -2463,8 +2463,12 @@ h6 {
   width: 18px;
   margin-right: 6px;
 }
-.popup-cart__chekbox-label {
+.popup-cart__checkbox-label {
   font-size: 18px;
+  display: flex;
+}
+.popup-cart__checkbox-label span {
+  padding-top: 2px;
 }
 .popup-cart__product-price {
   text-align: right;

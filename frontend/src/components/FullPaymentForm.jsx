@@ -53,8 +53,10 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
             <input name='delivery_time' type="text" disabled placeholder="Пример: с 10:00 до 11:00" className="popup-cart__time-input _input" />
         </div>
         <div className="popup-cart__checkbox-wrapper">
-            <input onClick={(e) => setReceiver(e.target.closest('form'))} type="checkbox" name="customer_is_receiver" className="popup-cart__checkbox-input" />
-            <label className="popup-cart__checkbox-label">Заказчик является получателем заказа</label>
+            <label className="popup-cart__checkbox-label">
+                <input onClick={(e) => setReceiver(e.target.closest('form'))} type="checkbox" name="customer_is_receiver" className="popup-cart__checkbox-input" />
+                Заказчик является получателем заказа
+            </label>
         </div>
          <div className="popup-cart__input-name-wrapper">
             <label className="popup-cart__name-label _label">Имя получателя</label>
@@ -65,16 +67,22 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
             <input type="text" onClick={(e) => formatPhoneNumber(e)} placeholder="Например: +7 (999) 777-77-77" className="popup-cart__phone-input _input" name="receiver_phone_number" required maxLength="20" minLength="11" />
         </div>
         <div className="popup-cart__checkbox-wrapper">
-            <input onClick={(e) => changeDeliveringPrice(e)} type='checkbox' name="delivering" className="popup-cart__checkbox-input" />
-            <label className="popup-cart__chekbox-label"> С доставкой (+350 рублей) </label>
+            <label className="popup-cart__checkbox-label">
+                <input onClick={(e) => changeDeliveringPrice(e)} type='checkbox' name="delivering" className="popup-cart__checkbox-input" />
+                    С доставкой (+350 рублей)
+             </label>
         </div>
         <div className="popup-cart__checkbox-wrapper">
-            <input type='checkbox' name='cash' className="popup-cart__checkbox-input" />
-            <label className="popup-cart__chekbox-label"> Оплатить наличными при получении </label>
+            <label className="popup-cart__checkbox-label">
+                <input type='checkbox' name='cash' className="popup-cart__checkbox-input" />
+                Оплатить наличными при получении
+            </label>
         </div>
         <div className="popup-cart__checkbox-wrapper">
-            <input type='checkbox' name='without_calling' className="popup-cart__checkbox-input" />
-            <label className="popup-cart__chekbox-label"> Напишите мне в whatsapp/telegram (Не звонить) </label>
+            <label className="popup-cart__checkbox-label">
+                <input type='checkbox' name='without_calling' className="popup-cart__checkbox-input" />
+                <span> Напишите мне в whatsapp/telegram (Не звонить) </span>
+             </label>
         </div>
         <div className="popup-cart__input-name-wrapper">
             <label className="popup-cart__name-label _label">Примечание</label>
