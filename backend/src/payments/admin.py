@@ -33,6 +33,7 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = (
         *base_fields,
         'without_calling',
+        'customer_email',
         'receiver_name',
         'receiver_phone_number',
         'delivery_address',
