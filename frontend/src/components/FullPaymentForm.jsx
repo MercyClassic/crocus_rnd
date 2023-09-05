@@ -35,7 +35,7 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
                 </span>
             </p>
             </label>
-            <input type="text" name='email' placeholder="Без указания почты, чек прикрепляется к букету" class="popup-cart__email-input _input" />
+            <input type="text" name='email' placeholder="Без указания почты чек прикрепляется к букету" class="popup-cart__email-input _input" />
         </div>
         <div className="popup-cart__address-label _label">
             <label className="popup-cart__date-label _label">
@@ -99,7 +99,7 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
             <label className="popup-cart__name-label _label">Примечание</label>
             <textarea className="textarea_note" placeholder="Напишите примечание, если оно требуется" name="note" maxLength="300"></textarea>
         </div>
-        <div className="popup-cart__product-price">Сумма без учёта доставки: {amount} ₽</div>
+        <div className="popup-cart__product-price">Сумма без учёта доставки: {amount - delivering} ₽</div>
         <div className="popup-cart__delivery-price">Доставка: {delivering} ₽</div>
         <div className="popup-cart__last-price">Итоговая сумма: {amount} ₽ </div>
         <div className="popup-cart__create-order-button-wrapper">

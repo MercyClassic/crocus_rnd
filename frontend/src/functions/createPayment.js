@@ -38,7 +38,7 @@ const createPayment = async (event, oneclick=false) => {
         'customer_phone_number': form.customer_phone_number.value,
         'receiver_phone_number': form.receiver_phone_number.value,
         'without_calling': form.without_calling.checked,
-        'email': form.email.value,
+        'customer_email': form.email.value,
         'delivery_address': form.delivery_address.value,
         'delivery_date': form.delivery_date.value,
         'delivery_time': form.delivery_time.value,
