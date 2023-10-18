@@ -121,15 +121,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'http://localhost',
-    'https://crocus-rnd.ru',
-    'https://www.crocus-rnd.ru',
+    *['http://%s' % host for host in os.getenv('ALLOWED_HOSTS').split(', ')],
 ]
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
-    'http://localhost',
-    'https://crocus-rnd.ru',
-    'https://www.crocus-rnd.ru',
+    *['http://%s' % host for host in os.getenv('ALLOWED_HOSTS').split(', ')],
 ]
 
 CACHALOT_TIMEOUT = 30

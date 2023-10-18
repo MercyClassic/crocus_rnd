@@ -23,38 +23,37 @@ def check_payment_token(request_data: dict) -> bool:
     return request_token == generated_token
 
 
-def payment_acceptance(request: dict) -> bool:
-    if request.get('Status') == 'AUTHORIZED':
+def payment_acceptance(request_data: dict) -> bool:
+    if request_data.get('Status') == 'AUTHORIZED':
         return True
     try:
-        order = Order.objects.only('id').get(
-            uuid=request['OrderId'],
-        )
+        order = Order.objects.only('id').get(uuid=request_data['OrderId'])
     except Order.DoesNotExist:
         message = (
-            f'Ошибка при попытке найти заказ, uuid заказа: {request["OrderId"]},'
-            f' id оплаты  в системе банка: {request["PaymentId"]}',
+            f'Ошибка при попытке найти заказ, uuid заказа: {request_data["OrderId"]},'
+            f' id оплаты  в системе банка: {request_data["PaymentId"]}',
         )
         rollbar.report_message(message)
         logger.warning(message)
         return False
-    if not check_payment_token(request):
+    if not check_payment_token(request_data):
         message = (
             f'Ошибка при сравнении токенов,'
-            f' id заказа: {request["OrderId"]}, токен: {request["Token"]}',
+            f' id заказа: {request_data["OrderId"]}, токен: {request_data["Token"]}',
         )
         rollbar.report_message(message)
         logger.warning(message)
         return False
-    if request.get('Success') and request.get('Status') == 'CONFIRMED':
+    if request_data.get('Success') and request_data.get('Status') == 'CONFIRMED':
         order.is_paid = True
         order.save()
-        logger.info(f'Заказ с id: {request["OrderId"]} - успешно оплачен')
+        logger.info(f'Заказ с id: {request_data["OrderId"]} - успешно оплачен')
         asyncio.run(send_notification_about_new_order(order.id))
-    elif not request.get('Success'):
+    elif not request_data.get('Success'):
         order.delete()
         logger.warning(
-            f'Заказ с id: {request["OrderId"]} - не был оплачен,'
-            f'id в системе банка:{request["PaymentId"]}, код ошибки: {request["ErrorCode"]}',
+            f'Заказ с id: {request_data["OrderId"]} - не был оплачен,'
+            f'id в системе банка:{request_data["PaymentId"]},'
+            f' код ошибки: {request_data["ErrorCode"]}',
         )
     return True

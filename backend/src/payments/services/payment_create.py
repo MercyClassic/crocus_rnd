@@ -5,27 +5,36 @@ import os
 import re
 from datetime import datetime
 from hashlib import sha256
+from typing import List
 
 import requests
-from django.db.models import QuerySet
 
-from accounts.models import Account
+from accounts.repositories import UserRepository
 from bot.handlers.notifications import send_notification_about_new_order
-from payments.models import Order, OrderProduct
-from payments.serializers import PaymentCreateSerializer
+from payments.repositories import PaymentRepository
+from payments.schemas import OrderData
 from products.models import Product
 
 
 class PaymentCreateService:
-    def __init__(self, serialized_data: dict):
-        for key in PaymentCreateSerializer._declared_fields.keys():
-            setattr(self, key, serialized_data.get(key))
-        self.customer_phone_number = self.normalize_phone_number(self.customer_phone_number)
-        if self.receiver_phone_number:
-            self.receiver_phone_number = self.normalize_phone_number(self.receiver_phone_number)
-        if not self.delivering:
-            self.delivery_address = None
-            self.delivery_time = None
+    def __init__(
+        self,
+        serialized_data: dict,
+        payment_repo: PaymentRepository,
+        user_repo: UserRepository,
+    ):
+        self.payment_repo = payment_repo
+        self.user_repo = user_repo
+        self.order_data = OrderData(
+            customer_phone_number=self.normalize_phone_number(
+                serialized_data.pop('customer_phone_number'),
+            ),
+            receiver_phone_number=self.normalize_phone_number(
+                serialized_data.pop('receiver_phone_number', None),
+            ),
+            products=serialized_data.pop('items'),
+            **serialized_data,
+        )
 
     @staticmethod
     def normalize_phone_number(phone_number: str) -> str:
@@ -46,17 +55,14 @@ class PaymentCreateService:
 
     def generate_receipt(
         self,
-        products: QuerySet,
+        products: List[Product],
         with_delivery: bool = False,
     ) -> dict:
-        customer_phone_number = self.customer_phone_number
-        if customer_phone_number[0] != '+':
-            customer_phone_number = f'+{self.customer_phone_number}'
         receipt = {
             'Taxation': os.getenv('TINKOFF_TAXATION'),
-            'Phone': customer_phone_number,
+            'Phone': self.order_data.customer_phone_number,
         }
-        request_items = self.items
+        request_items = self.order_data.products
         receipt_items = []
         for product in products:
             item = {}
@@ -73,7 +79,7 @@ class PaymentCreateService:
                     'Name': 'Доставка',
                     'Quantity': '1',
                     'Price': delivery_price,
-                    'Amount': delivery_price * 100 * 1,
+                    'Amount': delivery_price * 100,
                     'Tax': os.getenv('TINKOFF_TAX'),
                 },
             )
@@ -91,7 +97,7 @@ class PaymentCreateService:
             'TerminalKey': os.getenv('TINKOFF_TERMINAL_KEY'),
             'Amount': int(amount) * 100,
             'OrderId': order_uuid,
-            'DATA': {'Phone': self.customer_phone_number},
+            'DATA': {'Phone': self.order_data.customer_phone_number},
         }
         token = self.generate_payment_token(data)
         data.setdefault('Token', token)
@@ -110,93 +116,53 @@ class PaymentCreateService:
             return None
         return response.get('PaymentURL')
 
-    def get_or_create_customer(self) -> Account:
-        try:
-            user_account = Account.objects.only('id').get(phone_number=self.customer_phone_number)
-        except Account.DoesNotExist:
-            user_account = Account.objects.create(
-                phone_number=self.customer_phone_number,
-                name=self.customer_name,
-            )
-        return user_account
-
-    def create_order(
-        self,
-        user_account: Account,
-        amount: int,
-    ):
-        order = Order.objects.create(
-            user=user_account,
-            amount=amount,
-            without_calling=self.without_calling,
-            customer_email=self.customer_email,
-            receiver_name=self.receiver_name,
-            receiver_phone_number=self.receiver_phone_number,
-            delivery_address=self.delivery_address,
-            delivery_date=self.delivery_date,
-            delivery_time=self.delivery_time,
-            note=self.note,
-            cash=self.cash,
-            is_paid=False,
-            delivering=self.delivering,
-        )
-        return order
-
-    def create_order_products(
-        self,
-        order: Order,
-        order_products: QuerySet,
-    ) -> None:
-        products_to_bulk_create = []
-        for product in order_products:
-            products_to_bulk_create.append(
-                OrderProduct(
-                    order=order,
-                    product=product,
-                    count=int(self.items.get(product.slug)),
-                ),
-            )
-        OrderProduct.objects.bulk_create(products_to_bulk_create)
-
     def create_payment(self) -> str | bool:
         if (
-            (self.delivery_date.date() < datetime.utcnow().date())
-            or (self.amount > 50350)
-            or (any(int(count) < 1 for count in self.items.values()))
+            (self.order_data.delivery_date.date() < datetime.utcnow().date())
+            or (self.order_data.amount > 50350)
+            or (any(int(count) < 1 for count in self.order_data.products.values()))
         ):
             return False
-        order_products = Product.objects.only('title', 'slug', 'price').filter(
-            slug__in=[*self.items.keys()],
+        order_products = self.payment_repo.get_order_products_from_db(
+            self.order_data.products.keys(),
         )
-        if len(order_products) == 0:
+        if not order_products:
             return False
+
         calculated_amount = sum(
-            product.price * int(self.items.get(product.slug)) for product in order_products
+            product.price * int(self.order_data.products.get(product.slug))
+            for product in order_products
         )
-        if self.delivering:
+
+        if self.order_data.delivering:
             calculated_amount += 350
-        if calculated_amount != self.amount:
+        if calculated_amount != self.order_data.amount:
             return False
 
-        user_account = self.get_or_create_customer()
+        user_account = self.user_repo.get_or_create_customer(
+            self.order_data.customer_phone_number,
+            self.order_data.customer_name,
+        )
 
-        order = self.create_order(
-            user_account=user_account,
+        order = self.payment_repo.create_order(
             amount=calculated_amount,
+            data=self.order_data,
+            user_account=user_account,
         )
 
-        self.create_order_products(
-            order=order,
+        self.payment_repo.create_order_products(
+            order_id=order.pk,
             order_products=order_products,
+            products_with_count=self.order_data.products,
         )
 
-        if self.cash:
-            asyncio.run(send_notification_about_new_order(order.id))
+        if self.order_data.cash:
+            asyncio.run(send_notification_about_new_order(order.pk))
             return 'OK'
 
         payment_url = self.get_payment_url(
             order_uuid=str(order.uuid),
             amount=calculated_amount,
-            receipt=self.generate_receipt(order_products, self.delivering),
+            receipt=self.generate_receipt(order_products, self.order_data.delivering),
         )
         return payment_url

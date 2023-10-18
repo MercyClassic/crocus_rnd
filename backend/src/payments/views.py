@@ -1,10 +1,12 @@
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.repositories import UserRepository
 from utils.pause import check_for_pause_timer, set_pause_timer
 
+from .repositories import PaymentRepository
 from .serializers import CallMeSerializer, PaymentCreateSerializer
 from .services.call_me import create_call_me_request
 from .services.payment_accept import payment_acceptance
@@ -16,7 +18,7 @@ bad_request_response = Response(
 )
 
 
-class CreatePaymentAPIView(CreateAPIView):
+class CreatePaymentAPIView(GenericAPIView):
     serializer_class = PaymentCreateSerializer
 
     def post(self, request, *args, **kwargs):
@@ -32,7 +34,11 @@ class CreatePaymentAPIView(CreateAPIView):
         else:
             return bad_request_response
 
-        payment_service = PaymentCreateService(serialized_data)
+        payment_service = PaymentCreateService(
+            serialized_data,
+            PaymentRepository(),
+            UserRepository(),
+        )
         payment_url = payment_service.create_payment()
 
         set_pause_timer(request, 'create_order')

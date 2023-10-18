@@ -13,5 +13,9 @@ urlpatterns = [
         views.AcceptPaymentAPIView.as_view(),
         name='api-payment-accept',
     ),
-    path('api/v1/call_me', views.CallMeAPIView.as_view(), name='api-call-me'),
+    path(
+        'api/v1/call_me',
+        views.CallMeAPIView.as_view(),
+        name='api-call-me',
+    ),
 ]
