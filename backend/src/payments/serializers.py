@@ -8,7 +8,7 @@ from utils.validators import phone_validator
 
 class PaymentCreateSerializer(serializers.Serializer):
     items = serializers.DictField(allow_empty=False)
-    amount = serializers.IntegerField(max_value=100000)
+    amount = serializers.DecimalField(max_value=1000000, max_digits=9, decimal_places=2)
     customer_name = serializers.CharField(max_length=150)
     customer_email = serializers.CharField(max_length=300, allow_blank=True)
     receiver_name = serializers.CharField(

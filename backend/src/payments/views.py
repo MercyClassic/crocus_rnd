@@ -29,7 +29,7 @@ class CreatePaymentAPIView(GenericAPIView):
             if not check_for_pause_timer(request, 'create_order'):
                 return Response(
                     status=status.HTTP_403_FORBIDDEN,
-                    data='Вы уже сделали заказ, подождите немного,' ' прежде, чем сделать ещё один',
+                    data='Вы уже сделали заказ, подождите немного прежде, чем сделать ещё один',
                 )
         else:
             return bad_request_response

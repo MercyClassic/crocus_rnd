@@ -32,7 +32,7 @@ class Product(PhotoMixin, models.Model):
     slug = models.SlugField('URL параметр', max_length=128, unique=True, db_index=True)
     description = models.TextField('Описание', blank=True, null=True)
     image = models.ImageField('Изображение', upload_to='images/')
-    price = models.IntegerField('Цена')
+    price = models.DecimalField('Цена', max_digits=8, decimal_places=2)
     kind = models.CharField(
         'Тип товара',
         max_length=7,

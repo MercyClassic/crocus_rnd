@@ -15,6 +15,7 @@ class ProductListSerializer(serializers.ModelSerializer):
         read_only=True,
         lookup_field='slug',
     )
+    price = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -27,10 +28,14 @@ class ProductListSerializer(serializers.ModelSerializer):
             'price',
         )
 
+    def get_price(self, obj):
+        return obj.price
+
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True)
     kind = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
@@ -44,6 +49,9 @@ class ProductDetailSerializer(serializers.ModelSerializer):
             'kind',
             'price',
         )
+
+    def get_price(self, obj):
+        return obj.price
 
     def get_kind(self, obj):
         type_choices = {

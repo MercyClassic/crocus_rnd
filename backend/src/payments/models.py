@@ -16,7 +16,7 @@ class Order(models.Model):
         on_delete=models.DO_NOTHING,
         related_name='products',
     )
-    amount = models.IntegerField('Всего')
+    amount = models.DecimalField('Всего', max_digits=7, decimal_places=2)
     is_paid = models.BooleanField('Оплачено', default=False)
     delivering = models.BooleanField('С доставкой', default=False)
     created_at = models.DateTimeField('Время создания заказа', auto_now_add=True)

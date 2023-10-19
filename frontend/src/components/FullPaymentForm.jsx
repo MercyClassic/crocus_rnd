@@ -26,8 +26,8 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
 
     return(
         <>
-        <div class="popup-cart__input-email-wrapper">
-            <label class="popup-cart__email-label _label">
+        <div className="popup-cart__input-email-wrapper">
+            <label className="popup-cart__email-label _label">
             Email
             <p>
                 <span style={{fontSize: "14px"}}>
@@ -35,7 +35,7 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
                 </span>
             </p>
             </label>
-            <input type="text" name='email' placeholder="Без указания почты чек прикрепляется к букету" class="popup-cart__email-input _input" />
+            <input type="text" name='email' placeholder="Без указания почты чек прикрепляется к букету" className="popup-cart__email-input _input" />
         </div>
         <div className="popup-cart__address-label _label">
             <label className="popup-cart__date-label _label">
@@ -61,7 +61,14 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
                     </span>
                 </p>
             </label>
-            <input name='delivery_time' type="text" disabled placeholder="Пример: с 10:00 до 11:00" className="popup-cart__time-input _input" />
+            <select name='delivery_time' defaultValue="" disabled className="popup-cart__time-input _input">
+              <option disabled value="">Выберите время доставки</option>
+              <option value="10:00 - 12:00">10:00 - 12:00</option>
+              <option value="12:00 - 15:00">12:00 - 15:00</option>
+              <option value="15:00 - 18:00">15:00 - 18:00</option>
+              <option value="18:00 - 21:00">18:00 - 21:00</option>
+              <option value="21:00 - 00:00">21:00 - 00:00</option>
+           </select>
         </div>
         <div className="popup-cart__checkbox-wrapper">
             <label className="popup-cart__checkbox-label">
