@@ -1,8 +1,7 @@
 from aiogram import Dispatcher, types
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from create_bot import bot, domain
+from create_bot import admin_panel_category_url, bot, domain
 from db.queries import create_category
-from django.urls import reverse
 from download_image import download_photo
 
 from utils import command_for
@@ -69,7 +68,7 @@ async def set_active(message, state):
         types.InlineKeyboardButton(
             'Перейти в админ панель товара',
             url=''.join(
-                (domain, reverse('admin:products_category_change', args=[category_id])),
+                (domain, (admin_panel_category_url % category_id)),
             ),
         ),
     )

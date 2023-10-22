@@ -1,4 +1,3 @@
-import asyncio
 import copy
 import json
 import os
@@ -8,12 +7,13 @@ from hashlib import sha256
 from typing import List
 
 import requests
-from bot.handlers.notifications import send_notification_about_new_order
 
 from accounts.repositories import UserRepository
 from payments.repositories import PaymentRepository
 from payments.schemas import OrderData
 from products.models import Product
+
+# from bot.handlers.notifications import send_notification_about_new_order
 
 
 class PaymentCreateService:
@@ -68,8 +68,8 @@ class PaymentCreateService:
             item = {}
             item.setdefault('Name', product.title)
             item.setdefault('Quantity', request_items[product.slug])
-            item.setdefault('Price', product.price)
-            item.setdefault('Amount', product.price * 100 * int(request_items[product.slug]))
+            item.setdefault('Price', int(product.price))
+            item.setdefault('Amount', int(product.price) * 100 * int(request_items[product.slug]))
             item.setdefault('Tax', os.getenv('TINKOFF_TAX'))
             receipt_items.append(item)
         if with_delivery:
@@ -157,7 +157,7 @@ class PaymentCreateService:
         )
 
         if self.order_data.cash:
-            asyncio.run(send_notification_about_new_order(order.pk))
+            # asyncio.run(send_notification_about_new_order(order.pk))
             return 'OK'
 
         payment_url = self.get_payment_url(

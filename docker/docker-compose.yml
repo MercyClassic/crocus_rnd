@@ -6,7 +6,7 @@ services:
     ports:
       - "5432:5432"
     env_file:
-      - ../backend/.env
+      - ../backend/core/.env
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     healthcheck:
@@ -21,10 +21,10 @@ services:
     container_name: market
     restart: always
     build:
-      context: ../backend
+      context: ../backend/core
     volumes:
-      - ../backend/src/media:/market/backend/src/media
-      - ../backend/src/logs:/market/backend/src/logs
+      - ../backend/core/src/media:/market/backend/core/src/media
+      - ../backend/core/src/logs:/market/backend/core/src/logs
     depends_on:
       postgres:
         condition: service_healthy
@@ -32,23 +32,16 @@ services:
         condition: service_healthy
     networks:
       - main
-
-#  react:
-#    container_name: react
-#    restart: always
-#    build:
-#      context: ../frontend
-#    networks:
-#      - main
-
-#  telegram_bot:
-#    container_name: telegram_bot
-#    restart: always
-#    build:
-#      context: ../backend
-#    volumes:
-#      - ../backend/src/media:/market/backend/src/media
-#    command: python manage.py startbot
+  telegram_bot:
+    container_name: telegram_bot
+    restart: always
+    build:
+      context: ../backend/tg_bot
+    volumes:
+      - ../backend/core/src/media:/market/backend/core/src/media
+      - ../frontend/build/static/img:/market/frontend/build/static/img
+    networks:
+      - main
   nginx:
     image: nginx
     restart: always
@@ -60,9 +53,9 @@ services:
       - "443:443"
     volumes:
       - ../frontend/build:/var/market/build
-      - ../backend/src/media:/var/market/media
+      - ../backend/core/src/media:/var/market/media
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - /etc/letsencrypt:/etc/letsencrypt
+      # - /etc/letsencrypt:/etc/letsencrypt
     healthcheck:
       test: [ "CMD", "service", "nginx", "status" ]
       interval: 30s

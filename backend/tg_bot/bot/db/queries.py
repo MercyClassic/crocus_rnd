@@ -42,18 +42,22 @@ async def create_product(data: dict) -> tuple:
     )
     async with async_session_maker() as session:
         product = await session.execute(stmt)
-    product = product.scalar()
+        product = product.scalar()
 
-    if data['extra_images']:
-        product_images = [
-            ProductImage(
-                image=image,
-                product_id=product.id,
-            )
-            for image in data['extra_image']
-        ]
-    #     await bulk create
-    return product.pk, product.slug
+        if data['extra_images']:
+            product_images = [
+                {
+                    'image': image,
+                    'product_id': product.id,
+                }
+                for image in data['extra_images']
+            ]
+
+            stmt = insert(ProductImage).values(product_images)
+            await session.execute(stmt)
+            await session.commit()
+
+    return product.id, product.slug
 
 
 async def create_category(data: dict) -> int:
@@ -68,4 +72,5 @@ async def create_category(data: dict) -> int:
     )
     async with async_session_maker() as session:
         result = await session.execute(stmt)
-    return result.scalar().id
+        await session.commit()
+    return result.scalar()

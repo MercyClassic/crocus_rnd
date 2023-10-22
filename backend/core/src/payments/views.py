@@ -1,10 +1,10 @@
-from bot.utils import check_for_pause_timer, set_pause_timer
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.repositories import UserRepository
+from utils.pause import check_for_pause_timer, set_pause_timer
 
 from .repositories import PaymentRepository
 from .serializers import CallMeSerializer, PaymentCreateSerializer

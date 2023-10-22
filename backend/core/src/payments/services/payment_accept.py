@@ -5,9 +5,11 @@ import os
 from hashlib import sha256
 
 import rollbar
-from bot.handlers.notifications import send_notification_about_new_order
 
 from payments.models import Order
+
+# from bot.handlers.notifications import send_notification_about_new_order
+
 
 logger = logging.getLogger('payment')
 
@@ -48,7 +50,7 @@ def payment_acceptance(request_data: dict) -> bool:
         order.is_paid = True
         order.save()
         logger.info(f'Заказ с id: {request_data["OrderId"]} - успешно оплачен')
-        asyncio.run(send_notification_about_new_order(order.id))
+        # asyncio.run(send_notification_about_new_order(order.id))
     elif not request_data.get('Success'):
         order.delete()
         logger.warning(

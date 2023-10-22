@@ -1,5 +1,5 @@
 # LONG BOT MESSAGES
-from db.models import Order
+from schemas import OrderData
 
 admin_help_text = (
     'Доступные команды:'
@@ -12,7 +12,7 @@ admin_help_text = (
 )
 
 
-def get_order_detail_message(order: Order):
+def get_order_detail_message(order: OrderData):
     products = ''
     for product_association in order.product_associations:
         products += (

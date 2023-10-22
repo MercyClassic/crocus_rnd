@@ -3,6 +3,8 @@ from aiogram.utils.callback_data import CallbackData
 from create_bot import bot
 from db.queries import get_paid_orders
 from messages import get_order_detail_message
+from pydantic import TypeAdapter
+from schemas import OrderData
 
 from utils import command_for
 
@@ -16,21 +18,17 @@ async def get_order_list(message):
     global orders
     orders = await get_paid_orders()
     markup = types.InlineKeyboardMarkup()
-    new_orders = {}
-    for order in orders:
+    orders = {order.id: TypeAdapter(OrderData).validate_python(order) for order in orders}
+    for order in orders.values():
         markup.add(
             types.InlineKeyboardButton(
-                text=f'{order.id}'
-                f' - {order.created_at.strftime("%d.%m.%Y - %H:%S")}'
-                f' - {order.amount}р',
+                text=f'{order.id}' f' - {order.created_at}' f' - {order.amount}р',
                 callback_data=callback_order.new(
                     pk=order.id,
                     action='check_order_detail',
                 ),
             ),
         )
-        new_orders[order.id] = order
-    orders = new_orders
 
     await bot.send_message(
         message.from_user.id,

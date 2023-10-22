@@ -1,6 +1,5 @@
 from aiogram import Dispatcher, types
-from create_bot import bot, domain
-from django.urls import reverse
+from create_bot import admin_panel_url, bot, domain
 from messages import admin_help_text
 
 from utils import command_for
@@ -16,7 +15,7 @@ async def admin_help(message):
 
 @command_for(permission_level='admin')
 async def open_admin_panel(message):
-    url = ''.join((domain, reverse('admin:index')))
+    url = ''.join((domain, admin_panel_url))
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton('Перейти в админ панель', url=url))
     await bot.send_message(

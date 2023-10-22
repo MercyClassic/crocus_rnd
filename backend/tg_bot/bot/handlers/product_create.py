@@ -2,9 +2,8 @@ import asyncio
 
 from aiogram import Dispatcher, types
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from create_bot import bot, domain
+from create_bot import admin_panel_product_url, bot, domain
 from db.queries import create_product
-from django.urls import reverse
 from download_image import download_photo
 from markups import type_product_markup
 
@@ -161,7 +160,7 @@ async def set_extra_images(message, state, album=None):
         types.InlineKeyboardButton(
             'Перейти в админ панель товара',
             url=''.join(
-                (domain, reverse('admin:products_product_change', args=[product_id])),
+                (domain, (admin_panel_product_url % product_id)),
             ),
         ),
     )

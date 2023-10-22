@@ -3,16 +3,7 @@ from typing import List
 from uuid import uuid4
 
 from db.database import Base
-from sqlalchemy import (
-    DATETIME,
-    UUID,
-    Boolean,
-    Date,
-    ForeignKey,
-    Integer,
-    Numeric,
-    String,
-)
+from sqlalchemy import DATETIME, UUID, Boolean, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -26,7 +17,7 @@ class Product(Base):
     price: Mapped[str] = mapped_column(Numeric(8, 2))
     kind: Mapped[str] = mapped_column(String(10), index=True, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    important: Mapped[bool] = mapped_column(Boolean, default=1)
+    important: Mapped[int] = mapped_column(Integer, default=1)
 
     order_associations: Mapped[List['OrderProduct']] = relationship(back_populates='product')
 
@@ -47,7 +38,7 @@ class Category(Base):
     image: Mapped[str] = mapped_column(String(128))
     name: Mapped[str] = mapped_column(String(50), index=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    important: Mapped[bool] = mapped_column(Boolean, default=1)
+    important: Mapped[int] = mapped_column(Integer, default=1)
 
 
 class Order(Base):
@@ -58,7 +49,7 @@ class Order(Base):
     amount: Mapped[str] = mapped_column(Numeric(7, 2))
     is_paid: Mapped[bool] = mapped_column(Boolean, default=False)
     delivering: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime] = mapped_column(DATETIME, default=datetime.utcnow())
+    created_at: Mapped[datetime] = mapped_column(DATETIME, default=datetime.now)
     done_at: Mapped[datetime] = mapped_column(DATETIME, nullable=True)
     without_calling: Mapped[bool] = mapped_column(Boolean, default=False)
     customer_email: Mapped[str] = mapped_column(String(300), nullable=True)
@@ -69,7 +60,7 @@ class Order(Base):
         nullable=True,
         default='Без доставки',
     )
-    delivery_date: Mapped[Date] = mapped_column(Date)
+    delivery_date: Mapped[datetime] = mapped_column(DATETIME)
     delivery_time: Mapped[str] = mapped_column(
         String(200),
         nullable=True,
