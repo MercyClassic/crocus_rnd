@@ -1,8 +1,8 @@
 from aiogram import Dispatcher, types
 from create_bot import admin_panel_url, bot, domain
-from messages import admin_help_text
 
-from utils import command_for
+from utils.messages import admin_help_text
+from utils.utils import command_for
 
 
 @command_for(permission_level='admin')

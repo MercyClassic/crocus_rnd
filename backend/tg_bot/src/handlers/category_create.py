@@ -1,10 +1,12 @@
 from aiogram import Dispatcher, types
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from container import Container
 from create_bot import admin_panel_category_url, bot, domain
-from db.queries import create_category
-from download_image import download_photo
+from dependency_injector.wiring import Provide, inject
+from repositories.core import CoreRepository
 
-from utils import command_for
+from utils.download_image import download_photo
+from utils.utils import command_for
 
 
 class CategoryState(StatesGroup):
@@ -48,7 +50,10 @@ async def set_image(message, state):
     )
 
 
-async def set_active(message, state):
+async def set_active(
+    message,
+    state,
+):
     if message.text.lower() not in ('да', 'нет'):
         await bot.send_message(
             message.from_user.id,
@@ -60,8 +65,16 @@ async def set_active(message, state):
         data['is_active'] = is_active.get(message.text.lower())
 
     await state.finish()
+    await finish_category_create(data._data, message.from_user.id)
 
-    category_id = await create_category(data._data)
+
+@inject
+async def finish_category_create(
+    data: dict,
+    from_user_id: int,
+    core_repo: CoreRepository = Provide[Container.core_repo],
+):
+    category_id = await core_repo.create_category(data)
 
     markup = types.InlineKeyboardMarkup()
     markup.add(
@@ -74,7 +87,7 @@ async def set_active(message, state):
     )
 
     await bot.send_message(
-        message.from_user.id,
+        from_user_id,
         'Готово! Категория создана!',
         reply_markup=markup,
     )

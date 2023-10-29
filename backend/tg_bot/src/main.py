@@ -1,10 +1,21 @@
 import handlers
 from aiogram import executor
+from container import Container
 from create_bot import dp
-from middlewares import AlbumMiddleware
+
+from utils.middlewares import AlbumMiddleware
 
 
 def bot_run():
+    container = Container()
+    container.wire(
+        modules=[
+            'handlers.category_create',
+            'handlers.get_order_list',
+            'handlers.product_create',
+            'handlers.others',
+        ],
+    )
     dp.middleware.setup(AlbumMiddleware())
     handlers.admin.register_admin_handlers(dp)
     handlers.background_image.register_background_image_handlers(dp)

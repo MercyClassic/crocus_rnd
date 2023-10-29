@@ -1,9 +1,9 @@
 from aiogram import Dispatcher
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from create_bot import bot
-from download_image import download_photo
 
-from utils import command_for
+from utils.download_image import download_photo
+from utils.utils import command_for
 
 
 class ImageState(StatesGroup):

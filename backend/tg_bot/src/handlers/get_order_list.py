@@ -1,12 +1,14 @@
 from aiogram import Dispatcher, types
 from aiogram.utils.callback_data import CallbackData
+from container import Container
 from create_bot import bot
-from db.queries import get_paid_orders
-from messages import get_order_detail_message
+from dependency_injector.wiring import Provide, inject
 from pydantic import TypeAdapter
-from schemas import OrderData
+from repositories.core import CoreRepository
 
-from utils import command_for
+from utils.messages import get_order_detail_message
+from utils.schemas import OrderData
+from utils.utils import command_for
 
 orders = []
 
@@ -14,9 +16,13 @@ callback_order = CallbackData('order', 'pk', 'action')
 
 
 @command_for(permission_level='admin')
-async def get_order_list(message):
+@inject
+async def get_order_list(
+    message,
+    core_repo: CoreRepository = Provide[Container.core_repo],
+):
     global orders
-    orders = await get_paid_orders()
+    orders = await core_repo.get_paid_orders()
     markup = types.InlineKeyboardMarkup()
     orders = {order.id: TypeAdapter(OrderData).validate_python(order) for order in orders}
     for order in orders.values():

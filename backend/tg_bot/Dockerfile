@@ -21,7 +21,7 @@ RUN apt update \
 
 COPY --chown=app:app . /market/backend/tg_bot
 
-WORKDIR /market/backend/tg_bot/bot
+WORKDIR /market/backend/tg_bot/src
 
 USER app
 

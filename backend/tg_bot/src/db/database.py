@@ -7,12 +7,12 @@ from sqlalchemy.orm import DeclarativeBase
 
 load_dotenv()
 
-host = os.getenv('POSTGRES_HOST')
-user = os.getenv('POSTGRES_USER')
-password = os.getenv('POSTGRES_PASSWORD')
-db = os.getenv('POSTGRES_DB')
-
-DATABASE_URL = f'postgresql+asyncpg://{user}:{password}@{host}:5432/{db}'
+DATABASE_URL = 'postgresql+asyncpg://%s:%s@%s:5432/%s' % (
+    os.getenv('POSTGRES_USER'),
+    os.getenv('POSTGRES_PASSWORD'),
+    os.getenv('POSTGRES_HOST'),
+    os.getenv('POSTGRES_DB'),
+)
 
 engine = create_async_engine(DATABASE_URL, echo=True)
 async_session_maker = async_sessionmaker(

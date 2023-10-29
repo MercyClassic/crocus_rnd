@@ -2,12 +2,14 @@ import asyncio
 
 from aiogram import Dispatcher, types
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from container import Container
 from create_bot import admin_panel_product_url, bot, domain
-from db.queries import create_product
-from download_image import download_photo
-from markups import type_product_markup
+from dependency_injector.wiring import Provide, inject
+from repositories.core import CoreRepository
 
-from utils import command_for, slugify_string, validate_title
+from utils.download_image import download_photo
+from utils.markups import type_product_markup
+from utils.utils import command_for, slugify_string, validate_title
 
 
 class ProductState(StatesGroup):
@@ -121,7 +123,11 @@ async def set_main_image(message, state):
     )
 
 
-async def set_extra_images(message, state, album=None):
+async def set_extra_images(
+    message,
+    state,
+    album=None,
+):
     if message.content_type == 'text':
         if message.text == '-':
             async with state.proxy() as data:
@@ -151,9 +157,17 @@ async def set_extra_images(message, state, album=None):
         async with state.proxy() as data:
             data['extra_images'] = extra_images
 
-    await state.finish()
+        await state.finish()
+        await finish_product_create(data._data, message.from_user.id)
 
-    product_id, product_slug = await create_product(data._data)
+
+@inject
+async def finish_product_create(
+    data: dict,
+    from_user_id: int,
+    core_repo: CoreRepository = Provide[Container.core_repo],
+):
+    product_id, product_slug = await core_repo.create_product(data)
 
     markup = types.InlineKeyboardMarkup()
     markup.add(
@@ -172,7 +186,7 @@ async def set_extra_images(message, state, album=None):
     )
 
     await bot.send_message(
-        message.from_user.id,
+        from_user_id,
         'Готово, продукт создан!',
         reply_markup=markup,
     )

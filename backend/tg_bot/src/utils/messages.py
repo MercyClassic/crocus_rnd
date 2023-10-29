@@ -1,5 +1,5 @@
 # LONG BOT MESSAGES
-from schemas import OrderData
+from utils.schemas import OrderData
 
 admin_help_text = (
     'Доступные команды:'

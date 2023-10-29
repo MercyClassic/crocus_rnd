@@ -13,7 +13,10 @@ REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-ALLOWED_HOSTS = [host for host in os.getenv('ALLOWED_HOSTS').split(', ')]
+DEV_HOSTS = ['http://%s' % host for host in os.getenv('DEV_HOSTS').split(', ')]
+PROD_HOSTS = ['https://%s' % host for host in os.getenv('PROD_HOSTS').split(', ')]
+
+ALLOWED_HOSTS = DEV_HOSTS + PROD_HOSTS
 
 ROLLBAR = {
     'access_token': os.getenv('ROLLBAR_ACCESS_TOKEN'),
@@ -117,14 +120,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 AUTH_USER_MODEL = 'accounts.AuthUser'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    *['http://%s' % host for host in os.getenv('ALLOWED_HOSTS').split(', ')],
+    *DEV_HOSTS,
+    *PROD_HOSTS,
 ]
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000',
-    *['http://%s' % host for host in os.getenv('ALLOWED_HOSTS').split(', ')],
+    *DEV_HOSTS,
+    *PROD_HOSTS,
 ]
 
 CACHALOT_TIMEOUT = 30

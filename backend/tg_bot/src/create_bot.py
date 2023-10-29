@@ -9,7 +9,6 @@ load_dotenv()
 
 logger = logging.getLogger('telegram_errors')
 
-
 bot = Bot(os.getenv('BOT_TOKEN'))
 
 domain = os.getenv('DOMAIN')
