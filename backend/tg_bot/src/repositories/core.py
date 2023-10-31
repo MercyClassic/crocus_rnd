@@ -57,7 +57,7 @@ class CoreRepository:
 
             stmt = insert(ProductImage).values(product_images)
             await self._session.execute(stmt)
-            await self._session.commit()
+        await self._session.commit()
 
         return product.id, product.slug
 

@@ -1,0 +1,13 @@
+[Unit]
+Description=Rabbitmq script
+After=multi-user.target
+
+[Service]
+Type=idle
+User=user
+Group=user
+ExecStart=/bin/sh -c 'cd /home/user/market/backend/tg_bot/src && poetry run python3.11 start_consuming.py'
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

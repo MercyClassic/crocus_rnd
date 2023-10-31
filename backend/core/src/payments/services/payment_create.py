@@ -7,24 +7,29 @@ from hashlib import sha256
 from typing import List
 
 import requests
+from django.db import transaction
 
 from accounts.repositories import UserRepository
 from payments.repositories import PaymentRepository
 from payments.schemas import OrderData
 from products.models import Product
-
-# from bot.handlers.notifications import send_notification_about_new_order
+from rabbitmq.notifications import NotificationBus
 
 
 class PaymentCreateService:
+    order_data: OrderData
+
     def __init__(
         self,
-        serialized_data: dict,
         payment_repo: PaymentRepository,
         user_repo: UserRepository,
+        notification_bus: NotificationBus,
     ):
         self.payment_repo = payment_repo
         self.user_repo = user_repo
+        self.notification_bus = notification_bus
+
+    def fill_in_with_data(self, serialized_data: dict) -> None:
         self.order_data = OrderData(
             customer_phone_number=self.normalize_phone_number(
                 serialized_data.pop('customer_phone_number'),
@@ -144,20 +149,23 @@ class PaymentCreateService:
             self.order_data.customer_name,
         )
 
-        order = self.payment_repo.create_order(
-            amount=calculated_amount,
-            data=self.order_data,
-            user_account=user_account,
-        )
+        with transaction.atomic():
+            order = self.payment_repo.create_order(
+                amount=calculated_amount,
+                data=self.order_data,
+                user_account=user_account,
+            )
 
-        self.payment_repo.create_order_products(
-            order_id=order.pk,
-            order_products=order_products,
-            products_with_count=self.order_data.products,
-        )
+            self.payment_repo.create_order_products(
+                order_id=order.pk,
+                order_products=order_products,
+                products_with_count=self.order_data.products,
+            )
+
+        with self.notification_bus:
+            self.notification_bus.send_order_notification(order.pk)
 
         if self.order_data.cash:
-            # asyncio.run(send_notification_about_new_order(order.pk))
             return 'OK'
 
         payment_url = self.get_payment_url(

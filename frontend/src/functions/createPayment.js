@@ -50,7 +50,7 @@ const createPayment = async (event, oneclick=false) => {
     await PaymentCreateRequest(data).then((response) => {
         if (response.status === 201) {
             /////// need to be deleted when payments will turn on
-            alert('Онлайн оплата временно недоступна, свяжитесь с нами напрямую');
+            alert('Онлайн оплата временно недоступна, но мы приняли ваш заказ! Скоро свяжемся с вами');
             return null;
             ///////
             if (response.data.payment_url === 'OK') {

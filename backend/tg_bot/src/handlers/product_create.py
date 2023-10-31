@@ -2,11 +2,12 @@ import asyncio
 
 from aiogram import Dispatcher, types
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from container import Container
-from create_bot import admin_panel_product_url, bot, domain
+from create_bot import bot
 from dependency_injector.wiring import Provide, inject
 from repositories.core import CoreRepository
 
+from config import Config
+from container import Container
 from utils.download_image import download_photo
 from utils.markups import type_product_markup
 from utils.utils import command_for, slugify_string, validate_title
@@ -166,6 +167,7 @@ async def finish_product_create(
     data: dict,
     from_user_id: int,
     core_repo: CoreRepository = Provide[Container.core_repo],
+    config: Config = Provide[Container.config],
 ):
     product_id, product_slug = await core_repo.create_product(data)
 
@@ -174,14 +176,14 @@ async def finish_product_create(
         types.InlineKeyboardButton(
             'Перейти в админ панель товара',
             url=''.join(
-                (domain, (admin_panel_product_url % product_id)),
+                (config.domain, (config.admin_panel_product_url % product_id)),
             ),
         ),
     )
     markup.add(
         types.InlineKeyboardButton(
             'Посмотреть товар на сайте',
-            url=''.join((domain, f'/flower/{product_slug}')),
+            url=''.join((config.domain, f'/flower/{product_slug}')),
         ),
     )
 

@@ -45,13 +45,12 @@ class PaymentRepository:
         order_products: List[Product],
         products_with_count: dict,
     ) -> None:
-        products_to_bulk_create = []
-        for product in order_products:
-            products_to_bulk_create.append(
-                OrderProduct(
-                    order_id=order_id,
-                    product=product,
-                    count=int(products_with_count.get(product.slug)),
-                ),
+        products_to_bulk_create = [
+            OrderProduct(
+                order_id=order_id,
+                product=product,
+                count=int(products_with_count.get(product.slug)),
             )
+            for product in order_products
+        ]
         OrderProduct.objects.bulk_create(products_to_bulk_create)

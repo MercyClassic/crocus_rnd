@@ -3,14 +3,11 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.repositories import UserRepository
+from container import Container
 from utils.pause import check_for_pause_timer, set_pause_timer
 
-from .repositories import PaymentRepository
 from .serializers import CallMeSerializer, PaymentCreateSerializer
-from .services.call_me import create_call_me_request
 from .services.payment_accept import payment_acceptance
-from .services.payment_create import PaymentCreateService
 
 bad_request_response = Response(
     status=status.HTTP_400_BAD_REQUEST,
@@ -34,13 +31,9 @@ class CreatePaymentAPIView(GenericAPIView):
         else:
             return bad_request_response
 
-        payment_service = PaymentCreateService(
-            serialized_data,
-            PaymentRepository(),
-            UserRepository(),
-        )
+        payment_service = Container.payment_service()
+        payment_service.fill_in_with_data(serialized_data)
         payment_url = payment_service.create_payment()
-
         set_pause_timer(request, 'create_order')
 
         if not payment_url:
@@ -59,11 +52,14 @@ class CallMeAPIView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = CallMeSerializer(data=request.data)
 
+        call_me_service = Container.call_me_service()
+
         if serializer.is_valid():
-            if create_call_me_request(
+            if call_me_service.create_call_me_request(
                 request,
                 serializer.validated_data.get('phone_number'),
             ):
+                set_pause_timer(request, 'call_me')
                 return Response(
                     status=status.HTTP_200_OK,
                     data='Спасибо за обращение, скоро мы вам перезвоним!',

@@ -1,17 +1,22 @@
-import asyncio
-
 from rest_framework.request import Request
 
-# from bot.handlers.notifications import send_notification_about_new_call_me
-from utils.pause import check_for_pause_timer, set_pause_timer
+from rabbitmq.notifications import NotificationBus
+from utils.pause import check_for_pause_timer
 
 
-def create_call_me_request(request: Request, phone_number: str) -> bool | None:
-    if not check_for_pause_timer(request, 'call_me'):
-        return False
-    set_pause_timer(request, 'call_me')
+class CallMeService:
+    def __init__(self, notification_bus: NotificationBus):
+        self.notification_bus = notification_bus
 
-    # asyncio.run(
-    #     send_notification_about_new_call_me(phone_number),
-    # )
-    return True
+    def create_call_me_request(
+        self,
+        request: Request,
+        phone_number: str,
+    ) -> bool:
+        if not check_for_pause_timer(request, 'call_me'):
+            return False
+
+        with self.notification_bus:
+            self.notification_bus.send_call_me_request_notification(phone_number)
+
+        return True

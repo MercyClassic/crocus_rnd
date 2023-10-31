@@ -1,10 +1,11 @@
 from aiogram import Dispatcher, types
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from container import Container
-from create_bot import admin_panel_category_url, bot, domain
+from create_bot import bot
 from dependency_injector.wiring import Provide, inject
 from repositories.core import CoreRepository
 
+from config import Config
+from container import Container
 from utils.download_image import download_photo
 from utils.utils import command_for
 
@@ -73,6 +74,7 @@ async def finish_category_create(
     data: dict,
     from_user_id: int,
     core_repo: CoreRepository = Provide[Container.core_repo],
+    config: Config = Provide[Container.config],
 ):
     category_id = await core_repo.create_category(data)
 
@@ -81,7 +83,7 @@ async def finish_category_create(
         types.InlineKeyboardButton(
             'Перейти в админ панель товара',
             url=''.join(
-                (domain, (admin_panel_category_url % category_id)),
+                (config.domain, (config.admin_panel_category_url % category_id)),
             ),
         ),
     )

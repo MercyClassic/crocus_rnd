@@ -8,9 +8,7 @@ def check_for_pause_timer(request, attr_name: str) -> bool:
     if pause and datetime.strptime(pause, '%Y:%m:%d:%H:%M:%S') > datetime.utcnow():
         return False
     ip = request.headers.get('X-Real-Ip')
-    if cache.get(ip):
-        return False
-    return True
+    return not cache.get(ip)
 
 
 def set_pause_timer(request, attr_name: str) -> None:

@@ -1,12 +1,20 @@
 from aiogram import Dispatcher
 from aiogram.types import ContentType
-from create_bot import bot, domain
+from create_bot import bot
+from dependency_injector.wiring import Provide, inject
+
+from config import Config
+from container import Container
 
 
-async def open_website(message):
+@inject
+async def open_website(
+    message,
+    config: Config = Provide[Container.config],
+):
     await bot.send_message(
         message.from_user.id,
-        domain,
+        config.domain,
     )
 
 
