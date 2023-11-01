@@ -1,14 +1,9 @@
 [flake8]
 exclude =
-    */venv/*
-    */migrations/*
     *.git
     */__pycache__/*
     */__init__.py
-    core/src/media
-    core/src/logs
-    manage.py
-ignore = DJ01, A003, VNE003, W503
+ignore = A003, VNE003
 max-line-length=100
 max-cognitive-complexity=8
 inline-quotes = '

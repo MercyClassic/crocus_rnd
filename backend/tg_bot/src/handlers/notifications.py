@@ -2,7 +2,7 @@ from aiogram import types
 from create_bot import bot
 from dependency_injector.wiring import Provide, inject
 
-from config import Config, get_config
+from config import Config
 from container import Container
 
 

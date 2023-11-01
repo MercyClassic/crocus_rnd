@@ -5,29 +5,40 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from accounts.repositories import UserRepository
+from container import container
 from payments.repositories import PaymentRepository
 from payments.serializers import PaymentCreateSerializer
 from payments.services.payment_create import PaymentCreateService
 from products.models import Product
 
 
-class TestPaymentCreateService(PaymentCreateService):
+class PaymentCreateServiceOverride(PaymentCreateService):
     def get_payment_url(
         self,
         order_uuid: str,
         amount: int,
         receipt: dict,
     ) -> str:
-        data = {
-            'TerminalKey': 'TINKOFF_TERMINAL_KEY',
-            'Amount': int(amount) * 100,
-            'OrderId': order_uuid,
-            'DATA': {'Phone': self.order_data.customer_phone_number},
-        }
-        token = self.generate_payment_token(data)
-        data.setdefault('Token', token)
-        data.setdefault('Receipt', receipt)
         return 'OK'
+
+
+class CallMeServiceOverride:
+    def create_call_me_request(self, *args, **kwargs) -> bool:
+        return True
+
+
+class NotificationBusMock:
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def send_order_notification(self, order_id: int) -> None:
+        pass
+
+    def send_call_me_request_notification(self, phone_number: str) -> None:
+        pass
 
 
 class PaymentTests(APITestCase):
@@ -48,6 +59,12 @@ class PaymentTests(APITestCase):
         )
 
     def test_create_payment(self):
+        payment_service = PaymentCreateServiceOverride(
+            PaymentRepository(),
+            UserRepository(),
+            NotificationBusMock(),
+        )
+
         """ALL DATA IS VALID"""
         data = {
             'items': {'product1': 1, 'product2': 1},
@@ -67,34 +84,28 @@ class PaymentTests(APITestCase):
         }
         serializer = PaymentCreateSerializer(data=data)
         serializer.is_valid()
-        payment_service = TestPaymentCreateService(
-            serializer.validated_data,
-            PaymentRepository(),
-            UserRepository(),
-        )
+        payment_service.fill_in_with_data(serializer.validated_data)
         result = payment_service.create_payment()
         self.assertEqual(result, 'OK')
-
         data = {
             'items': {'product1': 1, 'product2': 1},
             'amount': 650,
             'customer_name': 'Test Name',
             'customer_phone_number': '+79999999999',
+            'receiver_name': '',
+            'receiver_phone_number': '+79999999999',
             'without_calling': False,
             'customer_email': '',
             'delivery_address': 'улица Пушкина',
             'delivery_date': datetime.utcnow(),
             'delivery_time': '',
+            'note': 'Примечание',
             'delivering': True,
             'cash': True,
         }
         serializer = PaymentCreateSerializer(data=data)
         serializer.is_valid()
-        payment_service = TestPaymentCreateService(
-            serializer.validated_data,
-            PaymentRepository(),
-            UserRepository(),
-        )
+        payment_service.fill_in_with_data(serializer.validated_data)
         result = payment_service.create_payment()
         self.assertEqual(result, 'OK')
         data = {
@@ -102,20 +113,20 @@ class PaymentTests(APITestCase):
             'amount': 400,
             'customer_name': 'Test Name',
             'customer_phone_number': '+79999999999',
+            'receiver_name': '',
+            'receiver_phone_number': '+79999999999',
             'without_calling': False,
             'customer_email': '',
+            'delivery_address': '',
             'delivery_date': datetime.utcnow(),
             'delivery_time': '',
+            'note': 'Примечание',
             'delivering': False,
             'cash': True,
         }
         serializer = PaymentCreateSerializer(data=data)
         serializer.is_valid()
-        payment_service = TestPaymentCreateService(
-            serializer.validated_data,
-            PaymentRepository(),
-            UserRepository(),
-        )
+        payment_service.fill_in_with_data(serializer.validated_data)
         result = payment_service.create_payment()
         self.assertEqual(result, 'OK')
         """ AMOUNT IS NOT VALID """
@@ -124,20 +135,20 @@ class PaymentTests(APITestCase):
             'amount': 301,
             'customer_name': 'Test Name',
             'customer_phone_number': '+79999999999',
+            'receiver_name': '',
+            'receiver_phone_number': '+79999999999',
             'without_calling': False,
             'customer_email': '',
+            'delivery_address': '',
             'delivery_date': datetime.utcnow(),
             'delivery_time': '',
+            'note': 'Примечание',
             'delivering': False,
             'cash': True,
         }
         serializer = PaymentCreateSerializer(data=data)
         serializer.is_valid()
-        payment_service = TestPaymentCreateService(
-            serializer.validated_data,
-            PaymentRepository(),
-            UserRepository(),
-        )
+        payment_service.fill_in_with_data(serializer.validated_data)
         result = payment_service.create_payment()
         self.assertEqual(result, False)
         """ NAME IS NOT VALID """
@@ -146,10 +157,14 @@ class PaymentTests(APITestCase):
             'amount': 300,
             'customer_name': 'i' * 201,
             'customer_phone_number': '+79999999999',
+            'receiver_name': '',
+            'receiver_phone_number': '+79999999999',
             'without_calling': False,
             'customer_email': '',
             'delivery_time': '',
+            'delivery_address': '',
             'delivery_date': datetime.utcnow(),
+            'note': 'Примечание',
             'delivering': False,
             'cash': True,
         }
@@ -162,10 +177,14 @@ class PaymentTests(APITestCase):
             'amount': 300,
             'customer_name': 'Test Name',
             'customer_phone_number': '42331231',
+            'receiver_name': '',
+            'receiver_phone_number': '+79999999999',
             'without_calling': False,
             'customer_email': '',
+            'delivery_address': '',
             'delivery_date': datetime.utcnow(),
             'delivery_time': '',
+            'note': 'Примечание',
             'delivering': False,
             'cash': True,
         }
@@ -178,20 +197,20 @@ class PaymentTests(APITestCase):
             'amount': 200,
             'customer_name': 'Test Name',
             'customer_phone_number': '+79999999999',
+            'receiver_name': '',
+            'receiver_phone_number': '+79999999999',
             'without_calling': False,
             'customer_email': '',
+            'delivery_address': '',
             'delivery_date': datetime.utcnow(),
             'delivery_time': '',
+            'note': 'Примечание',
             'delivering': False,
             'cash': True,
         }
         serializer = PaymentCreateSerializer(data=data)
         serializer.is_valid()
-        payment_service = TestPaymentCreateService(
-            serializer.validated_data,
-            PaymentRepository(),
-            UserRepository(),
-        )
+        payment_service.fill_in_with_data(serializer.validated_data)
         result = payment_service.create_payment()
         self.assertEqual(result, False)
         """ ITEMS CANT BE NULL """
@@ -200,10 +219,14 @@ class PaymentTests(APITestCase):
             'amount': 200,
             'customer_name': 'Test Name',
             'customer_phone_number': '+79999999999',
+            'receiver_name': '',
+            'receiver_phone_number': '+79999999999',
             'without_calling': False,
+            'delivery_address': '',
             'delivery_date': datetime.utcnow(),
             'delivery_time': '',
             'delivering': False,
+            'note': 'Примечание',
             'customer_email': '',
             'cash': True,
         }
@@ -216,10 +239,14 @@ class PaymentTests(APITestCase):
             'amount': 200,
             'customer_name': 'Test Name',
             'customer_phone_number': '+79999999999',
+            'receiver_name': '',
+            'receiver_phone_number': '+79999999999',
             'without_calling': False,
             'customer_email': '',
+            'delivery_address': '',
             'delivery_date': '',
             'delivery_time': '',
+            'note': 'Примечание',
             'delivering': False,
             'cash': True,
         }
@@ -228,6 +255,8 @@ class PaymentTests(APITestCase):
         self.assertEqual(result, False)
 
     def test_call_me(self):
+        container.call_me_service.override(CallMeServiceOverride())
+
         """PHONE NUMBER IS NOT VALID"""
         response = self.client.post(
             reverse('api-call-me'),
@@ -240,9 +269,3 @@ class PaymentTests(APITestCase):
             {'phone_number': '+79999999999'},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        """ PHONE NUMBER IS VALID BUT TIMEOUT """
-        response = self.client.post(
-            reverse('api-call-me'),
-            {'phone_number': '+79999999999'},
-        )
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

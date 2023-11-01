@@ -31,3 +31,6 @@ class Container(containers.DeclarativeContainer):
         CallMeService,
         notification_bus,
     )
+
+
+container = Container()

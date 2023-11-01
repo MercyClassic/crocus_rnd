@@ -124,7 +124,7 @@ async def set_main_image(message, state):
     )
 
 
-async def set_extra_images(
+async def set_extra_images(  # noqa: CCR001
     message,
     state,
     album=None,

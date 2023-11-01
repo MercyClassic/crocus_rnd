@@ -3,7 +3,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from container import Container
+from container import container
 from utils.pause import check_for_pause_timer, set_pause_timer
 
 from .serializers import CallMeSerializer, PaymentCreateSerializer
@@ -31,7 +31,7 @@ class CreatePaymentAPIView(GenericAPIView):
         else:
             return bad_request_response
 
-        payment_service = Container.payment_service()
+        payment_service = container.payment_service()
         payment_service.fill_in_with_data(serialized_data)
         payment_url = payment_service.create_payment()
         set_pause_timer(request, 'create_order')
@@ -52,7 +52,7 @@ class CallMeAPIView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = CallMeSerializer(data=request.data)
 
-        call_me_service = Container.call_me_service()
+        call_me_service = container.call_me_service()
 
         if serializer.is_valid():
             if call_me_service.create_call_me_request(
