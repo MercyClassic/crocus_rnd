@@ -135,12 +135,12 @@ CSRF_TRUSTED_ORIGINS = [
 
 CACHALOT_TIMEOUT = 30
 
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django_redis.cache.RedisCache',
-#         'LOCATION': f'redis://{REDIS_HOST}:6379/1',
-#         'OPTIONS': {
-#             'PASSWORD': os.getenv('REDIS_PASSWORD'),
-#         },
-#     },
-# }
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': f'redis://{REDIS_HOST}:6379/1',
+        'OPTIONS': {
+            'PASSWORD': os.getenv('REDIS_PASSWORD'),
+        },
+    },
+}
