@@ -32,6 +32,14 @@ services:
         condition: service_healthy
     networks:
       - main
+  rabbitmq:
+    image: rabbitmq
+    container_name: rabbitmq_container
+    restart: always
+    ports:
+      - "5672:5672"
+    networks:
+      - main
   telegram_bot:
     container_name: telegram_bot
     restart: always
@@ -40,6 +48,16 @@ services:
     volumes:
       - ../backend/core/src/media:/market/backend/core/src/media
       - ../frontend/build/static/img:/market/frontend/build/static/img
+    networks:
+      - main
+  rabbitmq_consumer:
+    container_name: rabbitmq_consumer
+    restart: always
+    build:
+      context: ../backend/tg_bot
+    command: python start_consuming.py
+    depends_on:
+      - rabbitmq
     networks:
       - main
   nginx:

@@ -8,7 +8,7 @@ class Config(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_DB: str
 
-    PIKA_HOST: str
+    RABBITMQ_HOST: str
     domain: str
     to_notificate_telegram_id: str
     admin_panel_product_url: str

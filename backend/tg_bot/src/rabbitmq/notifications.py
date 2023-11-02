@@ -8,7 +8,7 @@ from config import get_config
 class NotificationBus:
     def __init__(self):
         self.__connection = pika.BlockingConnection(
-            pika.ConnectionParameters(get_config().PIKA_HOST),
+            pika.ConnectionParameters(get_config().RABBITMQ_HOST),
         )
         self._channel = self.__connection.channel()
         self._channel.exchange_declare(

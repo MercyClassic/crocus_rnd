@@ -11,7 +11,7 @@ DEBUG = os.getenv('DEBUG', False) == 'True'
 
 REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
 
-PIKA_HOST = os.getenv('PIKA_HOST', 'localhost')
+RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'localhost')
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 

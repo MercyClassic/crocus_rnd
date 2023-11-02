@@ -1,11 +1,11 @@
 import pika
 
-from config.settings import PIKA_HOST
+from config.settings import RABBITMQ_HOST
 
 
 class NotificationBus:
     def __init__(self):
-        self.__connection = pika.BlockingConnection(pika.ConnectionParameters(PIKA_HOST))
+        self.__connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST))
 
     def __enter__(self):
         self._channel = self.__connection.channel()
