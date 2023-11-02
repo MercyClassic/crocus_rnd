@@ -18,7 +18,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEV_HOSTS = ['http://%s' % host for host in os.getenv('DEV_HOSTS').split(', ')]
 PROD_HOSTS = ['https://%s' % host for host in os.getenv('PROD_HOSTS').split(', ')]
 
-ALLOWED_HOSTS = [host for host in (os.getenv('DEV_HOSTS') + os.getenv('PROD_HOSTS')).split(', ')]
+ALLOWED_HOSTS = [
+    host for host in f"{os.getenv('DEV_HOSTS')}, {os.getenv('PROD_HOSTS')}".split(', ')
+]
 
 ROLLBAR = {
     'access_token': os.getenv('ROLLBAR_ACCESS_TOKEN'),
