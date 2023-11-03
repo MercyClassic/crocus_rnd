@@ -1,7 +1,7 @@
 from aiogram import Dispatcher
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from create_bot import bot
 
+from create_bot import bot
 from utils.download_image import download_photo
 from utils.utils import command_for
 
@@ -24,7 +24,7 @@ async def set_background_image(message, state):
     await state.finish()
     await download_photo(
         message.photo[-1].file_id,
-        '../../../../frontend/build/static/img/jpg/bg.jpg',
+        '../../../frontend/build/static/img/jpg/bg.jpg',
     )
     await bot.send_message(
         message.from_user.id,
@@ -34,7 +34,7 @@ async def set_background_image(message, state):
 
 @command_for(permission_level='admin')
 async def send_background_image(message):
-    with open('../../../../frontend/build/static/img/jpg/bg.jpg', 'rb') as buffer:
+    with open('../../../frontend/build/static/img/jpg/bg.jpg', 'rb') as buffer:
         await bot.send_photo(
             message.from_user.id,
             buffer,

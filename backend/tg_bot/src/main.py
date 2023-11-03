@@ -1,8 +1,8 @@
-import handlers
 from aiogram import executor
+
+import handlers
 from container import Container
 from create_bot import dp
-
 from utils.middlewares import AlbumMiddleware
 
 
@@ -13,6 +13,7 @@ def bot_run():
             'handlers.category_create',
             'handlers.get_order_list',
             'handlers.product_create',
+            'handlers.admin',
             'handlers.others',
         ],
     )

@@ -1,9 +1,9 @@
 from aiogram import Dispatcher, types
-from create_bot import bot
 from dependency_injector.wiring import Provide, inject
 
 from config import Config
 from container import Container
+from create_bot import bot
 from utils.messages import admin_help_text
 from utils.utils import command_for
 
@@ -18,7 +18,10 @@ async def admin_help(message):
 
 @command_for(permission_level='admin')
 @inject
-async def open_admin_panel(message, config: Config = Provide[Container.config]):
+async def open_admin_panel(
+    message,
+    config: Config = Provide[Container.config],
+):
     url = ''.join((config.domain, config.admin_panel_url))
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton('Перейти в админ панель', url=url))

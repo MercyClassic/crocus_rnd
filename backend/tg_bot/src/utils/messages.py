@@ -7,6 +7,7 @@ admin_help_text = (
     '\n/adminpanel - Открыть административную панель'
     '\n/createproduct - Создать товар'
     '\n/createcategory - Создать категорию'
+    '\n/cancel - Отменить создание'
     '\n/setbgimage - Поменять главное изображение'
     '\n/downloadbgimage - Скачать главное изображение'
 )
