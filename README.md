@@ -14,6 +14,7 @@
 - **<h3> Aiogram 2.25.1 </h3>**
 - **<h3> PostgreSQL </h3>**
 - **<h3> Redis </h3>**
+- **<h3> RabbitMQ </h3>**
 - **<h3> Nginx </h3>**
 - **<h3> Docker </h3>**
 - **<h3> React </h3>**
