@@ -47,7 +47,7 @@ services:
       context: ../backend/tg_bot
     volumes:
       - ../backend/core/src/media:/market/backend/core/src/media
-      - ../frontend/build/static/img:/market/frontend/build/static/img
+      - ../frontend/build/static/img/jpg:/market/frontend/build/static/img/jpg
     networks:
       - main
   rabbitmq_consumer:
@@ -70,10 +70,10 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ../frontend/build:/var/market/build
-      - ../backend/core/src/media:/var/market/media
+      - ../frontend/build:/market/frontend/build
+      - ../backend/core/src/media:/market/backend/core/src/media/
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      # - /etc/letsencrypt:/etc/letsencrypt
+      - /etc/letsencrypt:/etc/letsencrypt
     healthcheck:
       test: [ "CMD", "service", "nginx", "status" ]
       interval: 30s

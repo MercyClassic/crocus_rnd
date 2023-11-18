@@ -1,7 +1,10 @@
 from aiogram import Dispatcher
 from aiogram.dispatcher.filters.state import State, StatesGroup
-
 from create_bot import bot
+from dependency_injector.wiring import Provide, inject
+
+from config import Config
+from container import Container
 from utils.download_image import download_photo
 from utils.utils import command_for
 
@@ -20,11 +23,16 @@ async def start_set_background_image(message):
     )
 
 
-async def set_background_image(message, state):
+@inject
+async def set_background_image(
+    message,
+    state,
+    config: Config = Provide[Container.config],
+):
     await state.finish()
     await download_photo(
         message.photo[-1].file_id,
-        '../../../frontend/build/static/img/jpg/bg.jpg',
+        config.BG_IMG_PATH,
     )
     await bot.send_message(
         message.from_user.id,
@@ -33,8 +41,12 @@ async def set_background_image(message, state):
 
 
 @command_for(permission_level='admin')
-async def send_background_image(message):
-    with open('../../../frontend/build/static/img/jpg/bg.jpg', 'rb') as buffer:
+@inject
+async def send_background_image(
+    message,
+    config: Config = Provide[Container.config],
+):
+    with open(config.BG_IMG_PATH, 'rb') as buffer:
         await bot.send_photo(
             message.from_user.id,
             buffer,

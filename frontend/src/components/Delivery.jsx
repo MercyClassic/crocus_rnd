@@ -18,6 +18,7 @@ const Delivery = () => {
         <>
         {loader && <Loader />}
         <section className="delivery">
+            <img src="/static/img/jpg/bg.jpg" className="delivery__background" />
             <div className="delivery__body">
                 <h1 className="delivery__title"> <p> Доставка <span style={{display: 'block'}}> свежих цветов </span> </p> <span>в Ростове-на-Дону</span></h1>
                 <p className="delivery__text">

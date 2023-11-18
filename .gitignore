@@ -9,5 +9,5 @@ dist
 backend/core/src/media
 backend/core/src/logs
 frontend/build
-
+dev
 __pycache__

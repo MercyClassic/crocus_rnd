@@ -158,8 +158,8 @@ async def set_extra_images(  # noqa: CCR001
         async with state.proxy() as data:
             data['extra_images'] = extra_images
 
-        await state.finish()
-        await finish_product_create(data._data, message.from_user.id)
+    await state.finish()
+    await finish_product_create(data._data, message.from_user.id)
 
 
 @inject

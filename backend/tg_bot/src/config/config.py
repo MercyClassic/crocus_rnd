@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -7,6 +9,15 @@ class Config(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_HOST: str
     POSTGRES_DB: str
+
+    MEDIA_DIR: Path = '%s/%s' % (
+        Path(__file__).parent.parent.parent.parent,
+        'core/src/media/images',
+    )
+    BG_IMG_PATH: str = '%s/%s' % (
+        Path(__file__).parent.parent.parent.parent.parent,
+        'frontend/build/static/img/jpg/bg.jpg',
+    )
 
     RABBITMQ_HOST: str
     domain: str

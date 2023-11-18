@@ -1,8 +1,8 @@
-from aiogram import executor
-
 import handlers
-from container import Container
+from aiogram import executor
 from create_bot import dp
+
+from container import Container
 from utils.middlewares import AlbumMiddleware
 
 
@@ -15,6 +15,8 @@ def bot_run():
             'handlers.product_create',
             'handlers.admin',
             'handlers.others',
+            'handlers.background_image',
+            'utils.download_image',
         ],
     )
     dp.middleware.setup(AlbumMiddleware())
