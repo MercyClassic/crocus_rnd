@@ -1,13 +1,17 @@
 import logging
 import os
+from logging import config
 
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from dotenv import load_dotenv
 
+from config import get_config, get_logging_dict
+
 load_dotenv()
 
-logger = logging.getLogger('telegram_errors')
+config.dictConfig(get_logging_dict(get_config()))
+logger = logging.getLogger(__name__)
 
 bot = Bot(os.getenv('BOT_TOKEN'))
 

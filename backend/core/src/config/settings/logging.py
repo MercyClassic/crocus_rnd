@@ -6,10 +6,6 @@ LOGGING = {
             'format': '{asctime} - {levelname} - {module} - {view} - {session_id} - {message}',
             'style': '{',
         },
-        'telegram_format': {
-            'format': '{asctime} - {levelname} - {module} - {message} - {user_id} - {message_id}',
-            'style': '{',
-        },
         'payment_format': {
             'format': '{asctime} - {levelname} - {message}',
             'style': '{',

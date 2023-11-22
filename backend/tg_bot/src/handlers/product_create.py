@@ -135,6 +135,7 @@ async def set_extra_images(  # noqa: CCR001
                 data['extra_images'] = None
         else:
             await bot.send_message(message.from_user.id, 'Неверная команда')
+            return
     elif message.content_type == 'photo':
         if album:
             media_group = types.MediaGroup()

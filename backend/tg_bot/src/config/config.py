@@ -10,6 +10,7 @@ class Config(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_DB: str
 
+    ROOT_DIR: str = '%s' % Path(__file__).parent.parent
     MEDIA_DIR: Path = '%s/%s' % (
         Path(__file__).parent.parent.parent.parent,
         'core/src/media/images',
