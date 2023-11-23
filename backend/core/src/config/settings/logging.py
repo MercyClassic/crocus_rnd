@@ -20,14 +20,6 @@ LOGGING = {
             'formatter': 'main_format',
             'filename': 'logs/market.log',
         },
-        'telegram': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'maxBytes': 1_048_576,
-            'backupCount': 50,
-            'formatter': 'telegram_format',
-            'filename': 'logs/telegram.log',
-        },
         'payment_info': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -48,11 +40,6 @@ LOGGING = {
     'loggers': {
         'unexpected_errors': {
             'handlers': ['market'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-        'telegram_errors': {
-            'handlers': ['telegram'],
             'level': 'ERROR',
             'propagate': True,
         },
