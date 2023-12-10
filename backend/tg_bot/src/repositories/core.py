@@ -1,8 +1,9 @@
-from models.payments import Order, OrderProduct
-from models.products import Category, Product, ProductImage
-from sqlalchemy import insert, or_, select
+from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
+
+from models.payments import Order, OrderProduct
+from models.products import Category, Product, ProductImage
 
 
 class CoreRepository:
@@ -20,10 +21,7 @@ class CoreRepository:
                 ),
             )
             .where(
-                or_(
-                    Order.is_paid.is_(True),
-                    Order.cash.is_(True),
-                ),
+                Order.done_at.is_(None),
             )
         )
         orders = await self._session.execute(query)
