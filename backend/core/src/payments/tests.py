@@ -1,15 +1,18 @@
 from datetime import datetime
 
+from django.core.cache import cache
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from accounts.repositories import UserRepository
-from container import container
-from payments.repositories import PaymentRepository
-from payments.serializers import PaymentCreateSerializer
+from interfaces.notification_bus import NotificationBusInterface
+from interfaces.services.call_me import CallMeServiceInterface
+from interfaces.services.payment_create import PaymentCreateServiceInterface
+from ioc.ioc import container
+from payments.services.call_me import CallMeService
 from payments.services.payment_create import PaymentCreateService
 from products.models import Product
+from rabbitmq.notification_bus import NotificationBus
 
 
 class PaymentCreateServiceOverride(PaymentCreateService):
@@ -22,23 +25,22 @@ class PaymentCreateServiceOverride(PaymentCreateService):
         return 'OK'
 
 
-class CallMeServiceOverride:
+class CallMeServiceOverride(CallMeService):
     def create_call_me_request(self, *args, **kwargs) -> bool:
         return True
 
 
-class NotificationBusMock:
-    def __enter__(self):
-        pass
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        pass
-
+class NotificationBusOverride(NotificationBus):
     def send_order_notification(self, order_id: int) -> None:
         pass
 
     def send_call_me_request_notification(self, phone_number: str) -> None:
         pass
+
+
+container.override(PaymentCreateServiceInterface, PaymentCreateServiceOverride)
+container.override(CallMeServiceInterface, CallMeServiceOverride)
+container.override(NotificationBusInterface, NotificationBusOverride)
 
 
 class PaymentTests(APITestCase):
@@ -59,13 +61,8 @@ class PaymentTests(APITestCase):
         )
 
     def test_create_payment(self):
-        payment_service = PaymentCreateServiceOverride(
-            PaymentRepository(),
-            UserRepository(),
-            NotificationBusMock(),
-        )
-
         """ALL DATA IS VALID"""
+        cache.clear()
         data = {
             'items': {'product1': 1, 'product2': 1},
             'amount': 300,
@@ -82,11 +79,22 @@ class PaymentTests(APITestCase):
             'cash': True,
             'delivering': False,
         }
-        serializer = PaymentCreateSerializer(data=data)
-        serializer.is_valid()
-        payment_service.fill_in_with_data(serializer.validated_data)
-        result = payment_service.create_payment()
-        self.assertEqual(result, 'OK')
+        cache.clear()
+        response = self.client.post(
+            reverse('api-payment-create'),
+            data=data,
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        """ALL DATA IS VALID BUT TIMEOUT"""
+        response = self.client.post(
+            reverse('api-payment-create'),
+            data=data,
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        cache.clear()
+        """ALL DATA IS VALID"""
         data = {
             'items': {'product1': 1, 'product2': 1},
             'amount': 650,
@@ -103,11 +111,14 @@ class PaymentTests(APITestCase):
             'delivering': True,
             'cash': True,
         }
-        serializer = PaymentCreateSerializer(data=data)
-        serializer.is_valid()
-        payment_service.fill_in_with_data(serializer.validated_data)
-        result = payment_service.create_payment()
-        self.assertEqual(result, 'OK')
+        response = self.client.post(
+            reverse('api-payment-create'),
+            data=data,
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        cache.clear()
+        """ALL DATA IS VALID"""
         data = {
             'items': {'product1': 2, 'product2': 1},
             'amount': 400,
@@ -124,11 +135,13 @@ class PaymentTests(APITestCase):
             'delivering': False,
             'cash': True,
         }
-        serializer = PaymentCreateSerializer(data=data)
-        serializer.is_valid()
-        payment_service.fill_in_with_data(serializer.validated_data)
-        result = payment_service.create_payment()
-        self.assertEqual(result, 'OK')
+        response = self.client.post(
+            reverse('api-payment-create'),
+            data=data,
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        cache.clear()
         """ AMOUNT IS NOT VALID """
         data = {
             'items': {'product1': 1, 'product2': 1},
@@ -146,11 +159,13 @@ class PaymentTests(APITestCase):
             'delivering': False,
             'cash': True,
         }
-        serializer = PaymentCreateSerializer(data=data)
-        serializer.is_valid()
-        payment_service.fill_in_with_data(serializer.validated_data)
-        result = payment_service.create_payment()
-        self.assertEqual(result, False)
+        response = self.client.post(
+            reverse('api-payment-create'),
+            data=data,
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        cache.clear()
         """ NAME IS NOT VALID """
         data = {
             'items': {'product1': 1, 'product2': 1},
@@ -168,9 +183,13 @@ class PaymentTests(APITestCase):
             'delivering': False,
             'cash': True,
         }
-        serializer = PaymentCreateSerializer(data=data)
-        result = serializer.is_valid()
-        self.assertEqual(result, False)
+        response = self.client.post(
+            reverse('api-payment-create'),
+            data=data,
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        cache.clear()
         """ PHONE NUMBER IS NOT VALID """
         data = {
             'items': {'product1': 1, 'product2': 1},
@@ -188,9 +207,13 @@ class PaymentTests(APITestCase):
             'delivering': False,
             'cash': True,
         }
-        serializer = PaymentCreateSerializer(data=data)
-        result = serializer.is_valid()
-        self.assertEqual(result, False)
+        response = self.client.post(
+            reverse('api-payment-create'),
+            data=data,
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        cache.clear()
         """ COUNT COULD NOT BE 0 """
         data = {
             'items': {'product1': 0, 'product2': 1},
@@ -208,11 +231,13 @@ class PaymentTests(APITestCase):
             'delivering': False,
             'cash': True,
         }
-        serializer = PaymentCreateSerializer(data=data)
-        serializer.is_valid()
-        payment_service.fill_in_with_data(serializer.validated_data)
-        result = payment_service.create_payment()
-        self.assertEqual(result, False)
+        response = self.client.post(
+            reverse('api-payment-create'),
+            data=data,
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        cache.clear()
         """ ITEMS CANT BE NULL """
         data = {
             'items': {},
@@ -230,9 +255,13 @@ class PaymentTests(APITestCase):
             'customer_email': '',
             'cash': True,
         }
-        serializer = PaymentCreateSerializer(data=data)
-        serializer.is_valid()
-        self.assertEqual(result, False)
+        response = self.client.post(
+            reverse('api-payment-create'),
+            data=data,
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        cache.clear()
         """ DELIVERY DATE CANT BE NULL """
         data = {
             'items': {},
@@ -250,13 +279,15 @@ class PaymentTests(APITestCase):
             'delivering': False,
             'cash': True,
         }
-        serializer = PaymentCreateSerializer(data=data)
-        result = serializer.is_valid()
-        self.assertEqual(result, False)
+        response = self.client.post(
+            reverse('api-payment-create'),
+            data=data,
+            format='json',
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        cache.clear()
 
     def test_call_me(self):
-        container.call_me_service.override(CallMeServiceOverride())
-
         """PHONE NUMBER IS NOT VALID"""
         response = self.client.post(
             reverse('api-call-me'),
@@ -269,3 +300,9 @@ class PaymentTests(APITestCase):
             {'phone_number': '+79999999999'},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        """ PHONE NUMBER IS VALID BUT TIMEOUT """
+        response = self.client.post(
+            reverse('api-call-me'),
+            {'phone_number': '+79999999999'},
+        )
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

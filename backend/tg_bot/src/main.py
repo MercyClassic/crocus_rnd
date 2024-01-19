@@ -1,34 +1,43 @@
-import handlers
-from aiogram import executor
-from create_bot import dp
+import asyncio
+import os
 
-from container import Container
-from utils.middlewares import AlbumMiddleware
+from aiogram import Bot, Dispatcher
+from aiogram.fsm.storage.memory import MemoryStorage
+from db.database import create_async_session_maker
+from logic import handlers
+from logic.middlewares import AlbumMiddleware, DependencyMiddleware
+
+from config import load_config
 
 
-def bot_run():
-    container = Container()
-    container.wire(
-        modules=[
-            'handlers.category_create',
-            'handlers.get_order_list',
-            'handlers.product_create',
-            'handlers.admin',
-            'handlers.others',
-            'handlers.background_image',
-            'utils.download_image',
-        ],
+async def main() -> None:
+    tg_config = load_config()
+    bot = Bot(tg_config.bot_token)
+    storage = MemoryStorage()
+    dp = Dispatcher(storage=storage)
+
+    async_session_maker = create_async_session_maker(os.environ['db_uri'])
+    dp.update.outer_middleware(AlbumMiddleware())
+    dp.update.outer_middleware(
+        DependencyMiddleware(
+            bot,
+            tg_config,
+            async_session_maker,
+        ),
     )
-    dp.middleware.setup(AlbumMiddleware())
-    handlers.admin.register_admin_handlers(dp)
-    handlers.background_image.register_background_image_handlers(dp)
-    handlers.cancel_state.register_cancel_handler(dp)
-    handlers.category_create.register_category_create_handlers(dp)
-    handlers.get_order_list.register_get_order_list_handlers(dp)
-    handlers.product_create.register_product_create_handlers(dp)
-    handlers.others.register_other_handlers(dp)
-    executor.start_polling(dp, skip_updates=True)
+
+    dp.include_router(handlers.admin_router)
+    dp.include_router(handlers.bg_image_router)
+    dp.include_router(handlers.cancel_state_router)
+    dp.include_router(handlers.category_create_router)
+    dp.include_router(handlers.get_order_list_router)
+    dp.include_router(handlers.product_create_router)
+    dp.include_router(handlers.others_router)
+    dp.include_router(handlers.errors_router)
+
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot, skip_updates=True)
 
 
 if __name__ == '__main__':
-    bot_run()
+    asyncio.run(main())

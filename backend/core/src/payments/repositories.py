@@ -30,7 +30,7 @@ class PaymentRepository:
         )
         return order
 
-    def get_order_products_from_db(
+    def get_order_products(
         self,
         products_slug: List[str],
     ) -> List[Product]:
@@ -54,3 +54,17 @@ class PaymentRepository:
             for product in order_products
         ]
         OrderProduct.objects.bulk_create(products_to_bulk_create)
+
+    def get_order_by_uuid(self, uuid: str) -> Order | None:
+        try:
+            order = Order.objects.only('id', 'is_paid').get(uuid=uuid)
+        except Order.DoesNotExist:
+            return None
+        return order
+
+    def delete_order(self, uuid: str):
+        Order.objects.filter(uuid=uuid).delete()
+
+    def set_is_paid_to_order(self, order: Order) -> None:
+        order.is_paid = True
+        order.save()

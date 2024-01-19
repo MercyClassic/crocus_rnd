@@ -7,7 +7,7 @@ After=network.target
 User=user
 Group=user
 WorkingDirectory=/home/user/market/backend/core/src
-ExecStart=/home/user/.cache/pypoetry/virtualenvs/market-d-7F1-9Z-py3.11/bin/gunicorn \
+ExecStart=source ../.env && gunicorn \
           --access-logfile /var/log/gunicorn/access.log \
           --error-logfile /var/log/gunicorn/error.log \
           --workers 3 \

@@ -1,13 +1,10 @@
 from rest_framework import status
-from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from container import container
-from utils.pause import check_for_pause_timer, set_pause_timer
-
-from .serializers import CallMeSerializer, PaymentCreateSerializer
-from .services.payment_accept import payment_acceptance
+from ioc.ioc import provider
+from payments.pause import is_user_paused, set_pause_timer
+from payments.serializers import CallMeSerializer, PaymentCreateSerializer
 
 bad_request_response = Response(
     status=status.HTTP_400_BAD_REQUEST,
@@ -15,15 +12,13 @@ bad_request_response = Response(
 )
 
 
-class CreatePaymentAPIView(GenericAPIView):
-    serializer_class = PaymentCreateSerializer
-
+class CreatePaymentAPIView(APIView):
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = PaymentCreateSerializer(data=request.data)
 
         if serializer.is_valid():
             serialized_data = serializer.validated_data
-            if not check_for_pause_timer(request, 'create_order'):
+            if is_user_paused(request, 'create_order'):
                 return Response(
                     status=status.HTTP_403_FORBIDDEN,
                     data='Вы уже сделали заказ, подождите немного прежде, чем сделать ещё один',
@@ -31,7 +26,7 @@ class CreatePaymentAPIView(GenericAPIView):
         else:
             return bad_request_response
 
-        payment_service = container.payment_service()
+        payment_service = provider.provide_payment_create_service()
         payment_service.fill_in_with_data(serialized_data)
         payment_url = payment_service.create_payment()
         set_pause_timer(request, 'create_order')
@@ -43,7 +38,8 @@ class CreatePaymentAPIView(GenericAPIView):
 
 class AcceptPaymentAPIView(APIView):
     def post(self, request, *args, **kwargs):
-        if payment_acceptance(request.data):
+        payment_service = provider.provide_payment_accept_service(request.data)
+        if payment_service.handle_webhook():
             return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -52,23 +48,24 @@ class CallMeAPIView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = CallMeSerializer(data=request.data)
 
-        call_me_service = container.call_me_service()
+        call_me_service = provider.provide_call_me_service()
 
         if serializer.is_valid():
-            if call_me_service.create_call_me_request(
-                request,
-                serializer.validated_data.get('phone_number'),
-            ):
-                set_pause_timer(request, 'call_me')
-                return Response(
-                    status=status.HTTP_200_OK,
-                    data='Спасибо за обращение, скоро мы вам перезвоним!',
-                )
-            else:
+            serialized_data = serializer.validated_data
+            if is_user_paused(request, 'call_me'):
                 return Response(
                     status=status.HTTP_403_FORBIDDEN,
                     data='Вы уже заказывали звонок недавно, '
                     'подождите немного, прежде, чем заказать ещё один',
                 )
+            call_me_service.create_call_me_request(
+                request,
+                serialized_data.get('phone_number'),
+            )
+            set_pause_timer(request, 'call_me')
+            return Response(
+                status=status.HTTP_200_OK,
+                data='Спасибо за обращение, скоро мы вам перезвоним!',
+            )
 
         return bad_request_response

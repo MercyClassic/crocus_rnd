@@ -2,55 +2,63 @@ import copy
 import logging
 import os
 from hashlib import sha256
+from typing import Dict
 
 import rollbar
 
-from payments.models import Order
+from payments.repositories import PaymentRepository
 
 logger = logging.getLogger('payment')
 
 
-def check_payment_token(request_data: dict) -> bool:
-    data = copy.copy(request_data)
-    request_token = data.pop('Token')
-    data.pop('Data')
-    data.update({'Password': os.getenv('TINKOFF_PASSWORD')})
-    data['Success'] = str(data['Success']).lower()
-    token_data = tuple(map(lambda tup: str(tup[1]), sorted(data.items())))
-    generated_token = sha256(''.join(token_data).encode('utf-8')).hexdigest()
-    return request_token == generated_token
+class PaymentAcceptService:
+    def __init__(
+        self,
+        payment_repo: PaymentRepository,
+        request_data: Dict,
+    ):
+        self.payment_repo = payment_repo
+        self._request_data: Dict = request_data
 
+    def check_payment_token(self) -> bool:
+        data = copy.copy(self._request_data)
+        request_token = data.pop('Token')
+        data.pop('Data')
+        data.update({'Password': os.getenv('TINKOFF_PASSWORD')})
+        data['Success'] = str(data['Success']).lower()
+        token_data = tuple(map(lambda tup: str(tup[1]), sorted(data.items())))
+        generated_token = sha256(''.join(token_data).encode('utf-8')).hexdigest()
+        return request_token == generated_token
 
-def payment_acceptance(request_data: dict) -> bool:
-    if request_data.get('Status') == 'AUTHORIZED':
+    def handle_webhook(self) -> bool:
+        if self._request_data.get('Status') == 'AUTHORIZED':
+            return True
+        order_uuid = self._request_data['OrderId']
+        order = self.payment_repo.get_order_by_uuid(order_uuid)
+        if not order:
+            message = (
+                f'Ошибка при попытке найти заказ, uuid заказа: {order_uuid},'
+                f' id оплаты  в системе банка: {self._request_data["PaymentId"]}',
+            )
+            rollbar.report_message(message)
+            logger.warning(message)
+            return False
+        if not self.check_payment_token():
+            message = (
+                f'Ошибка при сравнении токенов,'
+                f' id заказа: {order_uuid}, токен: {self._request_data["Token"]}',
+            )
+            rollbar.report_message(message)
+            logger.warning(message)
+            return False
+        if self._request_data.get('Success') and self._request_data.get('Status') == 'CONFIRMED':
+            self.payment_repo.set_is_paid_to_order(order)
+            logger.info(f'Заказ с id: {order_uuid} - успешно оплачен')
+        elif not self._request_data.get('Success'):
+            self.payment_repo.delete_order(order_uuid)
+            logger.warning(
+                f'Заказ с id: {order_uuid} - не был оплачен,'
+                f'id в системе банка:{self._request_data["PaymentId"]},'
+                f' код ошибки: {self._request_data["ErrorCode"]}',
+            )
         return True
-    try:
-        order = Order.objects.only('id').get(uuid=request_data['OrderId'])
-    except Order.DoesNotExist:
-        message = (
-            f'Ошибка при попытке найти заказ, uuid заказа: {request_data["OrderId"]},'
-            f' id оплаты  в системе банка: {request_data["PaymentId"]}',
-        )
-        rollbar.report_message(message)
-        logger.warning(message)
-        return False
-    if not check_payment_token(request_data):
-        message = (
-            f'Ошибка при сравнении токенов,'
-            f' id заказа: {request_data["OrderId"]}, токен: {request_data["Token"]}',
-        )
-        rollbar.report_message(message)
-        logger.warning(message)
-        return False
-    if request_data.get('Success') and request_data.get('Status') == 'CONFIRMED':
-        order.is_paid = True
-        order.save()
-        logger.info(f'Заказ с id: {request_data["OrderId"]} - успешно оплачен')
-    elif not request_data.get('Success'):
-        order.delete()
-        logger.warning(
-            f'Заказ с id: {request_data["OrderId"]} - не был оплачен,'
-            f'id в системе банка:{request_data["PaymentId"]},'
-            f' код ошибки: {request_data["ErrorCode"]}',
-        )
-    return True

@@ -2,7 +2,7 @@
 exclude =
     *.git
     */__pycache__/*
-    */__init__.py
+    *__init__.py*
 ignore = A003, VNE003
 max-line-length=100
 max-cognitive-complexity=8

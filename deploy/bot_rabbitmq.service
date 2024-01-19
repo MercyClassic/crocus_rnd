@@ -6,7 +6,8 @@ After=multi-user.target
 Type=idle
 User=user
 Group=user
-ExecStart=/bin/sh -c 'cd /home/user/market/backend/tg_bot/src && poetry run python3.11 start_consuming.py'
+WorkingDirectory=/home/user/market/backend/tg_bot/src
+ExecStart=/bin/sh -c 'source ../.env && poetry run python3.11 start_consuming.py'
 Restart=always
 
 [Install]

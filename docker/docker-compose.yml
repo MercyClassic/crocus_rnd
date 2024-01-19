@@ -22,6 +22,8 @@ services:
     restart: always
     build:
       context: ../backend/core
+    env_file:
+      - ../backend/core/.env
     volumes:
       - ../backend/core/src/media:/market/backend/core/src/media
       - ../backend/core/src/logs:/market/backend/core/src/logs
@@ -34,7 +36,7 @@ services:
       - main
   rabbitmq:
     image: rabbitmq
-    container_name: rabbitmq_container
+    container_name: rabbitmq
     restart: always
     ports:
       - "5672:5672"
@@ -45,6 +47,8 @@ services:
     restart: always
     build:
       context: ../backend/tg_bot
+    env_file:
+      - ../backend/tg_bot/.env
     volumes:
       - ../backend/core/src/media:/market/backend/core/src/media
       - ../frontend/build/static/img/jpg:/market/frontend/build/static/img/jpg
@@ -55,6 +59,8 @@ services:
     restart: always
     build:
       context: ../backend/tg_bot
+    env_file:
+      - ../backend/tg_bot/.env
     command: python start_consuming.py
     depends_on:
       - rabbitmq
@@ -72,6 +78,7 @@ services:
     volumes:
       - ../frontend/build:/market/frontend/build
       - ../backend/core/src/media:/market/backend/core/src/media/
+      - ../backend/core/src/logs:/market/backend/core/src/logs/
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - /etc/letsencrypt:/etc/letsencrypt
     healthcheck:
@@ -87,7 +94,9 @@ services:
     hostname: redis
     image: redis
     restart: always
-    command: redis-server
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: bash -c 'redis-server --requirepass $REDIS_PASSWORD'
     ports:
       - "6379:6379"
     healthcheck:

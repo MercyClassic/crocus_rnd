@@ -1,14 +1,10 @@
-from config import Config
-
-
-def get_logging_dict(config: Config) -> dict:
+def get_logging_dict(root_dir: str) -> dict:
     return {
         'version': 1,
         'disable_existing_loggers': False,
         'formatters': {
             'main': {
-                'format': '{asctime} - {levelname} - {module} - '
-                '{message} - {user_id} - {message_id}',
+                'format': '{asctime} - {levelname} - {module} - ' '{message} - {message}',
                 'style': '{',
             },
         },
@@ -19,7 +15,7 @@ def get_logging_dict(config: Config) -> dict:
                 'maxBytes': 1_048_576,
                 'backupCount': 50,
                 'formatter': 'main',
-                'filename': f'{config.ROOT_DIR}/logs/error.log',
+                'filename': f'{root_dir}/logs/error.log',
             },
         },
         'loggers': {

@@ -4,10 +4,10 @@ exclude =
     */migrations/*
     *.git
     */__pycache__/*
-    */__init__.py
+    *__init__.py*
     core/src/media
     core/src/logs
-    manage.py
+    *manage.py*
 ignore = DJ01, A003, VNE003, W503
 max-line-length=100
 max-cognitive-complexity=8

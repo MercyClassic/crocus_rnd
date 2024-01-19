@@ -1,6 +1,7 @@
-from django.db.models import Q
+from django.db.models import Q, QuerySet
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 
@@ -8,7 +9,7 @@ class ProductResponseMixin(GenericAPIView):
     lookup_field = 'slug'
 
     def get(self, request, *args, **kwargs):
-        if self.lookup_field in kwargs:
+        if kwargs.get(self.lookup_field):
             serializer = self.get_serializer(self.get_object())
         else:
             serializer = self.get_serializer(self.get_queryset(), many=True)
@@ -23,6 +24,9 @@ class ProductResponseMixin(GenericAPIView):
 
 
 class FilterQueryMixin:
+    queryset: QuerySet
+    request: Request
+
     def get_queryset(self, *args, **kwargs):
         queryset = self.queryset.all()
         search = self.request.GET.get('search')

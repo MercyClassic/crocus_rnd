@@ -7,25 +7,19 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from dotenv import load_dotenv
-
-
-load_dotenv()
-
-
 logging.basicConfig(
     level='DEBUG',
-    filename=f'src/logs/smtp.log',
+    filename='src/logs/smtp.log',
     format='{asctime} - {levelname} - {message}',
     style='{',
 )
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 
 
 def send_backup_db_email():
-    sender = os.getenv('EMAIL_HOST')
-    email_password = os.getenv('EMAIL_HOST_PASSWORD')
-    to_notification = os.getenv('TO_NOTIFICATION')
+    sender = os.environ['EMAIL_HOST']
+    email_password = os.environ['EMAIL_HOST_PASSWORD']
+    to_notification = os.environ['TO_NOTIFICATION']
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     server.login(sender, email_password)
@@ -33,12 +27,15 @@ def send_backup_db_email():
     msg['Subject'] = 'Backup database postgres'
     msg['To'] = to_notification
     msg['From'] = sender
-    current_time = datetime.utcnow()
-    msg.attach(MIMEText(
-        f'Бэкап базы данных crocus rnd на момент времени {current_time.strftime("%d.%m.%Y %H:%M")}',
-    ))
+    current_time = datetime.now()
+    msg.attach(
+        MIMEText(
+            'Бэкап базы данных crocus rnd'
+            f' на момент времени {current_time.strftime("%d.%m.%Y %H:%M")}',
+        ),
+    )
     message_file = MIMEBase('application', 'octet-stream')
-    with open(f'/tmp-market/{datetime.utcnow().date()}-market.dump.gz', 'rb') as fp:
+    with open(f'/tmp-market/{datetime.now().date()}-market.dump.gz', 'rb') as fp:
         message_file.set_payload(fp.read())
         encoders.encode_base64(message_file)
     message_file.add_header(

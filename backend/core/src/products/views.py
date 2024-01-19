@@ -28,7 +28,7 @@ class CategoryListAPIView(ListAPIView):
     serializer_class = CategorySerializer
 
 
-class FavouriteView(FilterQueryMixin, ProductResponseMixin):
+class FavouriteListAPIView(FilterQueryMixin, ProductResponseMixin):
     queryset = Product.objects.active()
     serializer_class = ProductListSerializer
 
@@ -39,7 +39,7 @@ class FavouriteView(FilterQueryMixin, ProductResponseMixin):
         return self.queryset.none()
 
 
-class CartView(APIView):
+class CartAPIView(APIView):
     def get(self, request, *args, **kwargs):
         data = cart_service.get_cart(request)
         return Response(data, status=status.HTTP_200_OK)

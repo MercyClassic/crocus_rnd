@@ -13,7 +13,7 @@ from accounts.repositories import UserRepository
 from payments.repositories import PaymentRepository
 from payments.schemas import OrderData
 from products.models import Product
-from rabbitmq.notifications import NotificationBus
+from rabbitmq.notification_bus import NotificationBus
 
 
 class PaymentCreateService:
@@ -128,7 +128,7 @@ class PaymentCreateService:
             or (any(int(count) < 1 for count in self.order_data.products.values()))
         ):
             return False
-        order_products = self.payment_repo.get_order_products_from_db(
+        order_products = self.payment_repo.get_order_products(
             self.order_data.products.keys(),
         )
         if not order_products:
@@ -162,8 +162,7 @@ class PaymentCreateService:
                 products_with_count=self.order_data.products,
             )
 
-        with self.notification_bus:
-            self.notification_bus.send_order_notification(order.pk)
+        self.notification_bus.send_order_notification(order.pk)
 
         if self.order_data.cash:
             return 'OK'

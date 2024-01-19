@@ -4,14 +4,14 @@
 - **<h3> Cart </h3>**
 - **<h3> Favourites </h3>**
 - **<h3> Payments </h3>**
-- **<h3> Telegram bot (mini amdin panel) </h3>**
+- **<h3> Telegram bot (amdin panel) </h3>**
 
 **<h3> <a href="https://crocus-rnd.ru/"> click </a> to redirect to the site </h3>**
 
 **<h2>Stack of this project:</h2>**
 - **<h3> Python 3.11.4 </h3>**
-- **<h3> Django Rest Framework 3.14.0 </h3>**
-- **<h3> Aiogram 2.25.1 </h3>**
+- **<h3> Django Rest Framework </h3>**
+- **<h3> Aiogram3 </h3>**
 - **<h3> PostgreSQL </h3>**
 - **<h3> Redis </h3>**
 - **<h3> RabbitMQ </h3>**

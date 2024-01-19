@@ -3,7 +3,7 @@ from datetime import datetime
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from utils.validators import phone_validator
+from payments.validators import phone_validator
 
 
 class PaymentCreateSerializer(serializers.Serializer):

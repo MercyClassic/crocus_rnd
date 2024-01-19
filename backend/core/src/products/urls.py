@@ -20,12 +20,12 @@ urlpatterns = [
     ),
     path(
         'api/v1/favourites',
-        views.FavouriteView.as_view(),
+        views.FavouriteListAPIView.as_view(),
         name='api-favourite-list',
     ),
     path(
         'api/v1/cart',
-        views.CartView.as_view(),
+        views.CartAPIView.as_view(),
         name='api-cart-product-list',
     ),
     path(

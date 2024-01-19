@@ -1,10 +1,6 @@
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 DEBUG = os.getenv('DEBUG', False) == 'True'
@@ -36,15 +32,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 3rd apps
+]
+
+THIRD_PARTY_APPS = [
     'corsheaders',
     'rest_framework',
-    'cachalot',
-    # local apps
-    'products.apps.MainConfig',
+]
+
+if not DEBUG:
+    THIRD_PARTY_APPS.append('cachalot')
+
+LOCAL_APPS = [
+    'products.apps.ProductsConfig',
     'payments.apps.PaymentsConfig',
     'accounts.apps.AccountsConfig',
 ]
+
+INSTALLED_APPS += THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -143,7 +147,7 @@ if not DEBUG:
             'BACKEND': 'django_redis.cache.RedisCache',
             'LOCATION': f'redis://{REDIS_HOST}:6379/1',
             'OPTIONS': {
-                'PASSWORD': os.getenv('REDIS_PASSWORD'),
+                'PASSWORD': os.environ['REDIS_PASSWORD'],
             },
         },
     }

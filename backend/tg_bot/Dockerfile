@@ -24,5 +24,3 @@ COPY --chown=app:app . /market/backend/tg_bot
 WORKDIR /market/backend/tg_bot/src
 
 USER app
-
-CMD ["python", "main.py"]
