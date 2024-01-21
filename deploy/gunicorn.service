@@ -7,7 +7,7 @@ After=network.target
 User=user
 Group=user
 WorkingDirectory=/home/user/market/backend/core/src
-ExecStart=source ../.env && gunicorn \
+ExecStart=poetry run gunicorn \
           --access-logfile /var/log/gunicorn/access.log \
           --error-logfile /var/log/gunicorn/error.log \
           --workers 3 \

@@ -3,5 +3,4 @@
 cd /home/user/market/deploy/postgres_utils/
 sh create_backup.sh
 cd /home/user/market/backend/core
-source .env
 poetry run python3.11 /home/user/market/deploy/postgres_utils/send_email.py

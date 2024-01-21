@@ -1,5 +1,5 @@
 [Unit]
-Description=Rabbitmq script
+Description=Telegram bot rabbitmq consumer
 After=multi-user.target
 
 [Service]
@@ -7,7 +7,7 @@ Type=idle
 User=user
 Group=user
 WorkingDirectory=/home/user/market/backend/tg_bot/src
-ExecStart=/bin/sh -c 'source ../.env && poetry run python3.11 start_consuming.py'
+ExecStart=poetry run python3.11 start_consuming.py
 Restart=always
 
 [Install]

@@ -3,7 +3,7 @@
 **<h3> Online flower shop with delivery in Rostov-on-Don, that provides </h3>**
 - **<h3> Cart </h3>**
 - **<h3> Favourites </h3>**
-- **<h3> Payments </h3>**
+- **<h3> Payments (Tinkoff API) </h3>**
 - **<h3> Telegram bot (amdin panel) </h3>**
 
 **<h3> <a href="https://crocus-rnd.ru/"> click </a> to redirect to the site </h3>**

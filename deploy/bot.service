@@ -1,12 +1,13 @@
 [Unit]
-Description=Telegram bot notifications
+Description=Telegram bot admin panel
 After=multi-user.target
 
 [Service]
 Type=idle
 User=user
 Group=user
-ExecStart=/bin/sh -c 'cd /home/user/market/backend/tg_bot/src && source ../.env && poetry run python3.11 main.py'
+WorkingDirectory=/home/user/market/backend/tg_bot/src
+ExecStart=poetry run python3.11 main.py
 Restart=always
 
 [Install]
