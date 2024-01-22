@@ -31,6 +31,12 @@ class CallMeServiceOverride(CallMeService):
 
 
 class NotificationBusOverride(NotificationBus):
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def __del__(self):
+        pass
+
     def send_order_notification(self, order_id: int) -> None:
         pass
 
