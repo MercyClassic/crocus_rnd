@@ -23,7 +23,12 @@ class Order(models.Model):
     done_at = models.DateTimeField('Время закрытия заказа', blank=True, null=True)
 
     without_calling = models.BooleanField('Писать в телеграм/ватсап', default=False)
-    customer_email = models.CharField('Email заказчика', max_length=300, blank=True, null=True)
+    customer_email = models.CharField(
+        'Email заказчика',
+        max_length=300,
+        blank=True,
+        null=True,
+    )
     receiver_name = models.CharField(
         'Имя получателя',
         max_length=200,
@@ -77,19 +82,6 @@ class Order(models.Model):
 
     def __str__(self):
         return f'Заказ #{self.pk}'
-
-    def save(self, *args, **kwargs):
-        field_names = (
-            'receiver_name',
-            'receiver_phone_number',
-            'delivery_address',
-            'delivery_time',
-            'note',
-        )
-        for field_name in field_names:
-            if getattr(self, field_name) in ['', None]:
-                setattr(self, field_name, self._meta.get_field(field_name).default)
-        return super().save(*args, **kwargs)
 
 
 class OrderProduct(models.Model):

@@ -10,8 +10,8 @@ import requests
 from django.db import transaction
 
 from accounts.repositories import UserRepository
-from payments.repositories import PaymentRepository
-from payments.schemas import OrderData
+from payments.infrastructure.repositores.order import PaymentRepository
+from payments.application.models.order import OrderData
 from products.models import Product
 from rabbitmq.notification_bus import NotificationBus
 

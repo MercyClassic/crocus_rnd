@@ -43,12 +43,12 @@ LOGGING = {
         },
     },
     'loggers': {
-        'unexpected_errors': {
+        'middlewares.log': {
             'handlers': ['market'],
             'level': 'ERROR',
             'propagate': True,
         },
-        'payment': {
+        'payments': {
             'handlers': ['payment_info', 'payment_warning'],
             'level': 'INFO',
             'propagate': True,

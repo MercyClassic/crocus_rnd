@@ -3,6 +3,39 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+
+if not os.path.exists(f'logs/'):
+    os.mkdir(f'logs/')
+
+
+logging.dictConfig = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'main': {
+            'format': '{asctime} - {levelname} - {module} - ' '{message} - {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'main': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1_048_576,
+            'backupCount': 50,
+            'formatter': 'main',
+            'filename': f'logs/error.log',
+        },
+    },
+    'loggers': {
+        'main': {
+            'handlers': ['main'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
+
 logger = logging.getLogger(__name__)
 
 
@@ -54,3 +87,4 @@ def load_config() -> Config:
         admin_panel_category_url=parse_from_env('ADMIN_PANEL_CATEGORY_URL'),
         admin_panel_url=parse_from_env('ADMIN_PANEL_URL'),
     )
+
