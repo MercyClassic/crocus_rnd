@@ -5,21 +5,21 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("products", "0003_alter_product_options_product_important"),
+        ('products', '0003_alter_product_options_product_important'),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name="product",
+            name='product',
             options={
-                "ordering": ["-important", "-id"],
-                "verbose_name": "Товар",
-                "verbose_name_plural": "Товары",
+                'ordering': ['-important', '-id'],
+                'verbose_name': 'Товар',
+                'verbose_name_plural': 'Товары',
             },
         ),
         migrations.AddField(
-            model_name="category",
-            name="important",
-            field=models.IntegerField(default=1, verbose_name="Важность"),
+            model_name='category',
+            name='important',
+            field=models.IntegerField(default=1, verbose_name='Важность'),
         ),
     ]

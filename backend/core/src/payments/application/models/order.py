@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 @dataclass
-class OrderData:
+class OrderDTO:
     amount: int
     delivering: bool
     without_calling: bool

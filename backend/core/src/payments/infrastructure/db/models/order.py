@@ -20,12 +20,17 @@ class Order(models.Model):
     is_paid = models.BooleanField('Оплачено', default=False)
     delivering = models.BooleanField('С доставкой', default=False)
     created_at = models.DateTimeField('Время создания заказа', auto_now_add=True)
-    done_at = models.DateTimeField('Время закрытия заказа', blank=True, null=True)
-
+    done_at = models.DateTimeField(
+        'Время закрытия заказа',
+        default=None,
+        blank=True,
+        null=True,
+    )
     without_calling = models.BooleanField('Писать в телеграм/ватсап', default=False)
     customer_email = models.CharField(
         'Email заказчика',
         max_length=300,
+        default=None,
         blank=True,
         null=True,
     )

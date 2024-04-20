@@ -1,31 +1,24 @@
 from abc import ABC, abstractmethod
-from typing import List
-
-from products.models import Product
+from datetime import datetime
 
 
 class PaymentCreateServiceInterface(ABC):
     @abstractmethod
-    def fill_in_with_data(self, serialized_data: dict) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    def generate_receipt(
-        self,
-        products: List[Product],
-        with_delivery: bool = False,
-    ) -> dict:
-        raise NotImplementedError
-
-    @abstractmethod
-    def get_payment_url(
-        self,
-        order_uuid: str,
-        amount: int,
-        receipt: dict,
-    ) -> str | None:
-        raise NotImplementedError
-
-    @abstractmethod
-    def create_payment(self) -> str | bool:
+    def create_payment(
+            self,
+            products: dict[str, int],
+            amount: int,
+            customer_name: str,
+            customer_email: str,
+            receiver_name: str | None,
+            customer_phone_number: str,
+            receiver_phone_number: str | None,
+            without_calling: bool,
+            delivery_address: str,
+            delivery_date: datetime,
+            delivery_time: str,
+            note: str,
+            cash: bool,
+            delivering: bool,
+    ) -> str | bool:
         raise NotImplementedError

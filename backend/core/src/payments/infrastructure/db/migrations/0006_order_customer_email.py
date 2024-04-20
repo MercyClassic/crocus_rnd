@@ -5,18 +5,18 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("payments", "0005_alter_order_receiver_phone_number"),
+        ('payments', '0005_alter_order_receiver_phone_number'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="order",
-            name="customer_email",
+            model_name='order',
+            name='customer_email',
             field=models.CharField(
                 blank=True,
                 max_length=300,
                 null=True,
-                verbose_name="Email заказчика",
+                verbose_name='Email заказчика',
             ),
         ),
     ]

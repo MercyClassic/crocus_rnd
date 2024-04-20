@@ -1,12 +1,13 @@
-from typing import List
+from typing import Iterable
 
 from accounts.schemas import UserDTO
+from payments.infrastructure.db.interfaces.repositories.order import PaymentRepositoryInterface
 from payments.infrastructure.db.models import Order, OrderProduct
 from payments.application.models.order import OrderDTO
 from products.models import Product
 
 
-class PaymentRepository:
+class PaymentRepository(PaymentRepositoryInterface):
     def create_order(
         self,
         amount: int,
@@ -32,28 +33,27 @@ class PaymentRepository:
 
     def get_order_products(
         self,
-        products_slug: List[str],
-    ) -> List[Product]:
-        order_products = (
+        products_slug: Iterable[str],
+    ) -> Iterable[Product]:
+        return (
             Product.objects
             .only('title', 'slug', 'price')
             .filter(
                 slug__in=[*products_slug],
             )
         )
-        return order_products
 
     def create_order_products(
         self,
         order_id: int,
-        order_products: List[Product],
-        products_with_count: dict,
+        order_products: Iterable[Product],
+        products_count: dict[str, int],
     ) -> None:
         products_to_bulk_create = [
             OrderProduct(
                 order_id=order_id,
                 product=product,
-                count=int(products_with_count.get(product.slug)),
+                count=int(products_count.get(product.slug)),
             )
             for product in order_products
         ]
@@ -66,7 +66,7 @@ class PaymentRepository:
             return None
         return order
 
-    def delete_order(self, uuid: str):
+    def delete_order(self, uuid: str) -> None:
         Order.objects.filter(uuid=uuid).delete()
 
     def set_is_paid_to_order(self, order: Order) -> None:

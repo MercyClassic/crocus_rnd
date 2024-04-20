@@ -5,3 +5,7 @@ class PaymentsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'payments'
     verbose_name = 'Оплата'
+
+    def ready(self):
+        from config.container import container
+        container.wire(modules=['payments.presentators.api.v1.views'])

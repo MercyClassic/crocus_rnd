@@ -1,73 +1,63 @@
+import glob
+import os
 from datetime import datetime
+from io import BytesIO
+from unittest.mock import Mock
 
+from PIL import Image
 from django.core.cache import cache
+from django.core.files.base import ContentFile
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from interfaces.notification_bus import NotificationBusInterface
-from interfaces.services.call_me import CallMeServiceInterface
-from interfaces.services.payment_create import PaymentCreateServiceInterface
-from ioc.ioc import container
-from payments.services.call_me import CallMeService
-from payments.services.payment_create import PaymentCreateService
+from config.container import container
 from products.models import Product
-from rabbitmq.notification_bus import NotificationBus
 
 
-class PaymentCreateServiceOverride(PaymentCreateService):
-    def get_payment_url(
-        self,
-        order_uuid: str,
-        amount: int,
-        receipt: dict,
-    ) -> str:
-        return 'OK'
+payment_url_gateway_mock = Mock()
+payment_url_gateway_mock.get_payment_url.return_value = 'OK'
+container.payment_url_gateway.override(payment_url_gateway_mock)
 
+notification_bus_mock = Mock()
+notification_bus_mock.send_order_notification.return_value = None
+notification_bus_mock.send_call_me_request_notification.return_value = None
+container.notification_bus.override(notification_bus_mock)
 
-class CallMeServiceOverride(CallMeService):
-    def create_call_me_request(self, *args, **kwargs) -> bool:
-        return True
-
-
-class NotificationBusOverride(NotificationBus):
-    def __init__(self, *args, **kwargs):
-        pass
-
-    def __del__(self):
-        pass
-
-    def send_order_notification(self, order_id: int) -> None:
-        pass
-
-    def send_call_me_request_notification(self, phone_number: str) -> None:
-        pass
-
-
-container.override(PaymentCreateServiceInterface, PaymentCreateServiceOverride)
-container.override(CallMeServiceInterface, CallMeServiceOverride)
-container.override(NotificationBusInterface, NotificationBusOverride)
+call_me_service_mock = Mock()
+call_me_service_mock.create_call_me_request.return_value = True
+container.call_me_service.override(call_me_service_mock)
 
 
 class PaymentTests(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
+        mock_image = Image.new('RGB', (100, 100))
+        image_io = BytesIO()
+        mock_image.save(image_io, format='JPEG')
+        mock_image_file = ContentFile(image_io.getvalue(), name='mock.jpg')
+
         Product.objects.create(
             title='product1',
             slug='product1',
-            image='images/test_image.jpg',
+            image=mock_image_file,
             price=100,
             kind=None,
         )
         Product.objects.create(
             title='product2',
             slug='product2',
-            image='images/test_image.jpg',
+            image=mock_image_file,
             price=200,
             kind=None,
         )
 
+    def tearDown(self) -> None:
+        for file_path in glob.glob('media/images/mock*.jpg'):
+            os.remove(file_path)
+
     def test_create_payment(self):
-        """ALL DATA IS VALID"""
+        payment_create_url = reverse('payments:api-payment-create')
+        """ ALL DATA IS VALID """
         cache.clear()
         data = {
             'items': {'product1': 1, 'product2': 1},
@@ -87,14 +77,15 @@ class PaymentTests(APITestCase):
         }
         cache.clear()
         response = self.client.post(
-            reverse('api-payment-create'),
+            payment_create_url,
             data=data,
             format='json',
         )
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         """ALL DATA IS VALID BUT TIMEOUT"""
         response = self.client.post(
-            reverse('api-payment-create'),
+            payment_create_url,
             data=data,
             format='json',
         )
@@ -118,7 +109,7 @@ class PaymentTests(APITestCase):
             'cash': True,
         }
         response = self.client.post(
-            reverse('api-payment-create'),
+            payment_create_url,
             data=data,
             format='json',
         )
@@ -142,7 +133,7 @@ class PaymentTests(APITestCase):
             'cash': True,
         }
         response = self.client.post(
-            reverse('api-payment-create'),
+            payment_create_url,
             data=data,
             format='json',
         )
@@ -166,7 +157,7 @@ class PaymentTests(APITestCase):
             'cash': True,
         }
         response = self.client.post(
-            reverse('api-payment-create'),
+            payment_create_url,
             data=data,
             format='json',
         )
@@ -190,7 +181,7 @@ class PaymentTests(APITestCase):
             'cash': True,
         }
         response = self.client.post(
-            reverse('api-payment-create'),
+            payment_create_url,
             data=data,
             format='json',
         )
@@ -214,7 +205,7 @@ class PaymentTests(APITestCase):
             'cash': True,
         }
         response = self.client.post(
-            reverse('api-payment-create'),
+            payment_create_url,
             data=data,
             format='json',
         )
@@ -238,7 +229,7 @@ class PaymentTests(APITestCase):
             'cash': True,
         }
         response = self.client.post(
-            reverse('api-payment-create'),
+            payment_create_url,
             data=data,
             format='json',
         )
@@ -262,7 +253,7 @@ class PaymentTests(APITestCase):
             'cash': True,
         }
         response = self.client.post(
-            reverse('api-payment-create'),
+            payment_create_url,
             data=data,
             format='json',
         )
@@ -286,7 +277,7 @@ class PaymentTests(APITestCase):
             'cash': True,
         }
         response = self.client.post(
-            reverse('api-payment-create'),
+            payment_create_url,
             data=data,
             format='json',
         )
@@ -295,20 +286,21 @@ class PaymentTests(APITestCase):
 
     def test_call_me(self):
         """PHONE NUMBER IS NOT VALID"""
+        call_me_url = reverse('payments:api-call-me')
         response = self.client.post(
-            reverse('api-call-me'),
+            call_me_url,
             {'phone_number': '+19999999999'},
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         """ PHONE NUMBER IS VALID """
         response = self.client.post(
-            reverse('api-call-me'),
+            call_me_url,
             {'phone_number': '+79999999999'},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         """ PHONE NUMBER IS VALID BUT TIMEOUT """
         response = self.client.post(
-            reverse('api-call-me'),
+            call_me_url,
             {'phone_number': '+79999999999'},
         )
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

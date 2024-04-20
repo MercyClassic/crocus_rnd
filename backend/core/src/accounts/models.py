@@ -20,9 +20,7 @@ class Account(models.Model):
         'Телефон',
         unique=True,
         max_length=12,
-        error_messages={
-            'unique': 'Пользователь с таким номером телефона уже существует',
-        },
+        error_messages={'unique': 'Пользователь с таким номером телефона уже существует'},
     )
     name = models.CharField(max_length=200)
 
