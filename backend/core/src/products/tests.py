@@ -1,6 +1,5 @@
-import glob
-import os
 from io import BytesIO
+from pathlib import Path
 
 from PIL import Image
 from django.core.files.base import ContentFile
@@ -35,8 +34,8 @@ class ProductTests(APITestCase):
         )
 
     def tearDown(self) -> None:
-        for file_path in glob.glob('media/images/mock*.jpg'):
-            os.remove(file_path)
+        for file_path in Path().glob('media/images/mock*.jpg'):
+            Path(file_path).unlink()
 
     def test_add_to_session(self) -> None:
         """ADD FIRST PRODUCT TO CART"""

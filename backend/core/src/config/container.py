@@ -1,13 +1,12 @@
 import os
 
-from dependency_injector.containers import DeclarativeContainer
-from dependency_injector import providers
-
 from accounts.repositories import UserRepository
+from dependency_injector import providers
+from dependency_injector.containers import DeclarativeContainer
 from notification_bus.services.sender import NotificationBus
 from payments.application.services.call_me import CallMeService
-from payments.application.services.payment_create import PaymentCreateService
 from payments.application.services.payment_accept import PaymentAcceptService
+from payments.application.services.payment_create import PaymentCreateService
 from payments.infrastructure.db.repositories.order import PaymentRepository
 from payments.infrastructure.db.repositories.tinkoff import TinkoffPaymentUrlGateway
 from products.services.cart import CartService

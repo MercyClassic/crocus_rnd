@@ -1,3 +1,4 @@
+from contextlib import suppress
 from typing import Literal
 
 from rest_framework.request import Request
@@ -9,10 +10,7 @@ from products.serializers import ProductListSerializer
 
 class CartService(CartServiceInterface):
     def add_to_cart(self, request: Request, product_slug: str) -> Literal[201, 204]:
-        if request.data.get('type') == 'cart':
-            add_to = 'cart_products'
-        else:
-            add_to = 'favourites'
+        add_to = 'cart_products' if request.data.get('type') == 'cart' else 'favourites'
 
         products = request.session.get(add_to)
         if not isinstance(products, list):
@@ -23,10 +21,8 @@ class CartService(CartServiceInterface):
             request.session.modified = True
             return 201
         else:
-            try:
+            with suppress(ValueError):
                 request.session.get(add_to).remove(product_slug)
-            except ValueError:
-                pass
             request.session.modified = True
             return 204
 

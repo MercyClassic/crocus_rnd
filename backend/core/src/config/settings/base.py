@@ -4,13 +4,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-DEBUG = os.getenv('DEBUG', False) == 'True'
+DEBUG = os.environ['DEBUG'] == 'True'
 
-REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+REDIS_HOST = os.environ['REDIS_HOST']
 
-RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'localhost')
+RABBITMQ_HOST = os.environ['RABBITMQ_HOST']
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.environ['SECRET_KEY']
 
 ALLOWED_HOSTS = json.loads(os.environ['ALLOWED_HOSTS'])
 
@@ -106,10 +106,10 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, '../../../frontend/src/static')
+STATIC_ROOT = BASE_DIR / '../../../frontend/src/static'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 AUTH_USER_MODEL = 'accounts.AuthUser'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

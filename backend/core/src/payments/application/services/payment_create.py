@@ -1,16 +1,16 @@
 import re
+from collections.abc import Iterable
 from datetime import datetime
-from typing import Iterable
-
-from django.db import transaction
 
 from accounts.repositories import UserRepository
-from payments.application.interfaces.services.payment_create import PaymentCreateServiceInterface
-from payments.infrastructure.db.interfaces.repositories.order import PaymentRepositoryInterface
-from payments.application.models.order import OrderDTO
+from django.db import transaction
 from notification_bus.interfaces.sender import NotificationBusInterface
-from payments.infrastructure.db.interfaces.repositories.tinkoff import PaymentUrlGatewayInterface
 from products.models import Product
+
+from payments.application.interfaces.services.payment_create import PaymentCreateServiceInterface
+from payments.application.models.order import OrderDTO
+from payments.infrastructure.db.interfaces.repositories.order import PaymentRepositoryInterface
+from payments.infrastructure.db.interfaces.repositories.tinkoff import PaymentUrlGatewayInterface
 
 
 class PaymentCreateService(PaymentCreateServiceInterface):
@@ -132,7 +132,7 @@ class PaymentCreateService(PaymentCreateServiceInterface):
         if order_data.cash:
             return 'OK'
         else:
-            payment_url = self.payment_url_gateway.get_payment_url(
+            return self.payment_url_gateway.get_payment_url(
                 order_uuid=str(order.uuid),
                 amount=calculated_amount,
                 products=order_products,
@@ -140,4 +140,3 @@ class PaymentCreateService(PaymentCreateServiceInterface):
                 with_delivery=order_data.delivering,
                 customer_phone_number=order_data.customer_phone_number,
             )
-            return payment_url

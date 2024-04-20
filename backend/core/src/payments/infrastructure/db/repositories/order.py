@@ -1,10 +1,11 @@
-from typing import Iterable
+from collections.abc import Iterable
 
 from accounts.schemas import UserDTO
+from products.models import Product
+
+from payments.application.models.order import OrderDTO
 from payments.infrastructure.db.interfaces.repositories.order import PaymentRepositoryInterface
 from payments.infrastructure.db.models import Order, OrderProduct
-from payments.application.models.order import OrderDTO
-from products.models import Product
 
 
 class PaymentRepository(PaymentRepositoryInterface):
@@ -14,7 +15,7 @@ class PaymentRepository(PaymentRepositoryInterface):
         data: OrderDTO,
         user_account: UserDTO,
     ) -> Order:
-        order = Order.objects.create(
+        return Order.objects.create(
             user_id=user_account.id,
             amount=amount,
             without_calling=data.without_calling,
@@ -29,7 +30,6 @@ class PaymentRepository(PaymentRepositoryInterface):
             is_paid=False,
             delivering=data.delivering,
         )
-        return order
 
     def get_order_products(
         self,

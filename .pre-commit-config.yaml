@@ -16,12 +16,12 @@ repos:
     rev: v0.4.1
     hooks:
       - id: ruff
-        files: ^backend/core/src/
+        files: ^backend/core
         args: [backend/core, --config, backend/core/pyproject.toml]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.4.1
     hooks:
       - id: ruff
-        files: ^backend/tg_bot/src/
+        files: ^backend/tg_bot
         args: [backend/tg_bot, --ignore, INP001, --config, backend/tg_bot/pyproject.toml]

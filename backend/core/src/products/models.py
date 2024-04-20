@@ -1,14 +1,14 @@
+from PIL import Image
 from django.db import models
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from PIL import Image
 
 from .managers import ProductManager
 
 
 class PhotoMixin:
     def thumbnail(self):
-        return mark_safe(
+        return mark_safe(  # noqa: S308
             '<img src="%s" width = "150" height = "150" '
             'style="object-fit: contain;" />' % self.image.url,
         )
