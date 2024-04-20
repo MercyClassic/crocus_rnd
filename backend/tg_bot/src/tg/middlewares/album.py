@@ -17,7 +17,7 @@ class AlbumMiddleware(BaseMiddleware):
         data: dict,
     ) -> None:
         message: types.Message = event.message
-        if not message or not message.media_group_id and not message.photo:
+        if not message or (not message.media_group_id and not message.photo):
             await handler(event, data)
         else:
             try:

@@ -1,10 +1,11 @@
 import functools
+import json
 import os
 
 from tg.unknown_command import unknown_command
 
-admin_ids = [int(admin_id) for admin_id in os.environ['ADMIN_TG_BOT_IDS'].split(', ')]
-owner_ids = [int(owner_id) for owner_id in os.environ['OWNER_TG_BOT_IDS'].split(', ')]
+admin_ids = [int(telegram_id) for telegram_id in json.loads(os.environ['ADMIN_TG_BOT_IDS'])]
+owner_ids = [int(telegram_id) for telegram_id in json.loads(os.environ['OWNER_TG_BOT_IDS'])]
 
 
 def command_for(permission_level: str):

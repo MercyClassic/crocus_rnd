@@ -36,6 +36,7 @@ ignore = [
     "RUF001",
     "G004",
     "SIM112",
+    "DTZ005",
 ]
 fixable = ["ALL"]
 unfixable = []
@@ -58,29 +59,6 @@ convention = "google"
 [tool.ruff.lint.flake8-quotes]
 inline-quotes = "single"
 
-[tool.mypy]
-files = ["src"]
-strict = true
-python_version = "3.11"
-ignore_missing_imports = true
-install_types = true
-non_interactive = true
-
-disallow_untyped_defs = true
-no_implicit_optional = true
-check_untyped_defs = true
-warn_return_any = true
-show_error_codes = true
-warn_unused_ignores = false
-
-disallow_incomplete_defs = true
-disallow_untyped_decorators = true
-disallow_any_unimported = false
-
-[tool.black]
-line-length = 100
-target-version = ["py311"]
-
 [tool.poetry.dependencies]
 python = "3.11.4"
 pillow = "^9.4.0"
@@ -91,9 +69,4 @@ pydantic = "^2.4.2"
 pika = "^1.3.2"
 aiogram = "^3.3.0"
 dishka = "^1.0.0"
-
-[tool.poetry.group.dev.dependencies]
-black="^23.7.0"
-add-trailing-comma="^3.0.1"
 ruff = "^0.4.1"
-mypy = "^1.9.0"
