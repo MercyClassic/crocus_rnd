@@ -1,9 +1,0 @@
-line-length = 100
-target-version="py311"
-src = ["src"]
-
-include = ["src/**.py", "tests/**.py"]
-exclude = ["src/manage.py", "**/migrations/**.py"]
-
-[lint.per-file-ignores]
-"**/**" = ["__init__.py:F401"]

@@ -29,9 +29,11 @@ class OrderDTO(BaseModel):
     product_associations: list[ProductAssociationDTO]
 
     @field_validator('created_at')
-    def pre_validate_created_at(self, value):
+    @classmethod
+    def pre_validate_created_at(cls, value):
         return value.strftime('%Y-%m-%d %H:%M:%S')
 
     @field_validator('delivery_date')
-    def pre_validate_delivery_date(self, value):
+    @classmethod
+    def pre_validate_delivery_date(cls, value):
         return value.strftime('%d-%m-%Y')

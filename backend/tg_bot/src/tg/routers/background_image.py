@@ -2,9 +2,9 @@ from aiogram import Bot, F, Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from config import Config
 from dishka import FromDishka
 from dishka.integrations.aiogram import inject
-from main.config import Config
 
 from tg.command_for import command_for
 

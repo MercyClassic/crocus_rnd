@@ -19,6 +19,7 @@ class CoreProvider(Provider):
         engine = create_async_engine(
             os.environ['db_uri'],
             isolation_level='REPEATABLE READ',
+            connect_args={'options': '-c timezone=Europe/Moscow'},
         )
         return async_sessionmaker(
             engine=engine,

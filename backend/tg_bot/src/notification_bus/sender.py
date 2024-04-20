@@ -1,6 +1,6 @@
 from aiogram import Bot, types
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from main.config import Config
+from config import Config
 
 
 class NotificationSender:

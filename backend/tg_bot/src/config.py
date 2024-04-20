@@ -3,33 +3,39 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
-if not Path('logs/').exists():
-    Path('logs/').mkdir()
-
+logs_path = Path(__file__).parent / 'logs'
+if not logs_path.exists():
+    logs_path.mkdir()
 
 logging.config.dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'main': {
-            'format': '{asctime} - {levelname} - {module} - {message} - {message}',
+            'format': '[{levelname}] {asctime} - {message}',
             'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
         },
     },
     'handlers': {
-        'main': {
+        'file': {
             'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
             'maxBytes': 1_048_576,
             'backupCount': 50,
             'formatter': 'main',
-            'filename': 'logs/error.log',
+            'filename': f'{logs_path}/telegram_error.log',
+        },
+        'console': {
+            'level': 'INFO',
+            'formatter': 'main',
+            'class': 'logging.StreamHandler',
         },
     },
     'loggers': {
         'main': {
-            'handlers': ['main'],
-            'level': 'ERROR',
+            'handlers': ['file', 'console'],
+            'level': 'INFO',
             'propagate': True,
         },
     },

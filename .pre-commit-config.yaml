@@ -12,14 +12,16 @@ repos:
     hooks:
       - id: add-trailing-comma
 
-#  - repo: https://github.com/astral-sh/ruff-pre-commit
-#    rev: v0.4.1
-#    hooks:
-#      - id: ruff
-#        args: [backend/core, --config, backend/core/pyproject.toml]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.1
+    hooks:
+      - id: ruff
+        files: ^backend/core/src/
+        args: [backend/core, --config, backend/core/pyproject.toml]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.4.1
     hooks:
       - id: ruff
-        args: [backend/tg_bot, --config, backend/tg_bot/pyproject.toml]
+        files: ^backend/tg_bot/src/
+        args: [backend/tg_bot, --ignore, INP001, --config, backend/tg_bot/pyproject.toml]

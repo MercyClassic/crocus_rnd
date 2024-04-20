@@ -1,7 +1,7 @@
 from aiogram import Bot, Router, types
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from main.config import Config
+from config import Config
 
 from tg.command_for import command_for
 

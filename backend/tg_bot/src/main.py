@@ -1,4 +1,6 @@
 import asyncio
+import logging
+from datetime import datetime
 
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -17,6 +19,8 @@ from tg.routers import (
     product_create_router,
     unknown_command_router,
 )
+
+logger = logging.getLogger('main')
 
 
 async def main() -> None:
@@ -40,6 +44,7 @@ async def main() -> None:
     setup_dishka(container=container, router=dp)
 
     await bot.delete_webhook(drop_pending_updates=True)
+    logger.info(f'Bot started {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
     await dp.start_polling(bot, skip_updates=True)
 
 

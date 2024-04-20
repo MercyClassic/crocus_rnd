@@ -6,10 +6,10 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
+from config import Config
 from db.repositories import CoreRepository
 from dishka import FromDishka
 from dishka.integrations.aiogram import inject
-from main.config import Config
 
 from tg.command_for import command_for
 

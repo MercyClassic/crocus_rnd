@@ -1,7 +1,7 @@
 import os
 
 from aiogram import Bot
-from config import load_config
+from main import load_config
 from notification_bus.notification_bus import NotificationBus
 from notification_bus.sender import NotificationSender
 
