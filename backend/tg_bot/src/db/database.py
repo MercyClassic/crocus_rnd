@@ -1,6 +1,10 @@
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.orm import DeclarativeBase
 
 
@@ -9,7 +13,7 @@ class Base(DeclarativeBase):
 
 
 def create_async_session_maker(db_uri: str):
-    engine = create_async_engine(db_uri, echo=True)
+    engine = create_async_engine(db_uri, isolation_level='REPEATABLE_READ')
     return async_sessionmaker(
         engine,
         class_=AsyncSession,

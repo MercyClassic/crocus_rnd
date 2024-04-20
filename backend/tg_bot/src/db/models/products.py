@@ -1,8 +1,9 @@
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 
-from db.database import Base
 from sqlalchemy import Boolean, ForeignKey, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from db.database import Base
 
 if TYPE_CHECKING:
     from db.models.payments import OrderProduct
@@ -20,7 +21,7 @@ class Product(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     important: Mapped[int] = mapped_column(Integer, default=1)
 
-    order_associations: Mapped[List['OrderProduct']] = relationship(back_populates='product')
+    order_associations: Mapped[list['OrderProduct']] = relationship(back_populates='product')
 
     def __repr__(self):
         return f'{self.id} - {self.title}'

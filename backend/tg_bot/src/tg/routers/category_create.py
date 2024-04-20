@@ -4,10 +4,11 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from db.repositories import CoreRepository
-from logic.utils.download_image import download_photo
-from logic.utils.utils import command_for
+from dishka import FromDishka
+from dishka.integrations.aiogram import inject
+from main.config import Config
 
-from config import Config
+from tg.command_for import command_for
 
 router = Router()
 
@@ -49,15 +50,18 @@ async def set_name(
 
 
 @router.message(CategoryState.image, F.photo)
+@inject
 async def set_image(
     message: types.Message,
     bot: Bot,
-    config: Config,
+    config: FromDishka[Config],
     state: FSMContext,
 ):
-    image = await download_photo(message.photo[-1].file_id, config)
+    file_id = message.photo[-1].file_id
+    path = f'{config.media_dir}/{file_id}.jpg'
+    await bot.download_file(file_id, path)
 
-    await state.update_data(image=image)
+    await state.update_data(image=f'images/{file_id}.jpg')
     await state.set_state(CategoryState.active)
 
     await bot.send_message(
@@ -67,32 +71,32 @@ async def set_image(
 
 
 @router.message(CategoryState.active)
+@inject
 async def set_active(
     message: types.Message,
     bot: Bot,
     state: FSMContext,
-    core_repo: CoreRepository,
-    config: Config,
+    core_repo: FromDishka[CoreRepository],
+    config: FromDishka[Config],
 ):
     text = message.text.lower()
     if text not in ('да', 'нет'):
         await bot.send_message(
             message.from_user.id,
-            'Тип не соответствует требованиям, попробуйте ещё раз',
+            'Символы в сообщении не соответсвуют правильному ответу, попробуйте ещё раз',
         )
-        return
+    else:
+        data = await state.get_data()
+        data['is_active'] = text == 'да'
 
-    data = await state.get_data()
-    data['is_active'] = True if text == 'да' else False
-
-    await state.clear()
-    await finish_category_create(
-        data,
-        message.from_user.id,
-        core_repo,
-        config,
-        bot,
-    )
+        await state.clear()
+        await finish_category_create(
+            data,
+            message.from_user.id,
+            core_repo,
+            config,
+            bot,
+        )
 
 
 async def finish_category_create(

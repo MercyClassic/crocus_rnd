@@ -1,2 +1,1 @@
-from logic.middlewares.album import AlbumMiddleware
-from logic.middlewares.dependency import DependencyMiddleware
+from tg.middlewares.album import AlbumMiddleware

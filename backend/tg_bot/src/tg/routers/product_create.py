@@ -5,15 +5,28 @@ from aiogram.enums import ContentType
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 from db.repositories import CoreRepository
-from logic.utils.download_image import download_photo
-from logic.utils.markups import get_product_type_markup
-from logic.utils.utils import command_for, slugify_string, validate_title
+from dishka import FromDishka
+from dishka.integrations.aiogram import inject
+from main.config import Config
 
-from config import Config
+from tg.command_for import command_for
 
 router = Router()
+
+
+def slugify_string(string: str) -> str:
+    return string.translate(
+        str.maketrans(
+            'абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ ’',
+            'abvgdeejzijklmnoprstufhzcss_y_euaABVGDEEJZIJKLMNOPRSTUFHZCSS_Y_EUA__',
+        ),
+    )
+
+
+def validate_title(title: str) -> bool:
+    return not any(i in '!@#$%^&*()+=`~;:"[]{}.,\'\\/' for i in title)
 
 
 class ProductState(StatesGroup):
@@ -81,6 +94,16 @@ async def set_description(
     )
 
 
+def get_product_type_keyboard() -> types.ReplyKeyboardMarkup:
+    markup = ReplyKeyboardBuilder()
+    markup.button(text='Нет типа')
+    markup.button(text='Букет')
+    markup.button(text='Коробка')
+    markup.button(text='Корзинка')
+    markup.adjust(1)
+    return markup.as_markup(one_time_keyboard=True, resize_keyboard=True)
+
+
 @router.message(ProductState.price)
 async def set_price(
     message: types.Message,
@@ -94,7 +117,7 @@ async def set_price(
             message.from_user.id,
             'Цена должна состоять только из цифр, попробуйте ещё раз',
         )
-        return None
+        return
 
     await state.update_data(price=int(message.text))
     await state.set_state(ProductState.kind)
@@ -102,7 +125,7 @@ async def set_price(
     await bot.send_message(
         message.from_user.id,
         "Введите тип товара либо '-', если у товара нет типа",
-        reply_markup=get_product_type_markup().as_markup(one_time_keyboard=True),
+        reply_markup=get_product_type_keyboard,
     )
 
 
@@ -116,43 +139,44 @@ async def set_kind(
         await bot.send_message(
             message.from_user.id,
             'Тип не соответствует требованиям, попробуйте ещё раз',
-            reply_markup=get_product_type_markup().as_markup(one_time_keyboard=True),
+            reply_markup=get_product_type_keyboard,
         )
-        return None
+    else:
+        product_types = {
+            'Нет букета': None,
+            '-': None,
+            'Букет': 'bouquet',
+            'Коробка': 'box',
+            'Корзинка': 'basket',
+        }
 
-    product_types = {
-        'Нет букета': None,
-        '-': None,
-        'Букет': 'bouquet',
-        'Коробка': 'box',
-        'Корзинка': 'basket',
-    }
+        await state.update_data(kind=product_types.get(message.text))
+        await state.set_state(ProductState.image)
 
-    await state.update_data(kind=product_types.get(message.text))
-    await state.set_state(ProductState.image)
-
-    await bot.send_message(
-        message.from_user.id,
-        'Добавьте главное изображение для товара',
-    )
+        await bot.send_message(
+            message.from_user.id,
+            'Добавьте главное изображение для товара',
+        )
 
 
 @router.message(ProductState.image, F.photo)
+@inject
 async def set_main_image(
     message: types.Message,
     bot: Bot,
-    config: Config,
+    config: FromDishka[Config],
     state: FSMContext,
 ):
-    print('DO IMAGE DOWNLOAD')
-    image = await download_photo(message.photo[-1].file_id, config)
-    print('POSLE IMAGE DOWNLOAD')
-    await state.update_data(image=image)
+    file_id = message.photo[-1].file_id
+    path = f'{config.media_dir}/{file_id}.jpg'
+    await bot.download_file(file_id, path)
+
+    await state.update_data(image=f'images/{file_id}.jpg')
     await state.set_state(ProductState.extra_images)
 
     await bot.send_message(
         message.from_user.id,
-        'Добавьте дополнительные изображения одним сообщением'
+        "Добавьте дополнительные изображения одним сообщением"
         " либо напишите '-', если они не нужны",
     )
 
@@ -161,13 +185,14 @@ async def set_main_image(
     ProductState.extra_images,
     F.content_type.in_([ContentType.TEXT, ContentType.PHOTO]),
 )
+@inject
 async def set_extra_images(
     message: types.Message,
     bot: Bot,
-    config: Config,
-    core_repo: CoreRepository,
+    config: FromDishka[Config],
+    core_repo: FromDishka[CoreRepository],
     state: FSMContext,
-    album: list = None,
+    album: list | None = None,
 ):
     if message.content_type == 'text':
         if message.text == '-':
@@ -185,7 +210,7 @@ async def set_extra_images(
             media_group.append(types.InputMediaPhoto(media=file_id))
 
         extra_images = await asyncio.gather(
-            *[download_photo(file.media, config) for file in media_group],
+            *[bot.download_file(file.media, config.media_dir) for file in media_group],
         )
         await state.update_data(extra_images=extra_images)
 
