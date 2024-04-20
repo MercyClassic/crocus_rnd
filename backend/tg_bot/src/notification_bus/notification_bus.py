@@ -1,7 +1,8 @@
 import asyncio
 
 import pika
-from logic.handlers.notifications import NotificationSender
+
+from notification_bus.sender import NotificationSender
 
 
 class NotificationBus:
@@ -10,7 +11,7 @@ class NotificationBus:
         host: str,
         port: int,
         notification_sender: NotificationSender,
-    ):
+    ) -> None:
         self.notification_sender = notification_sender
         self.__connection = pika.BlockingConnection(
             pika.ConnectionParameters(host=host, port=port),
@@ -21,7 +22,7 @@ class NotificationBus:
             exchange_type='direct',
         )
 
-    def receive_notification(self):
+    def receive_notification(self) -> None:
         callme_queue = self._channel.queue_declare(queue='call_me_notifications')
         order_queue = self._channel.queue_declare(queue='order_notifications')
         self._channel.queue_bind(
@@ -44,7 +45,7 @@ class NotificationBus:
         method,
         properties,
         body: bytes,
-    ):
+    ) -> None:
         loop = asyncio.get_event_loop()
         coro = self.notification_sender.new_order_notification(int(body.decode('utf-8')))
         loop.run_until_complete(coro)
@@ -56,7 +57,7 @@ class NotificationBus:
         method,
         properties,
         body: bytes,
-    ):
+    ) -> None:
         loop = asyncio.get_event_loop()
         coro = self.notification_sender.new_call_me_request_notification(body.decode('utf-8'))
         loop.run_until_complete(coro)

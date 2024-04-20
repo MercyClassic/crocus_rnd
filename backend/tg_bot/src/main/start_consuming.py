@@ -1,10 +1,9 @@
 import os
 
 from aiogram import Bot
-from logic.handlers.notifications import NotificationSender
-from logic.rabbitmq.notification_bus import NotificationBus
-
 from config import load_config
+from notification_bus.notification_bus import NotificationBus
+from notification_bus.sender import NotificationSender
 
 
 def main():
@@ -16,7 +15,7 @@ def main():
     )
     notification_bus = NotificationBus(
         host=os.environ['RABBITMQ_HOST'],
-        port=5672,
+        port=int(os.environ['RABBITMQ_PORT']),
         notification_sender=notification_sender,
     )
     notification_bus.receive_notification()

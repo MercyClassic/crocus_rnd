@@ -1,10 +1,19 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING
 from uuid import uuid4
 
-from db.database import Base
-from sqlalchemy import DATETIME, UUID, Boolean, ForeignKey, Integer, Numeric, String
+from sqlalchemy import (
+    DATETIME,
+    UUID,
+    Boolean,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from db.database import Base
 
 if TYPE_CHECKING:
     from db.models.products import Product
@@ -41,7 +50,7 @@ class Order(Base):
         default='Без примечания',
     )
     cash: Mapped[bool] = mapped_column(Boolean, default=False)
-    product_associations: Mapped[List['OrderProduct']] = relationship(back_populates='order')
+    product_associations: Mapped[list['OrderProduct']] = relationship(back_populates='order')
 
 
 class OrderProduct(Base):

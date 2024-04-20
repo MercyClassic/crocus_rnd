@@ -1,8 +1,9 @@
-from db.models import Order, OrderProduct
-from db.models.products import Category, Product, ProductImage
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
+
+from db.models import Order, OrderProduct
+from db.models.products import Category, Product, ProductImage
 
 
 class CoreRepository:
@@ -24,8 +25,24 @@ class CoreRepository:
             )
         )
         orders = await self._session.execute(query)
-        orders = orders.unique().scalars().all()
-        return orders
+        return orders.unique().scalars().all()
+
+    async def get_order(self, order_id: int) -> Order | None:
+        query = (
+            select(Order)
+            .options(
+                joinedload(Order.product_associations)
+                .load_only(OrderProduct.count)
+                .options(
+                    joinedload(OrderProduct.product).load_only(Product.title),
+                ),
+            )
+            .where(
+                Order.id == order_id,
+            )
+        )
+        order = await self._session.execute(query)
+        return order.scalar()
 
     async def create_product(self, data: dict) -> tuple:
         stmt = (

@@ -2,10 +2,11 @@ from aiogram import Bot, F, Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from logic.utils.download_image import download_photo
-from logic.utils.utils import command_for
+from dishka import FromDishka
+from dishka.integrations.aiogram import inject
+from main.config import Config
 
-from config import Config
+from tg.command_for import command_for
 
 router = Router()
 
@@ -30,18 +31,17 @@ async def start_set_background_image(
 
 
 @router.message(ImageState.image, F.photo)
+@inject
 async def set_background_image(
     message: types.Message,
     bot: Bot,
-    config: Config,
+    config: FromDishka[Config],
     state: FSMContext,
 ):
     await state.clear()
-    await download_photo(
-        message.photo[-1].file_id,
-        config,
-        path=config.bg_img_path,
-    )
+    file_id = message.photo[-1].file_id
+    path = f'{config.bg_img_path}/{file_id}.jpg'
+    await bot.download_file(file_id, path)
     await bot.send_message(
         message.from_user.id,
         'Главное изображение успешно загружено!',

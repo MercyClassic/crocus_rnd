@@ -4,12 +4,82 @@ version = "0.1.0"
 description = ""
 authors = []
 
+[tool.ruff]
+line-length = 100
+src = ["src"]
+indent-width = 4
+target-version = "py311"
+fix = true
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".tox",
+    ".venv",
+    "__pychache__",
+    "build",
+    "dist",
+    "node_modules",
+    "venv"
+]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "ARG002",
+    "ANN",
+    "D",
+    "EM102",
+    "TRY003",
+    "PLR0913",
+    "RUF001",
+    "G004",
+    "SIM112",
+]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+line-ending = "lf"
+quote-style = "single"
+docstring-code-format = true
+skip-magic-trailing-comma = false
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.lint.isort]
+case-sensitive = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
+
+[tool.mypy]
+files = ["src"]
+strict = true
+python_version = "3.11"
+ignore_missing_imports = true
+install_types = true
+non_interactive = true
+
+disallow_untyped_defs = true
+no_implicit_optional = true
+check_untyped_defs = true
+warn_return_any = true
+show_error_codes = true
+warn_unused_ignores = false
+
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+disallow_any_unimported = false
+
 [tool.black]
 line-length = 100
-
-[tool.isort]
-atomic = true
-profile = "black"
+target-version = ["py311"]
 
 [tool.poetry.dependencies]
 python = "3.11.4"
@@ -20,18 +90,10 @@ asyncpg = "^0.28.0"
 pydantic = "^2.4.2"
 pika = "^1.3.2"
 aiogram = "^3.3.0"
+dishka = "^1.0.0"
 
-[tool.poetry.dev-dependencies]
-flake8 = "^6.0.0"
-flake8-bugbear = "^23.3.12"
-flake8-builtins = "^2.1.0"
-flake8-cognitive-complexity = "^0.1.0"
-flake8-commas = "^2.1.0"
-flake8-django = "^1.1.5"
-flake8-quotes = "^3.3.2"
-flake8-todo = "^0.7"
-flake8-variables-names = "^0.0.5"
-autoflake = "^1.3.1"
-isort = "^5.12.0"
+[tool.poetry.group.dev.dependencies]
 black="^23.7.0"
 add-trailing-comma="^3.0.1"
+ruff = "^0.4.1"
+mypy = "^1.9.0"
