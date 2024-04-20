@@ -1,5 +1,5 @@
 from accounts.models import Account
-from accounts.schemas import UserData
+from accounts.schemas import UserDTO
 
 
 class UserRepository:
@@ -7,7 +7,7 @@ class UserRepository:
         self,
         customer_phone_number: str,
         customer_name: str,
-    ) -> UserData:
+    ) -> UserDTO:
         try:
             user_account = Account.objects.only('id').get(phone_number=customer_phone_number)
         except Account.DoesNotExist:
@@ -15,4 +15,4 @@ class UserRepository:
                 phone_number=customer_phone_number,
                 name=customer_name,
             )
-        return UserData(id=user_account.id)
+        return UserDTO(id=user_account.id)

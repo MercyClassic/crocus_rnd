@@ -1,4 +1,4 @@
 from .base import *
-from .database import *
-from .drf import *
-from .logging import *
+from .database import DATABASES
+from .drf import REST_FRAMEWORK
+from .logging_dict import LOGGING

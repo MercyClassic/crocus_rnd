@@ -5,16 +5,16 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("products", "0004_alter_product_options_category_important"),
+        ('products', '0004_alter_product_options_category_important'),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name="category",
+            name='category',
             options={
-                "ordering": ["-important", "-id"],
-                "verbose_name": "Категория",
-                "verbose_name_plural": "Категории",
+                'ordering': ['-important', '-id'],
+                'verbose_name': 'Категория',
+                'verbose_name_plural': 'Категории',
             },
         ),
     ]

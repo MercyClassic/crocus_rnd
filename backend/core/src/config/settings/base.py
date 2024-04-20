@@ -1,3 +1,4 @@
+import json
 import os
 from pathlib import Path
 
@@ -11,12 +12,7 @@ RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'localhost')
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEV_HOSTS = ['http://%s' % host for host in os.getenv('DEV_HOSTS').split(', ')]
-PROD_HOSTS = ['https://%s' % host for host in os.getenv('PROD_HOSTS').split(', ')]
-
-ALLOWED_HOSTS = [
-    host for host in f"{os.getenv('DEV_HOSTS')}, {os.getenv('PROD_HOSTS')}".split(', ')
-]
+ALLOWED_HOSTS = json.loads(os.environ['ALLOWED_HOSTS'])
 
 ROLLBAR = {
     'access_token': os.getenv('ROLLBAR_ACCESS_TOKEN'),
@@ -42,13 +38,15 @@ THIRD_PARTY_APPS = [
 if not DEBUG:
     THIRD_PARTY_APPS.append('cachalot')
 
+INSTALLED_APPS += THIRD_PARTY_APPS
+
 LOCAL_APPS = [
+    'payments.application.django.apps.PaymentsConfig',
     'products.apps.ProductsConfig',
-    'payments.apps.PaymentsConfig',
     'accounts.apps.AccountsConfig',
 ]
 
-INSTALLED_APPS += THIRD_PARTY_APPS + LOCAL_APPS
+INSTALLED_APPS += LOCAL_APPS
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -59,21 +57,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'config.middleware.LogUnexpectedErrorMiddleware',
+    'config.middlewares.log.LogUnexpectedErrorMiddleware',
     'rollbar.contrib.django.middleware.RollbarNotifierMiddlewareExcluding404',
 ]
-
-# if DEBUG is True:
-#     INSTALLED_APPS += ['debug_toolbar', 'silk']
-#     MIDDLEWARE += [
-#         'debug_toolbar.middleware.DebugToolbarMiddleware',
-#         # 'silk.middleware.SilkyMiddleware',
-#     ]
-#     INTERNAL_IPS = [
-#         '127.0.0.1',
-#         'localhost',
-#         '0.0.0.0',
-#     ]
 
 ROOT_URLCONF = 'config.urls'
 
@@ -128,16 +114,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 AUTH_USER_MODEL = 'accounts.AuthUser'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+MIGRATION_MODULES = {
+    'payments': 'payments.infrastructure.db.migrations',
+}
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    *DEV_HOSTS,
-    *PROD_HOSTS,
-]
-CSRF_TRUSTED_ORIGINS = [
-    *DEV_HOSTS,
-    *PROD_HOSTS,
-]
+
+CORS_ALLOWED_ORIGINS = json.loads(os.environ['CORS_ALLOWED_ORIGINS'])
+CSRF_TRUSTED_ORIGINS = json.loads(os.environ['CSRF_TRUSTED_ORIGINS'])
 
 CACHALOT_TIMEOUT = 30
 
@@ -145,7 +129,7 @@ if not DEBUG:
     CACHES = {
         'default': {
             'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': f'redis://{REDIS_HOST}:6379/1',
+            'LOCATION': f'redis://{REDIS_HOST}:6379',
             'OPTIONS': {
                 'PASSWORD': os.environ['REDIS_PASSWORD'],
             },

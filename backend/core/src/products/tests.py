@@ -1,3 +1,9 @@
+import glob
+import os
+from io import BytesIO
+
+from PIL import Image
+from django.core.files.base import ContentFile
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
@@ -7,23 +13,32 @@ from products.serializers import ProductDetailSerializer, ProductListSerializer
 
 
 class ProductTests(APITestCase):
-    def setUp(self):
+    def setUp(self) -> None:
+        mock_image = Image.new('RGB', (100, 100))
+        image_io = BytesIO()
+        mock_image.save(image_io, format='JPEG')
+        mock_image_file = ContentFile(image_io.getvalue(), name='mock.jpg')
+
         Product.objects.create(
             title='product1',
             slug='product1',
-            image='images/test_image.jpg',
+            image=mock_image_file,
             price=100,
             kind=None,
         )
         Product.objects.create(
             title='product2',
             slug='product2',
-            image='images/test_image.jpg',
+            image=mock_image_file,
             price=200,
             kind=None,
         )
 
-    def test_add_to_session(self):
+    def tearDown(self) -> None:
+        for file_path in glob.glob('media/images/mock*.jpg'):
+            os.remove(file_path)
+
+    def test_add_to_session(self) -> None:
         """ADD FIRST PRODUCT TO CART"""
         response = self.client.post(
             reverse('api-add-to-session', kwargs={'slug': 'product1'}),
@@ -61,7 +76,7 @@ class ProductTests(APITestCase):
         self.assertIn('product2', self.client.session.get('favourites'))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_delete_from_session(self):
+    def test_delete_from_session(self) -> None:
         self.test_add_to_session()
         """ DELETE FIRST PRODUCT FROM CART """
         response = self.client.post(
@@ -100,7 +115,7 @@ class ProductTests(APITestCase):
         self.assertNotIn('product2', self.client.session.get('favourites'))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_check_cart(self):
+    def test_check_cart(self) -> None:
         """CHECK WITH NO PRODUCTS IN CART"""
         response = self.client.get(reverse('api-cart-product-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -117,7 +132,7 @@ class ProductTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json(), serializer.data)
 
-    def test_check_product_list(self):
+    def test_check_product_list(self) -> None:
         """CHECK ACTIVE PRODUCTS"""
         response = self.client.get(reverse('api-product-list'))
         serializer = ProductListSerializer(
@@ -142,7 +157,7 @@ class ProductTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.json().get('result'), serializer.data)
 
-    def test_check_product_detail(self):
+    def test_check_product_detail(self) -> None:
         response = self.client.get(
             reverse('api-product-detail', kwargs={'slug': 'product1'}),
         )
@@ -154,7 +169,7 @@ class ProductTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data.get('result'), serializer.data)
 
-    def test_check_favourite_list(self):
+    def test_check_favourite_list(self) -> None:
         """CHECK FAVOURITES IF IT IS NONE"""
         response = self.client.get(reverse('api-favourite-list'))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
