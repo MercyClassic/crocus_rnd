@@ -1,9 +1,9 @@
+from config.container import Container
 from dependency_injector.wiring import Provide, inject
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from config.container import Container
 from payments.application.interfaces.services.call_me import CallMeServiceInterface
 from payments.application.interfaces.services.payment_accept import PaymentAcceptServiceInterface
 from payments.application.interfaces.services.payment_create import PaymentCreateServiceInterface
@@ -15,9 +15,9 @@ from payments.application.serializers.payment import PaymentCreateSerializer
 class CreatePaymentAPIView(APIView):
     @inject
     def post(
-            self,
-            request,
-            payment_service: PaymentCreateServiceInterface = Provide[Container.payment_create_service],
+        self,
+        request,
+        payment_service: PaymentCreateServiceInterface = Provide[Container.payment_create_service],
     ) -> Response:
         serializer = PaymentCreateSerializer(data=request.data)
 
@@ -64,9 +64,9 @@ class CreatePaymentAPIView(APIView):
 class AcceptPaymentAPIView(APIView):
     @inject
     def post(
-            self,
-            request,
-            payment_service: PaymentAcceptServiceInterface = Provide[Container.payment_accept_service],
+        self,
+        request,
+        payment_service: PaymentAcceptServiceInterface = Provide[Container.payment_accept_service],
     ) -> Response:
         if payment_service.handle_webhook(request_data=request.data):
             return Response(status=status.HTTP_200_OK)
@@ -76,9 +76,9 @@ class AcceptPaymentAPIView(APIView):
 class CallMeAPIView(APIView):
     @inject
     def post(
-            self,
-            request,
-            call_me_service: CallMeServiceInterface = Provide[Container.call_me_service],
+        self,
+        request,
+        call_me_service: CallMeServiceInterface = Provide[Container.call_me_service],
     ) -> Response:
         serializer = CallMeSerializer(data=request.data)
 

@@ -1,12 +1,12 @@
 import copy
 import json
+from collections.abc import Iterable
 from hashlib import sha256
-from typing import Iterable
 
 import requests
+from products.models import Product
 
 from payments.infrastructure.db.interfaces.repositories.tinkoff import PaymentUrlGatewayInterface
-from products.models import Product
 
 
 class TinkoffPaymentUrlGateway(PaymentUrlGatewayInterface):
@@ -30,7 +30,7 @@ class TinkoffPaymentUrlGateway(PaymentUrlGatewayInterface):
         data = copy.deepcopy(data)
         data.pop('DATA', None)
         data.update({'Password': self.password})
-        token_data = tuple(map(lambda tup: str(tup[1]), sorted(data.items())))
+        token_data = tuple(str(item) for _, item in sorted(data.items()))
         return sha256(''.join(token_data).encode('utf-8')).hexdigest()
 
     def generate_receipt(
@@ -86,11 +86,11 @@ class TinkoffPaymentUrlGateway(PaymentUrlGatewayInterface):
         token = self.generate_payment_token(data)
         data.setdefault('Token', token)
         receipt = self.generate_receipt(
-            products=order_products,
+            products=products,
             products_count=products_count,
             customer_phone_number=customer_phone_number,
-            with_delivery=delivering
-        ),
+            with_delivery=with_delivery,
+        )
         data.setdefault('Receipt', receipt)
         data = json.dumps(data)
         response = requests.post(

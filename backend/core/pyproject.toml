@@ -4,30 +4,67 @@ version = "0.1.0"
 description = ""
 authors = []
 
-[tool.flake8]
-exclude = [
-    "*/venv/*",
-    "*/migrations/*",
-    "*/__pycache__/*",
-    "*__init__.py*",
-    "src/manage.py"
-]
-ignore = ["DJ01", "A003", "VNE003", "W503"]
-max-line-length = 100
-max-cognitive-complexity = 8
-inline-quotes = "'"
-
-[tool.black]
+[tool.ruff]
 line-length = 100
-exclude = '''
-/(
-    migrations
-)/
-'''
+src = ["src"]
+indent-width = 4
+target-version = "py311"
+fix = true
+exclude = [
+    "migrations",
+    "manage.py",
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".tox",
+    ".venv",
+    "__pychache__",
+    "build",
+    "dist",
+    "node_modules",
+    "venv"
+]
 
-[tool.isort]
-atomic = true
-profile = "black"
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "ARG002",
+    "ANN",
+    "D",
+    "PLR0913",
+    "RUF001",
+    "G004",
+    "PT009",
+    "DJ001",
+    "RUF012",
+    "DTZ003",
+    "PLR2004",
+    "RET505",
+    "RET503",
+    "S113",
+    "FBT001",
+]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+line-ending = "lf"
+quote-style = "single"
+docstring-code-format = true
+skip-magic-trailing-comma = false
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401", "F403"]
+
+[tool.ruff.lint.isort]
+case-sensitive = true
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "single"
 
 [tool.poetry.dependencies]
 python = "3.11.4"
@@ -45,19 +82,4 @@ pre-commit = "^3.3.3"
 requests = "^2.31.0"
 pika = "^1.3.2"
 dependency-injector = "^4.41.0"
-
-[tool.poetry.group.dev.dependencies]
-flake8-pyproject = "^1.2.3"
-flake8 = "^6.0.0"
-flake8-bugbear = "^23.3.12"
-flake8-builtins = "^2.1.0"
-flake8-cognitive-complexity = "^0.1.0"
-flake8-commas = "^2.1.0"
-flake8-django = "^1.1.5"
-flake8-quotes = "^3.3.2"
-flake8-todo = "^0.7"
-flake8-variables-names = "^0.0.5"
-autoflake = "^1.3.1"
-isort = "^5.12.0"
-black="^23.7.0"
-add-trailing-comma="^3.0.1"
+ruff = "^0.4.1"

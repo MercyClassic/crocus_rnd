@@ -1,9 +1,10 @@
-from typing import Iterable
+from collections.abc import Iterable
 
 from accounts.schemas import UserDTO
-from payments.infrastructure.db.models import Order
-from payments.application.models.order import OrderDTO
 from products.models import Product
+
+from payments.application.models.order import OrderDTO
+from payments.infrastructure.db.models import Order
 
 
 class PaymentRepositoryInterface:

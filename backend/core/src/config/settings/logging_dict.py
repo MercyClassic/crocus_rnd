@@ -1,14 +1,14 @@
-import os
+from pathlib import Path
 
-if not os.path.exists('logs/'):
-    os.mkdir('logs/')
+if not Path('logs/').exists():
+    Path('logs/').mkdir()
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'main_format': {
-            'format': '{asctime} - {levelname} - {module} - {view} - {session_id} - {message}',
+            'format': '{asctime} - {levelname} - {module} - {message}',
             'style': '{',
         },
         'payment_format': {

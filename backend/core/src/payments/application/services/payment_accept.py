@@ -23,11 +23,11 @@ class PaymentAcceptService:
         data.pop('Data')
         data.update({'Password': os.getenv('TINKOFF_PASSWORD')})
         data['Success'] = str(data['Success']).lower()
-        token_data = tuple(map(lambda tup: str(tup[1]), sorted(data.items())))
+        token_data = tuple(item for _, item in sorted(data.items()))
         generated_token = sha256(''.join(token_data).encode('utf-8')).hexdigest()
         return request_token == generated_token
 
-    def handle_webhook(self, request_data: dict,) -> bool:
+    def handle_webhook(self, request_data: dict) -> bool:
         if request_data.get('Status') == 'AUTHORIZED':
             return True
         order_uuid = request_data['OrderId']

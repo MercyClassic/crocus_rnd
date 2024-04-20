@@ -1,3 +1,4 @@
+from config.container import Container
 from dependency_injector.wiring import Provide, inject
 from django.db.models import QuerySet
 from rest_framework import status
@@ -5,7 +6,6 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from config.container import Container
 from products.interfaces.cart import CartServiceInterface
 from products.mixins import FilterQueryMixin, ProductResponseMixin
 from products.models import Category, Product

@@ -1,19 +1,16 @@
-import glob
-import os
 from datetime import datetime
 from io import BytesIO
+from pathlib import Path
 from unittest.mock import Mock
 
 from PIL import Image
+from config.container import container
 from django.core.cache import cache
 from django.core.files.base import ContentFile
+from products.models import Product
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
-
-from config.container import container
-from products.models import Product
-
 
 payment_url_gateway_mock = Mock()
 payment_url_gateway_mock.get_payment_url.return_value = 'OK'
@@ -52,10 +49,10 @@ class PaymentTests(APITestCase):
         )
 
     def tearDown(self) -> None:
-        for file_path in glob.glob('media/images/mock*.jpg'):
-            os.remove(file_path)
+        for file_path in Path().glob('media/images/mock*.jpg'):
+            Path(file_path).unlink()
 
-    def test_create_payment(self):
+    def test_create_payment(self):  # noqa: PLR0915
         payment_create_url = reverse('payments:api-payment-create')
         """ ALL DATA IS VALID """
         cache.clear()
