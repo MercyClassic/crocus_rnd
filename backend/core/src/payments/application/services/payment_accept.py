@@ -2,23 +2,22 @@ import copy
 import logging
 import os
 from hashlib import sha256
-from typing import Dict
 
 import rollbar
 
-from payments.repositories import PaymentRepository
+from payments.infrastructure.repositores.order import PaymentRepository
 
-logger = logging.getLogger('payment')
+logger = logging.getLogger(__name__)
 
 
 class PaymentAcceptService:
     def __init__(
         self,
         payment_repo: PaymentRepository,
-        request_data: Dict,
+        request_data: dict,
     ):
         self.payment_repo = payment_repo
-        self._request_data: Dict = request_data
+        self._request_data = request_data
 
     def check_payment_token(self) -> bool:
         data = copy.copy(self._request_data)

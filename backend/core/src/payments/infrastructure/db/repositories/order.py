@@ -1,8 +1,8 @@
 from typing import List
 
-from accounts.schemas import UserData
-from payments.models import Order, OrderProduct
-from payments.schemas import OrderData
+from accounts.schemas import UserDTO
+from payments.infrastructure.db.models import Order, OrderProduct
+from payments.application.models.order import OrderDTO
 from products.models import Product
 
 
@@ -10,8 +10,8 @@ class PaymentRepository:
     def create_order(
         self,
         amount: int,
-        data: OrderData,
-        user_account: UserData,
+        data: OrderDTO,
+        user_account: UserDTO,
     ) -> Order:
         order = Order.objects.create(
             user_id=user_account.id,
@@ -34,8 +34,12 @@ class PaymentRepository:
         self,
         products_slug: List[str],
     ) -> List[Product]:
-        order_products = Product.objects.only('title', 'slug', 'price').filter(
-            slug__in=[*products_slug],
+        order_products = (
+            Product.objects
+            .only('title', 'slug', 'price')
+            .filter(
+                slug__in=[*products_slug],
+            )
         )
         return order_products
 
