@@ -19,25 +19,24 @@ class CoreProvider(Provider):
         engine = create_async_engine(
             os.environ['db_uri'],
             isolation_level='REPEATABLE READ',
-            connect_args={'options': '-c timezone=Europe/Moscow'},
         )
         return async_sessionmaker(
-            engine=engine,
+            engine,
             class_=AsyncSession,
             expire_on_commit=False,
         )
-
-    @provide(scope=Scope.APP)
-    async def get_config(self) -> Config:
-        return load_config()
 
     @provide()
     async def get_async_session(
             self,
             async_session_maker: async_sessionmaker,
     ) -> AsyncGenerator[AsyncSession, None]:
-        async with async_session_maker as session:
+        async with async_session_maker() as session:
             yield session
+
+    @provide(scope=Scope.APP)
+    async def get_config(self) -> Config:
+        return load_config()
 
     @provide()
     async def get_core_repository(self, session: AsyncSession) -> CoreRepository:

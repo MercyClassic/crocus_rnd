@@ -9,6 +9,7 @@ from dishka import FromDishka
 from dishka.integrations.aiogram import inject
 
 from tg.command_for import command_for
+from tg.download_image import download_image
 
 router = Router()
 
@@ -57,9 +58,7 @@ async def set_image(
     config: FromDishka[Config],
     state: FSMContext,
 ):
-    file_id = message.photo[-1].file_id
-    path = f'{config.media_dir}/{file_id}.jpg'
-    await bot.download_file(file_id, path)
+    file_id = await download_image(bot, message.photo[-1].file_id, config.media_dir)
 
     await state.update_data(image=f'images/{file_id}.jpg')
     await state.set_state(CategoryState.active)

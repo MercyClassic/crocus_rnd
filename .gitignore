@@ -1,14 +1,12 @@
 .env
-
 node_modules
-
 .idea
-
 dist
-
 backend/core/src/media
 backend/core/src/logs
 backend/tg_bot/src/logs
 frontend/build
 dev
 __pycache__
+venv
+.venv

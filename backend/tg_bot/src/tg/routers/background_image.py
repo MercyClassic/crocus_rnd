@@ -40,8 +40,7 @@ async def set_background_image(
 ):
     await state.clear()
     file_id = message.photo[-1].file_id
-    path = f'{config.bg_img_path}/{file_id}.jpg'
-    await bot.download_file(file_id, path)
+    await bot.download_file(file_id, config.bg_img_path)
     await bot.send_message(
         message.from_user.id,
         'Главное изображение успешно загружено!',

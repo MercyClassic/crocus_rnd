@@ -18,28 +18,34 @@ class OrderDetail(CallbackData, prefix='order_detail'):
 
 @command_for(permission_level='admin')
 @router.message(Command('orderlist'))
+@inject
 async def get_order_list(
     message: types.Message,
     bot: Bot,
     core_repo: FromDishka[CoreRepository],
 ) -> None:
     orders = await core_repo.get_paid_orders()
-    orders = {order.id: OrderDTO.model_validate(order) for order in orders}
+    if orders:
+        orders = {order.id: OrderDTO.model_validate(order) for order in orders}
 
-    markup = InlineKeyboardBuilder()
-    for order in orders.values():
-        markup.button(
-            text=f'{order.id} - {order.created_at} - {order.amount}р',
-            callback_data=OrderDetail(order_id=order.id),
+        markup = InlineKeyboardBuilder()
+        for order in orders.values():
+            markup.button(
+                text=f'{order.id} - {order.created_at} - {order.amount}р',
+                callback_data=OrderDetail(order_id=order.id),
+            )
+        markup.adjust(1)
+
+        await bot.send_message(
+            message.from_user.id,
+            'Нажмите на один из заказов ниже, чтобы посмотреть детали',
+            reply_markup=markup.as_markup(),
         )
-    markup.adjust(1)
-
-    await bot.send_message(
-        message.from_user.id,
-        'Нажмите на один из заказов ниже, чтобы посмотреть детали',
-        reply_markup=markup.as_markup(),
-    )
-
+    else:
+        await bot.send_message(
+            message.from_user.id,
+            'Заказов нет',
+        )
 
 @router.callback_query(OrderDetail.filter())
 @inject
@@ -49,7 +55,7 @@ async def callback_order_detail(
     callback_data: OrderDetail,
     core_repo: FromDishka[CoreRepository],
 ) -> None:
-    order = core_repo.get_order(order_id=callback_data.order_id)
+    order = await core_repo.get_order(order_id=callback_data.order_id)
     order = OrderDTO.model_validate(order)
 
     await bot.send_message(

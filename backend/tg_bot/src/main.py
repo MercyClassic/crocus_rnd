@@ -15,7 +15,7 @@ from tg.routers import (
     cancel_state_router,
     category_create_router,
     errors_router,
-    get_order_list_router,
+    order_router,
     product_create_router,
     unknown_command_router,
 )
@@ -35,7 +35,7 @@ async def main() -> None:
     dp.include_router(bg_image_router)
     dp.include_router(cancel_state_router)
     dp.include_router(category_create_router)
-    dp.include_router(get_order_list_router)
+    dp.include_router(order_router)
     dp.include_router(product_create_router)
     dp.include_router(unknown_command_router)
     dp.include_router(errors_router)

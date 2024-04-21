@@ -60,11 +60,11 @@ class Config:
 
     root_dir: str = str(Path(__file__).parent.parent)
     media_dir: str = '{}/{}'.format(  # noqa: RUF009
-        Path(__file__).parent.parent.parent.parent,
+        Path(__file__).parent.parent.parent,
         'core/src/media/images',
     )
     bg_img_path: str = '{}/{}'.format(  # noqa: RUF009
-        Path(__file__).parent.parent.parent.parent.parent,
+        Path(__file__).parent.parent.parent.parent,
         'frontend/build/static/img/jpg/bg.jpg',
     )
 

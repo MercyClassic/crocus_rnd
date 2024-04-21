@@ -14,6 +14,7 @@ async def handle_unexpected_errors(
         event.exception,
         exc_info=True,
     )
-    await event.update.message.answer(
-        'Возникли неожиданные проблемы, обратитесь к администратуору!',
-    )
+    if event.update.message:
+        await event.update.message.answer(
+            'Возникли неожиданные проблемы, обратитесь к администратуору!',
+        )
