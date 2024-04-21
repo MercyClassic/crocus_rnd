@@ -12,6 +12,7 @@ from dishka import FromDishka
 from dishka.integrations.aiogram import inject
 
 from tg.command_for import command_for
+from tg.download_image import download_image
 
 router = Router()
 
@@ -125,7 +126,7 @@ async def set_price(
     await bot.send_message(
         message.from_user.id,
         "Введите тип товара либо '-', если у товара нет типа",
-        reply_markup=get_product_type_keyboard,
+        reply_markup=get_product_type_keyboard(),
     )
 
 
@@ -139,7 +140,7 @@ async def set_kind(
         await bot.send_message(
             message.from_user.id,
             'Тип не соответствует требованиям, попробуйте ещё раз',
-            reply_markup=get_product_type_keyboard,
+            reply_markup=get_product_type_keyboard(),
         )
     else:
         product_types = {
@@ -167,9 +168,7 @@ async def set_main_image(
     config: FromDishka[Config],
     state: FSMContext,
 ):
-    file_id = message.photo[-1].file_id
-    path = f'{config.media_dir}/{file_id}.jpg'
-    await bot.download_file(file_id, path)
+    file_id = await download_image(bot, message.photo[-1].file_id, config.media_dir)
 
     await state.update_data(image=f'images/{file_id}.jpg')
     await state.set_state(ProductState.extra_images)
@@ -210,7 +209,7 @@ async def set_extra_images(
             media_group.append(types.InputMediaPhoto(media=file_id))
 
         extra_images = await asyncio.gather(
-            *[bot.download_file(file.media, config.media_dir) for file in media_group],
+            *[download_image(bot, file.media, config.media_dir) for file in media_group],
         )
         await state.update_data(extra_images=extra_images)
 

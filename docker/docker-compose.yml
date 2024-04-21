@@ -1,7 +1,7 @@
 services:
   postgres:
     container_name: postgres
-    image: postgres:15
+    image: postgres:15-alpine
     restart: always
     ports:
       - "5432:5432"
@@ -38,6 +38,12 @@ services:
     image: rabbitmq
     container_name: rabbitmq
     restart: always
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
     ports:
       - "5672:5672"
     networks:
@@ -45,6 +51,7 @@ services:
   telegram_bot:
     container_name: telegram_bot
     restart: always
+    command: python main.py
     build:
       context: ../backend/tg_bot
     env_file:
@@ -57,11 +64,11 @@ services:
   rabbitmq_consumer:
     container_name: rabbitmq_consumer
     restart: always
+    command: python start_consuming.py
     build:
       context: ../backend/tg_bot
     env_file:
       - ../backend/tg_bot/.env
-    command: python start_consuming.py
     depends_on:
       - rabbitmq
     networks:

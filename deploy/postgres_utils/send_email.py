@@ -8,7 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 logging.basicConfig(
-    level='DEBUG',
+    level='INFO',
     filename='src/logs/smtp.log',
     format='{asctime} - {levelname} - {message}',
     style='{',

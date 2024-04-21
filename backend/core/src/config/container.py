@@ -15,7 +15,11 @@ from products.services.cart import CartService
 class Container(DeclarativeContainer):
     user_repo = providers.Factory(UserRepository)
     payment_repo = providers.Factory(PaymentRepository)
-    notification_bus = providers.Factory(NotificationBus)
+    notification_bus = providers.Factory(
+        NotificationBus,
+        host=os.environ['RABBITMQ_HOST'],
+        port=os.environ['RABBITMQ_PORT'],
+    )
     payment_url_gateway = providers.Factory(
         TinkoffPaymentUrlGateway,
         terminal_key=os.environ['TINKOFF_TERMINAL_KEY'],

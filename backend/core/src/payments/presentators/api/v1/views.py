@@ -91,7 +91,6 @@ class CallMeAPIView(APIView):
                     'подождите немного, прежде, чем заказать ещё один',
                 )
             call_me_service.create_call_me_request(
-                request,
                 serialized_data.get('phone_number'),
             )
             set_pause_timer(request, 'call_me')

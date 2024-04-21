@@ -1,0 +1,26 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U postgres' || exit 1" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 3s
+  app_tests:
+    container_name: app_tests
+    restart: no
+    build:
+      context: ../backend/core
+    env_file:
+      - ../backend/core/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: python manage.py test

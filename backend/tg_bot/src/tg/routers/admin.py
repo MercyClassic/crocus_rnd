@@ -2,21 +2,12 @@ from aiogram import Bot, Router, types
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from config import Config
+from dishka import FromDishka
+from dishka.integrations.aiogram import inject
 
 from tg.command_for import command_for
 
 router = Router()
-
-
-@router.message()
-async def unknown_command(
-    message: types.Message,
-    bot: Bot,
-):
-    await bot.send_message(
-        message.from_user.id,
-        'Неизвестная команда. Проверьте сообщение на опечатку',
-    )
 
 
 @command_for(permission_level='admin')
@@ -40,10 +31,11 @@ async def admin_help(
 
 @command_for(permission_level='admin')
 @router.message(Command('adminpanel'))
+@inject
 async def open_admin_panel(
     message: types.Message,
     bot: Bot,
-    config: Config,
+    config: FromDishka[Config],
 ):
     url = f'{config.domain}{config.admin_panel_url}'
     markup = InlineKeyboardBuilder()
