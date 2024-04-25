@@ -24,7 +24,7 @@ async def get_order_list(
     bot: Bot,
     core_repo: FromDishka[CoreRepository],
 ) -> None:
-    orders = await core_repo.get_paid_orders()
+    orders = await core_repo.get_orders()
     if orders:
         orders = {order.id: OrderDTO.model_validate(order) for order in orders}
 

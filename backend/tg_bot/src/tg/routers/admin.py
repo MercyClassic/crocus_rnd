@@ -19,7 +19,7 @@ async def admin_help(
     await bot.send_message(
         message.from_user.id,
         'Доступные команды:'
-        '\n/orderlist - Посмотреть оплаченные неготовые заказазы'
+        '\n/orderlist - Посмотреть заказазы за последние 3 месяца'
         '\n/adminpanel - Открыть административную панель'
         '\n/createproduct - Создать товар'
         '\n/createcategory - Создать категорию'

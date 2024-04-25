@@ -1,3 +1,5 @@
+from datetime import UTC, datetime, timedelta
+
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -10,7 +12,7 @@ class CoreRepository:
     def __init__(self, session: AsyncSession):
         self._session = session
 
-    async def get_paid_orders(self):
+    async def get_orders(self):
         query = (
             select(Order)
             .options(
@@ -22,6 +24,9 @@ class CoreRepository:
             )
             .where(
                 Order.done_at.is_(None),
+                Order.created_at > (
+                        datetime.now(UTC) - timedelta(days=90)
+                ),
             )
         )
         orders = await self._session.execute(query)
