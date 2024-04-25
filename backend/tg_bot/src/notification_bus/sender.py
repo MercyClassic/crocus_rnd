@@ -13,14 +13,16 @@ class NotificationSender:
         url = f'{self.config.domain}{self.config.admin_panel_order_url % order_id}'
         markup.add(types.InlineKeyboardButton(text='Посмотреть детали заказа', url=url))
 
-        await self.bot.send_message(
-            self.config.to_notificate_telegram_id,
-            'У вас новый заказ!',
-            reply_markup=markup.as_markup(),
-        )
+        for telegram_id in self.config.to_notificate_telegram_ids:
+            await self.bot.send_message(
+                telegram_id,
+                'У вас новый заказ!',
+                reply_markup=markup.as_markup(),
+            )
 
     async def new_call_me_request_notification(self, phone_number: str) -> None:
-        await self.bot.send_message(
-            self.config.to_notificate_telegram_id,
-            f'Посетитель сайта попросил перезвонить ему на номер: {phone_number}',
-        )
+        for telegram_id in self.config.to_notificate_telegram_ids:
+            await self.bot.send_message(
+                telegram_id,
+                f'Посетитель сайта попросил перезвонить ему на номер: {phone_number}',
+            )

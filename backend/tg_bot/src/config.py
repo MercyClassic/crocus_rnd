@@ -1,3 +1,4 @@
+import json
 import logging.config
 import os
 from dataclasses import dataclass
@@ -50,7 +51,7 @@ class Config:
     bot_token: str
     rabbitmq_host: str
     rabbitmq_port: str
-    to_notificate_telegram_id: str
+    to_notificate_telegram_ids: list[int]
 
     domain: str
     admin_panel_product_url: str
@@ -84,7 +85,10 @@ def load_config() -> Config:
         rabbitmq_host=parse_from_env('RABBITMQ_HOST'),
         rabbitmq_port=parse_from_env('RABBITMQ_PORT'),
         domain=parse_from_env('DOMAIN'),
-        to_notificate_telegram_id=parse_from_env('TO_NOTIFICATE_TELEGRAM_ID'),
+        to_notificate_telegram_ids=[
+            int(t_id)
+            for t_id in json.loads(os.environ['TO_NOTIFICATE_TELEGRAM_ID'])
+        ],
         admin_panel_product_url=parse_from_env('ADMIN_PANEL_PRODUCT_URL'),
         admin_panel_order_url=parse_from_env('ADMIN_PANEL_ORDER_URL'),
         admin_panel_category_url=parse_from_env('ADMIN_PANEL_CATEGORY_URL'),
