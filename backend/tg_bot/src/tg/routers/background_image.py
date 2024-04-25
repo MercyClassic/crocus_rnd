@@ -49,10 +49,11 @@ async def set_background_image(
 
 @command_for(permission_level='admin')
 @router.message(Command('downloadbgimage'))
+@inject
 async def send_background_image(
     message: types.Message,
     bot: Bot,
-    config: Config,
+    config: FromDishka[Config],
 ):
     image = types.FSInputFile(config.bg_img_path)
     await bot.send_photo(
