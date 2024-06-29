@@ -40,8 +40,8 @@ class ProductState(StatesGroup):
     extra_images = State()
 
 
-@command_for(permission_level='owner')
 @router.message(Command('createproduct'))
+@command_for(permission_level='owner')
 async def create_product_start(
     message: types.Message,
     bot: Bot,

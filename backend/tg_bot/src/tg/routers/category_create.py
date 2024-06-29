@@ -20,8 +20,8 @@ class CategoryState(StatesGroup):
     active = State()
 
 
-@command_for(permission_level='owner')
 @router.message(Command('createcategory'))
+@command_for(permission_level='owner')
 async def create_category_start(
     message: types.Message,
     bot: Bot,
