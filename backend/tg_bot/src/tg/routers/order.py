@@ -16,8 +16,8 @@ class OrderDetail(CallbackData, prefix='order_detail'):
     order_id: int
 
 
-@command_for(permission_level='admin')
 @router.message(Command('orderlist'))
+@command_for(permission_level='admin')
 @inject
 async def get_order_list(
     message: types.Message,

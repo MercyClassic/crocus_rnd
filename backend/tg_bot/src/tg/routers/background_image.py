@@ -15,8 +15,8 @@ class ImageState(StatesGroup):
     image = State()
 
 
-@command_for(permission_level='owner')
 @router.message(Command('setbgimage'))
+@command_for(permission_level='owner')
 async def start_set_background_image(
     message: types.Message,
     bot: Bot,
@@ -31,6 +31,7 @@ async def start_set_background_image(
 
 
 @router.message(ImageState.image, F.photo)
+@command_for(permission_level='owner')
 @inject
 async def set_background_image(
     message: types.Message,
@@ -47,10 +48,10 @@ async def set_background_image(
     )
 
 
-@command_for(permission_level='admin')
 @router.message(Command('downloadbgimage'))
+@command_for(permission_level='admin')
 @inject
-async def send_background_image(
+async def download_background_image(
     message: types.Message,
     bot: Bot,
     config: FromDishka[Config],

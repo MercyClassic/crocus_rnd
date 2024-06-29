@@ -10,8 +10,8 @@ from tg.command_for import command_for
 router = Router()
 
 
-@command_for(permission_level='admin')
 @router.message(Command('ahelp'))
+@command_for(permission_level='admin')
 async def admin_help(
     message: types.Message,
     bot: Bot,
@@ -29,8 +29,8 @@ async def admin_help(
     )
 
 
-@command_for(permission_level='admin')
 @router.message(Command('adminpanel'))
+@command_for(permission_level='admin')
 @inject
 async def open_admin_panel(
     message: types.Message,
