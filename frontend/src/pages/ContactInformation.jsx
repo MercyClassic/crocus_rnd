@@ -25,12 +25,19 @@ const ContactInformation = () => {
                                 <li className="menu__sub-item">
                                     <Link className="catalog__link">Email: crocusrnd@mail.ru</Link>
                                 </li>
+                                <li className="menu__sub-item">
+                                    <Link className="catalog__link">
+                                        <p> ИП Сабанова Елена Александровна </p>
+                                        <p> ОГРНИП 318619600091608 </p>
+                                        <p> ИНН 612890171437 </p>
+                                    </Link>
+                                </li>
                             </ul>
                         </div>
                     </div>
                 </section>
             </main>
-        <Footer />
+            <Footer/>
         </>
     );
 }
