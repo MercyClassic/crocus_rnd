@@ -25,7 +25,6 @@ jobs:
         ALLOWED_HOSTS: '[0.0.0.0]'
         CORS_ALLOWED_ORIGINS: '[http://0.0.0.0]'
         CSRF_TRUSTED_ORIGINS: '[http://0.0.0.0]'
-        ROLLBAR_ACCESS_TOKEN: mock
         EMAIL_HOST: mock
         EMAIL_HOST_PASSWORD: mock
         TO_NOTIFICATION: mock

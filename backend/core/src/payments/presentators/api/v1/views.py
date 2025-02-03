@@ -1,3 +1,7 @@
+import ipaddress
+import json
+import os
+
 from config.container import Container
 from dependency_injector.wiring import Provide, inject
 from rest_framework import status
@@ -5,8 +9,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from payments.application.interfaces.services.call_me import CallMeServiceInterface
-from payments.application.interfaces.services.payment_accept import PaymentAcceptServiceInterface
-from payments.application.interfaces.services.payment_create import PaymentCreateServiceInterface
+from payments.application.interfaces.services.payment_accept import (
+    PaymentAcceptServiceInterface,
+)
+from payments.application.interfaces.services.payment_create import (
+    PaymentCreateServiceInterface,
+)
 from payments.application.pause import is_user_paused, set_pause_timer
 from payments.application.serializers.call_me import CallMeSerializer
 from payments.application.serializers.payment import PaymentCreateSerializer
@@ -17,7 +25,9 @@ class CreatePaymentAPIView(APIView):
     def post(
         self,
         request,
-        payment_service: PaymentCreateServiceInterface = Provide[Container.payment_create_service],
+        payment_service: PaymentCreateServiceInterface = Provide[
+            Container.payment_create_service
+        ],
     ) -> Response:
         serializer = PaymentCreateSerializer(data=request.data)
 
@@ -66,11 +76,23 @@ class AcceptPaymentAPIView(APIView):
     def post(
         self,
         request,
-        payment_service: PaymentAcceptServiceInterface = Provide[Container.payment_accept_service],
+        payment_service: PaymentAcceptServiceInterface = Provide[
+            Container.payment_accept_service
+        ],
     ) -> Response:
-        if payment_service.handle_webhook(request_data=request.data):
-            return Response(status=status.HTTP_200_OK)
+        if self.check_ip_addr(
+            request.headers.get('X-Real-Ip')
+            or request.META.get('HTTP_X_FORWARDED_FOR')
+        ):
+            if payment_service.handle_webhook(request_data=request.data):
+                return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def check_ip_addr(self, ip: str) -> bool:
+        return any(
+            ipaddress.ip_address(ip) in ipaddress.ip_network(valid_ip)
+            for valid_ip in json.loads(os.environ['YOOKASSA_VALID_IPS'])
+        )
 
 
 class CallMeAPIView(APIView):

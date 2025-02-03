@@ -43,7 +43,7 @@ LOGGING = {
         },
     },
     'loggers': {
-        'middlewares.log': {
+        'config.middlewares.log': {
             'handlers': ['market'],
             'level': 'ERROR',
             'propagate': True,

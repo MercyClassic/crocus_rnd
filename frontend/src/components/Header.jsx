@@ -87,7 +87,7 @@ const Header = () => {
                     </Link>
                     <div className="header__actions actions">
                         <div className="actions__contact">
-                            <Link to="https://wa.me/79185212571" className="actions__whatsapp-icon">
+                            <Link to="https://wa.me/79934451702" className="actions__whatsapp-icon">
                                 <img src={require("../static/img/png/whatsapp.png")} alt="Whatsapp"/>
                             </Link>
                             <Link to="https://wa.me/79934461702" className="actions__tel ">+7 (993) 446-17-02</Link>
@@ -98,7 +98,7 @@ const Header = () => {
                                 <span></span>
                             </Link>
                         </div>
-                        <Link to="https://wa.me/79185212571" className="actions__fast-call">Перейти в Whatsapp</Link>
+                        <Link to="https://wa.me/79934451702" className="actions__fast-call">Перейти в Whatsapp</Link>
                     </div>
                 </div>
             </div>

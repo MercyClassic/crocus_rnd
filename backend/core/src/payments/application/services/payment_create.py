@@ -1,30 +1,39 @@
 import re
 from collections.abc import Iterable
 from datetime import datetime
+from decimal import Decimal
 
 from accounts.repositories import UserRepository
 from django.db import transaction
 from notification_bus.interfaces.sender import NotificationBusInterface
 from products.models import Product
 
-from payments.application.interfaces.services.payment_create import PaymentCreateServiceInterface
+from payments.application.interfaces.services.payment_create import (
+    PaymentCreateServiceInterface,
+)
 from payments.application.models.order import OrderDTO
-from payments.infrastructure.db.interfaces.repositories.order import PaymentRepositoryInterface
-from payments.infrastructure.db.interfaces.repositories.tinkoff import PaymentUrlGatewayInterface
+from payments.infrastructure.db.interfaces.repositories.order import (
+    PaymentRepositoryInterface,
+)
+from payments.application.interfaces.repositories.base import (
+    PaymentUrlGatewayInterface,
+)
 
 
 class PaymentCreateService(PaymentCreateServiceInterface):
     def __init__(
         self,
-            payment_repo: PaymentRepositoryInterface,
-            user_repo: UserRepository,
-            notification_bus: NotificationBusInterface,
-            payment_url_gateway: PaymentUrlGatewayInterface,
+        payment_repo: PaymentRepositoryInterface,
+        user_repo: UserRepository,
+        notification_bus: NotificationBusInterface,
+        payment_url_gateway: PaymentUrlGatewayInterface,
+        delivery_price: Decimal,
     ):
         self.payment_repo = payment_repo
         self.user_repo = user_repo
         self.notification_bus = notification_bus
         self.payment_url_gateway = payment_url_gateway
+        self.delivery_price = delivery_price
 
     def normalize_phone_number(self, phone_number: str) -> str:
         phone_number = re.sub(r'[() -]*', '', phone_number)
@@ -35,45 +44,42 @@ class PaymentCreateService(PaymentCreateServiceInterface):
         return f'+7{phone_number[2:]}'
 
     def check_permissions(
-            self,
-            delivery_date: datetime,
-            order_products: Iterable[Product],
-            products_count: dict[str, int],
-            calculated_amount: int,
-            amount: int,
-            delivering: bool,
+        self,
+        delivery_date: datetime,
+        order_products: Iterable[Product],
+        products_count: dict[str, int],
+        calculated_amount: int,
+        amount: Decimal,
     ) -> bool:
         if delivery_date.date() < datetime.utcnow().date():
             return False
-        if amount > 50350:
+        if amount > 50000 + self.delivery_price:
             return False
         if any(int(count) < 1 for count in products_count.values()):
             return False
         if not order_products:
             return False
 
-        if delivering:
-            calculated_amount += 350
         if calculated_amount != amount:
             return False
         return True
 
     def create_payment(
-            self,
-            products: dict[str, int],
-            amount: int,
-            customer_name: str,
-            customer_email: str,
-            receiver_name: str | None,
-            customer_phone_number: str,
-            receiver_phone_number: str | None,
-            without_calling: bool,
-            delivery_address: str,
-            delivery_date: datetime,
-            delivery_time: str,
-            note: str,
-            cash: bool,
-            delivering: bool,
+        self,
+        products: dict[str, int],
+        amount: Decimal,
+        customer_name: str,
+        customer_email: str,
+        receiver_name: str | None,
+        customer_phone_number: str,
+        receiver_phone_number: str | None,
+        without_calling: bool,
+        delivery_address: str,
+        delivery_date: datetime,
+        delivery_time: str,
+        note: str,
+        cash: bool,
+        delivering: bool,
     ) -> str | bool:
         order_data = OrderDTO(
             products=products,
@@ -92,12 +98,16 @@ class PaymentCreateService(PaymentCreateServiceInterface):
             delivering=delivering,
         )
 
-        order_products = self.payment_repo.get_order_products(order_data.products.keys())
+        order_products = self.payment_repo.get_order_products(
+            order_data.products.keys()
+        )
 
         calculated_amount = sum(
             product.price * int(order_data.products.get(product.slug))
             for product in order_products
         )
+        if delivering:
+            calculated_amount += self.delivery_price
 
         is_permitted = self.check_permissions(
             delivery_date=order_data.delivery_date,
@@ -105,7 +115,6 @@ class PaymentCreateService(PaymentCreateServiceInterface):
             products_count=order_data.products,
             calculated_amount=calculated_amount,
             amount=order_data.amount,
-            delivering=order_data.delivering,
         )
         if not is_permitted:
             return False
@@ -139,4 +148,5 @@ class PaymentCreateService(PaymentCreateServiceInterface):
                 products_count=order_data.products,
                 with_delivery=order_data.delivering,
                 customer_phone_number=order_data.customer_phone_number,
+                customer_email=customer_email,
             )

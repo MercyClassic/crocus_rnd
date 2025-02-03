@@ -25,6 +25,11 @@ const createPayment = async (event, oneclick=false) => {
         return null;
     }
 
+    if (!form.cash.checked && !form.email.value) {
+        alert('При оплате онлайн укажите адрес электронной почты');
+        return null;
+    }
+
     counters.forEach(counter => {
         let el = counter.querySelector('input');
         items[el.dataset.slug] = el.value;
@@ -49,10 +54,6 @@ const createPayment = async (event, oneclick=false) => {
 
     await PaymentCreateRequest(data).then((response) => {
         if (response.status === 201) {
-            /////// need to be deleted when payments will turn on
-            alert('Онлайн оплата временно недоступна, но мы приняли ваш заказ! Скоро свяжемся с вами');
-            return null;
-            ///////
             if (response.data.payment_url === 'OK') {
                 alert('Ваш заказ успешно оформлен, начинаем его собирать!');
                 window.location.href = '/';

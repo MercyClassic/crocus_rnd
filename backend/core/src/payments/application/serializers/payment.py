@@ -9,7 +9,9 @@ from payments.application.validators import phone_validator
 
 class PaymentCreateSerializer(serializers.Serializer):
     items = serializers.DictField(allow_empty=False)
-    amount = serializers.DecimalField(max_value=Decimal(1000000), max_digits=9, decimal_places=2)
+    amount = serializers.DecimalField(
+        max_value=Decimal(1000000), max_digits=9, decimal_places=2
+    )
     customer_name = serializers.CharField(max_length=150)
     customer_email = serializers.CharField(max_length=300, allow_blank=True)
     receiver_name = serializers.CharField(max_length=150, allow_blank=True)
@@ -37,4 +39,6 @@ class PaymentCreateSerializer(serializers.Serializer):
             phone = phone_validator(value)
             if not phone:
                 raise ValidationError
+        if not data.get('cash') and not data.get('customer_email'):
+            raise ValidationError
         return data

@@ -14,5 +14,6 @@ class PaymentUrlGatewayInterface(ABC):
             products: Iterable[Product],
             products_count: dict[str, int],
             with_delivery: bool,
+            customer_email: str | None,
     ) -> str | None:
         raise NotImplementedError

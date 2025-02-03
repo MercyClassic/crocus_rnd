@@ -6,10 +6,10 @@ from hashlib import sha256
 import requests
 from products.models import Product
 
-from payments.infrastructure.db.interfaces.repositories.tinkoff import PaymentUrlGatewayInterface
+from payments.application.interfaces.repositories.base import PaymentUrlGatewayInterface
 
 
-class TinkoffPaymentUrlGateway(PaymentUrlGatewayInterface):
+class PaymentUrlGateway(PaymentUrlGatewayInterface):
     def __init__(
             self,
             terminal_key: str,
@@ -75,6 +75,7 @@ class TinkoffPaymentUrlGateway(PaymentUrlGatewayInterface):
             products: Iterable[Product],
             products_count: dict[str, int],
             with_delivery: bool,
+            customer_email: str | None = None,
     ) -> str | None:
         headers = {'Content-Type': 'application/json'}
         data = {

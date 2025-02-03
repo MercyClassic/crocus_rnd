@@ -1,14 +1,15 @@
 import os
+from decimal import Decimal
 
 from accounts.repositories import UserRepository
 from dependency_injector import providers
 from dependency_injector.containers import DeclarativeContainer
 from notification_bus.services.sender import NotificationBus
 from payments.application.services.call_me import CallMeService
-from payments.application.services.payment_accept import PaymentAcceptService
+from payments.application.services.payment_accept.yookassa import PaymentAcceptService
 from payments.application.services.payment_create import PaymentCreateService
 from payments.infrastructure.db.repositories.order import PaymentRepository
-from payments.infrastructure.db.repositories.tinkoff import TinkoffPaymentUrlGateway
+from payments.application.repositories.yookassa import PaymentUrlGateway
 from products.services.cart import CartService
 
 
@@ -21,13 +22,8 @@ class Container(DeclarativeContainer):
         port=os.environ['RABBITMQ_PORT'],
     )
     payment_url_gateway = providers.Factory(
-        TinkoffPaymentUrlGateway,
-        terminal_key=os.environ['TINKOFF_TERMINAL_KEY'],
-        taxation=os.environ['TINKOFF_TAXATION'],
-        password=os.environ['TINKOFF_PASSWORD'],
-        tax=os.environ['TINKOFF_TAX'],
-        delivery_price=int(os.environ['DELIVERY_PRICE']),
-        payment_url=os.environ['TINKOFF_PAYMENT_URL'],
+        PaymentUrlGateway,
+        delivery_price=Decimal(os.environ['DELIVERY_PRICE']),
     )
 
     payment_create_service = providers.Factory(
@@ -36,6 +32,7 @@ class Container(DeclarativeContainer):
         payment_repo=payment_repo,
         notification_bus=notification_bus,
         payment_url_gateway=payment_url_gateway,
+        delivery_price=Decimal(os.environ['DELIVERY_PRICE']),
     )
     payment_accept_service = providers.Factory(
         PaymentAcceptService,

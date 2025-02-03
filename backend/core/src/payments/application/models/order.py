@@ -1,10 +1,11 @@
 from dataclasses import dataclass
 from datetime import datetime
+from decimal import Decimal
 
 
 @dataclass
 class OrderDTO:
-    amount: int
+    amount: Decimal
     delivering: bool
     without_calling: bool
     customer_email: str | None

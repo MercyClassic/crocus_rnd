@@ -13,12 +13,12 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
         const form = event.target.closest('form');
         const disabledCartInputs = [form.delivery_address, form.delivery_time];
         if (form.delivering.checked) {
-            setDelivering(350);
-            amount += 350;
+            setDelivering(450);
+            amount += 450;
             disabledCartInputs.forEach((input) => {input.removeAttribute('disabled')});
         } else {
             setDelivering(0);
-            amount -= 350;
+            amount -= 450;
             disabledCartInputs.forEach((input) => {input.setAttribute('disabled', true)});
         }
         setAmount(amount);
@@ -35,7 +35,7 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
                 </span>
             </p>
             </label>
-            <input type="text" name='email' placeholder="Без указания почты чек прикрепляется к букету" className="popup-cart__email-input _input" />
+            <input type="text" name='email' placeholder="Требуется указать при онлайн оплате" className="popup-cart__email-input _input" />
         </div>
         <div className="popup-cart__address-label _label">
             <label className="popup-cart__date-label _label">
@@ -87,7 +87,7 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
         <div className="popup-cart__checkbox-wrapper">
             <label className="popup-cart__checkbox-label">
                 <input onClick={(e) => changeDeliveringPrice(e)} type='checkbox' name="delivering" className="popup-cart__checkbox-input" />
-                    С доставкой (+350 рублей)
+                    С доставкой (+450 рублей)
              </label>
         </div>
         <div className="popup-cart__checkbox-wrapper">
