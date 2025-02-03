@@ -90,8 +90,8 @@ const Header = () => {
                             <Link to="https://wa.me/79185212571" className="actions__whatsapp-icon">
                                 <img src={require("../static/img/png/whatsapp.png")} alt="Whatsapp"/>
                             </Link>
-                            <Link to="https://wa.me/79185212571" className="actions__tel ">+7 (918) 521-25-71</Link>
-                            <Link to="https://wa.me/79185212571" className="actions__whatsapp-text">Написать в Whatsapp</Link>
+                            <Link to="https://wa.me/79934461702" className="actions__tel ">+7 (993) 446-17-02</Link>
+                            <Link to="https://wa.me/79934461702" className="actions__whatsapp-text">Написать в Whatsapp</Link>
                             <Link className="icon-menu">
                                 <span></span>
                                 <span></span>
