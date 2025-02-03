@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useContext} from 'react';
 import {Link, useParams} from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -6,6 +6,8 @@ import useFetching from '../hooks/useFetching';
 import ProductService from '../API/ProductService';
 import Loader from '../components/Loader';
 import { CartModal } from '../components/Cart';
+import Cart from '../components/Cart';
+import {CountCartProductsContext} from '../context';
 import RedHeartSvg from '../components/Svg/RedHeart';
 import BlackHeartSvg from '../components/Svg/BlackHeart';
 import addToSession from '../functions/addToSession';
@@ -61,6 +63,8 @@ const ProductDetailPage = ({data, setCartVisible}) => {
     const cartProducts = data.cart_products;
     const favourites = data.favourites;
 
+
+    const {countCartProducts, setCountCartProducts} = useContext(CountCartProductsContext);
     const [mainPicture, setMainPicture] = useState(product && product.image);
     const [cartButton, setCartButton] = useState(null);
     const [likeButton, setLikeButton] = useState(null);
@@ -79,9 +83,17 @@ const ProductDetailPage = ({data, setCartVisible}) => {
         setMainPicture(event.target.getAttribute('src'));
     }
 
+    useEffect(() => {
+        if (cartProducts) {
+            setCountCartProducts(cartProducts.length);
+        }
+    }, [cartProducts])
+
+
     if (product) {
         return(
             <>
+                <Cart requestCountCartProducts={cartProducts && cartProducts.length} />
                 <section className="product">
                     <div className="product__container _container">
                         <div className="product__header header-product">
@@ -130,7 +142,7 @@ const ProductDetailPage = ({data, setCartVisible}) => {
                                     <p className="product-info__structure"> <span style={{display: "block", fontSize: "18px"}}> Описание: </span> {product.description}</p>
                                         {getKindLink(product.kind)}
                                     <p className="product-info__tip">
-                                        Для заказа товара нажмите добавить в корзину или <Link to="https://wa.me/79185212571/">свяжитесь с нами</Link>
+                                        Для заказа товара нажмите добавить в корзину или <Link to="https://wa.me/79934461702/">свяжитесь с нами</Link>
                                     </p>
                                 </div>
                             </div>
