@@ -3,14 +3,16 @@ import logging
 import os
 from hashlib import sha256
 
-import rollbar
 
+from payments.application.interfaces.services.payment_accept import (
+    PaymentAcceptServiceInterface
+)
 from payments.infrastructure.db.repositories.order import PaymentRepository
 
 logger = logging.getLogger(__name__)
 
 
-class PaymentAcceptService:
+class PaymentAcceptService(PaymentAcceptServiceInterface):
     def __init__(
         self,
         payment_repo: PaymentRepository,
@@ -37,7 +39,6 @@ class PaymentAcceptService:
                 f'Ошибка при попытке найти заказ, uuid заказа: {order_uuid}, '
                 f"id оплаты  в системе банка: {request_data['PaymentId']}",
             )
-            rollbar.report_message(message)
             logger.warning(message)
             return False
         if not self.check_payment_token(request_data):
@@ -45,7 +46,6 @@ class PaymentAcceptService:
                 f'Ошибка при сравнении токенов, '
                 f'id заказа: {order_uuid}, токен: {request_data["Token"]}',
             )
-            rollbar.report_message(message)
             logger.warning(message)
             return False
         if request_data.get('Success') and request_data.get('Status') == 'CONFIRMED':

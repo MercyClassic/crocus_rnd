@@ -1,7 +1,8 @@
 from notification_bus.interfaces.sender import NotificationBusInterface
+from payments.application.interfaces.services.call_me import CallMeServiceInterface
 
 
-class CallMeService:
+class CallMeService(CallMeServiceInterface):
     def __init__(self, notification_bus: NotificationBusInterface):
         self.notification_bus = notification_bus
 

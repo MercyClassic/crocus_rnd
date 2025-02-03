@@ -23,7 +23,7 @@ const Delivery = () => {
                 <h1 className="delivery__title"> <p> Доставка <span style={{display: 'block'}}> свежих цветов </span> </p> <span>в Ростове-на-Дону</span></h1>
                 <p className="delivery__text">
                     <span style={{display: 'block', borderBottom: "none"}}> Не можете определиться c выбором? </span>
-                    Закажите <span> <Link style={{color: "inherit"}} href="tel: +7 (918) 521-25-71"> онлайн звонок бесплатно </Link> </span>
+                    Закажите <span> <Link style={{color: "inherit"}} href="tel: +7 (993) 445-17-02"> онлайн звонок бесплатно </Link> </span>
                 </p>
                 <form className="delivery__form" method="post" action="/api/v1/call_me">
                     <input onClick={(e) => formatPhoneNumber(e)} name="phone_number" placeholder="+7 (999) 999 99-99" type="text" className="delivery__number-input" required maxLength="20" minLength="11" />

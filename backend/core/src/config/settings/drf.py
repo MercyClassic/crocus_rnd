@@ -7,5 +7,4 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
-    'EXCEPTION_HANDLER': 'rollbar.contrib.django_rest_framework.post_exception_handler',
 }

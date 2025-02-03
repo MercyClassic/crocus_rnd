@@ -14,12 +14,6 @@ SECRET_KEY = os.environ['SECRET_KEY']
 
 ALLOWED_HOSTS = json.loads(os.environ['ALLOWED_HOSTS'])
 
-ROLLBAR = {
-    'access_token': os.getenv('ROLLBAR_ACCESS_TOKEN'),
-    'environment': 'development' if DEBUG else 'production',
-    'root': str(BASE_DIR),
-}
-
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -58,7 +52,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'config.middlewares.log.LogUnexpectedErrorMiddleware',
-    'rollbar.contrib.django.middleware.RollbarNotifierMiddlewareExcluding404',
 ]
 
 ROOT_URLCONF = 'config.urls'
