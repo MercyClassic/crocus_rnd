@@ -19,3 +19,4 @@ class OrderDTO:
     note: str
     cash: bool
     products: dict
+    promo_code: str | None

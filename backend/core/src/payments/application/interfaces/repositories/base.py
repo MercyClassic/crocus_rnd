@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
+from decimal import Decimal
 
 from products.models import Product
 
@@ -15,5 +16,6 @@ class PaymentUrlGatewayInterface(ABC):
             products_count: dict[str, int],
             with_delivery: bool,
             customer_email: str | None,
+            discount_coefficient: Decimal,
     ) -> str | None:
         raise NotImplementedError

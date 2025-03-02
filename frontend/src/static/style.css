@@ -2504,6 +2504,33 @@ h6 {
 .popup-cart__create-order-button-wrapper {
   text-align: center;
 }
+.popup-cart__set-promo_code-button-wrapper {
+  text-align: center;
+  max-width: 100px;
+}
+
+._black-button-promo-code {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #272727;
+  color: #fff;
+  text-transform: uppercase;
+  height: 50px;
+  padding: 10px 45px;
+  margin-bottom: 10px;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: all 0.3s ease 0s;
+}
+@media (max-width: 479.98px) {
+  ._black-button-promo-code {
+    height: 40px;
+    padding: 0 35px;
+    font-size: 14px;
+  }
+}
+
 .popup-item-cart {
   display: flex;
   align-items: center;

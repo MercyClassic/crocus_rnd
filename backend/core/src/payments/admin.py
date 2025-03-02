@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from payments.infrastructure.db.models import Order, OrderProduct
+from payments.infrastructure.db.models import Order, OrderProduct, PromoCode
 
 
 class ProductInline(admin.StackedInline):
@@ -41,6 +41,7 @@ class OrderAdmin(admin.ModelAdmin):
         'delivery_time',
         'note',
         'cash',
+        'promo_code',
     )
     list_display_links = ('id', 'user')
     search_fields = ('id', 'uuid', 'amount')
@@ -60,5 +61,10 @@ class OrderProductAdmin(admin.ModelAdmin):
     show_full_result_count = False
 
 
+class PromoCodeAdmin(admin.ModelAdmin):
+    show_full_result_count = False
+
+
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderProduct, OrderProductAdmin)
+admin.site.register(PromoCode, PromoCodeAdmin)

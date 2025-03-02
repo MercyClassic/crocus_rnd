@@ -6,6 +6,7 @@ from decimal import Decimal
 from accounts.repositories import UserRepository
 from django.db import transaction
 from notification_bus.interfaces.sender import NotificationBusInterface
+from payments.infrastructure.db.models import PromoCode
 from products.models import Product
 
 from payments.application.interfaces.services.payment_create import (
@@ -64,49 +65,33 @@ class PaymentCreateService(PaymentCreateServiceInterface):
             return False
         return True
 
-    def create_payment(
-        self,
-        products: dict[str, int],
-        amount: Decimal,
-        customer_name: str,
-        customer_email: str,
-        receiver_name: str | None,
-        customer_phone_number: str,
-        receiver_phone_number: str | None,
-        without_calling: bool,
-        delivery_address: str,
-        delivery_date: datetime,
-        delivery_time: str,
-        note: str,
-        cash: bool,
-        delivering: bool,
-    ) -> str | bool:
-        order_data = OrderDTO(
-            products=products,
-            amount=amount,
-            customer_name=customer_name,
-            customer_email=customer_email,
-            receiver_name=receiver_name,
-            customer_phone_number=self.normalize_phone_number(customer_phone_number),
-            receiver_phone_number=self.normalize_phone_number(receiver_phone_number),
-            without_calling=without_calling,
-            delivery_address=delivery_address,
-            delivery_date=delivery_date,
-            delivery_time=delivery_time,
-            note=note,
-            cash=cash,
-            delivering=delivering,
+    def get_discount_percent(self, promo_code: PromoCode) -> Decimal:
+        if promo_code:
+            return Decimal(1 - promo_code.value / 100)
+        return Decimal(1)
+
+    def create_payment(self, order_data: OrderDTO) -> str | bool:
+        order_data.customer_phone_number = self.normalize_phone_number(
+            order_data.customer_phone_number
+        )
+        order_data.receiver_phone_number = self.normalize_phone_number(
+            order_data.receiver_phone_number
         )
 
         order_products = self.payment_repo.get_order_products(
             order_data.products.keys()
         )
 
+        promo_code = self.payment_repo.get_promo_code(order_data.promo_code)
+        discount_coefficient = self.get_discount_percent(promo_code)
+
         calculated_amount = sum(
             product.price * int(order_data.products.get(product.slug))
             for product in order_products
         )
-        if delivering:
+        calculated_amount *= discount_coefficient
+
+        if order_data.delivering:
             calculated_amount += self.delivery_price
 
         is_permitted = self.check_permissions(
@@ -128,6 +113,7 @@ class PaymentCreateService(PaymentCreateServiceInterface):
                 amount=calculated_amount,
                 data=order_data,
                 user_account=user_account,
+                promo_code=promo_code,
             )
 
             self.payment_repo.create_order_products(
@@ -148,5 +134,6 @@ class PaymentCreateService(PaymentCreateServiceInterface):
                 products_count=order_data.products,
                 with_delivery=order_data.delivering,
                 customer_phone_number=order_data.customer_phone_number,
-                customer_email=customer_email,
+                customer_email=order_data.customer_email,
+                discount_coefficient=discount_coefficient,
             )

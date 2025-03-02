@@ -17,7 +17,11 @@ from payments.application.interfaces.services.payment_create import (
 )
 from payments.application.pause import is_user_paused, set_pause_timer
 from payments.application.serializers.call_me import CallMeSerializer
-from payments.application.serializers.payment import PaymentCreateSerializer
+from payments.application.serializers.payment import (
+    PaymentCreateSerializer,
+    GetPromoCodeDiscountSerializer,
+)
+from payments.application.models.order import OrderDTO
 
 
 class CreatePaymentAPIView(APIView):
@@ -46,7 +50,7 @@ class CreatePaymentAPIView(APIView):
                 data='Данные введены неверно, обновите страничку и попробуйте ещё раз',
             )
 
-        payment_url = payment_service.create_payment(
+        order_data = OrderDTO(
             products=serialized_data['items'],
             amount=serialized_data['amount'],
             customer_name=serialized_data['customer_name'],
@@ -61,7 +65,9 @@ class CreatePaymentAPIView(APIView):
             note=serialized_data['note'],
             cash=serialized_data['cash'],
             delivering=serialized_data['delivering'],
+            promo_code=serialized_data['promo_code'],
         )
+        payment_url = payment_service.create_payment(order_data=order_data)
 
         if not payment_url:
             return Response(
@@ -124,4 +130,25 @@ class CallMeAPIView(APIView):
             return Response(
                 status=status.HTTP_400_BAD_REQUEST,
                 data='Данные введены неверно, обновите страничку и попробуйте ещё раз',
+            )
+
+
+class GetPromoCodeDiscountAPIView(APIView):
+    def post(self, request) -> Response:
+        serializer = GetPromoCodeDiscountSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serialized_data = serializer.validated_data
+            return Response(
+                status=status.HTTP_200_OK,
+                data={
+                    'promo_code': serialized_data['promo_code'],
+                    'value': serialized_data['value'],
+                    'amount': serialized_data['amount'],
+                },
+            )
+        else:
+            return Response(
+                status=status.HTTP_400_BAD_REQUEST,
+                data='Введён неверный или неактивный промокод!',
             )
