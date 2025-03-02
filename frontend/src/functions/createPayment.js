@@ -49,7 +49,8 @@ const createPayment = async (event, oneclick=false) => {
         'delivery_time': form.delivery_time.value,
         'note': form.note.value,
         'cash': form.cash.checked,
-        'delivering': form.delivering.checked
+        'delivering': form.delivering.checked,
+        'promo_code': form.promo_code.value
     }
 
     await PaymentCreateRequest(data).then((response) => {

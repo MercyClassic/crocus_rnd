@@ -1,6 +1,7 @@
 import copy
 import json
 from collections.abc import Iterable
+from decimal import Decimal
 from hashlib import sha256
 
 import requests
@@ -75,6 +76,7 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
             products: Iterable[Product],
             products_count: dict[str, int],
             with_delivery: bool,
+            discount_coefficient: Decimal,
             customer_email: str | None = None,
     ) -> str | None:
         headers = {'Content-Type': 'application/json'}

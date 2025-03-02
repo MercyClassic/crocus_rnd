@@ -80,6 +80,13 @@ class Order(models.Model):
         through='OrderProduct',
         related_name='orders',
     )
+    promo_code = models.ForeignKey(
+        'payments.PromoCode',
+        related_name='orders',
+        blank=True,
+        null=True,
+        on_delete=models.DO_NOTHING,
+    )
 
     class Meta:
         verbose_name = 'Заказ'
@@ -108,3 +115,20 @@ class OrderProduct(models.Model):
 
     def __str__(self):
         return f'Продукта заказа #{self.order_id}'
+
+
+class PromoCode(models.Model):
+    code = models.CharField(max_length=25, verbose_name='Промо-код', unique=True)
+    value = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name='Скидка в процентах',
+    )
+    is_active = models.BooleanField(default=True, verbose_name='Активность')
+
+    class Meta:
+        verbose_name = 'Промо код'
+        verbose_name_plural = 'Промо коды'
+
+    def __str__(self):
+        return f'Промокод: {self.code} ({self.value}%)'

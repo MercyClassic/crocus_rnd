@@ -2,6 +2,7 @@ import logging
 import os
 import uuid
 from collections.abc import Iterable
+from decimal import Decimal
 
 from products.models import Product
 from yookassa import Configuration, Payment
@@ -27,6 +28,7 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
         customer_phone_number: str,
         customer_email: str,
         with_delivery: bool,
+        discount_coefficient: Decimal,
     ) -> dict:
         receipt = {
             'customer': {
@@ -39,7 +41,9 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
                     'quantity': products_count[product.slug],
                     'amount': {
                         'value': str(
-                            float(product.price) * int(products_count[product.slug])
+                            float(product.price)
+                            * int(products_count[product.slug])
+                            * float(discount_coefficient)
                         ),
                         'currency': 'RUB',
                     },
@@ -75,6 +79,7 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
         products_count: dict[str, int],
         with_delivery: bool,
         customer_email: str | None,
+        discount_coefficient: Decimal,
     ) -> str | None:
         data = {
             'amount': {
@@ -92,6 +97,7 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
                 customer_phone_number,
                 customer_email,
                 with_delivery,
+                discount_coefficient,
             )
         payment = Payment.create(data, uuid.uuid4())
         if payment.status == 'pending':

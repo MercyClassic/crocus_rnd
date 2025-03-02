@@ -18,4 +18,9 @@ urlpatterns = [
         views.CallMeAPIView.as_view(),
         name='api-call-me',
     ),
+    path(
+        'api/v1/get_promo_code_discount',
+        views.GetPromoCodeDiscountAPIView.as_view(),
+        name='get-promo-code-discount',
+    ),
 ]

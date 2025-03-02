@@ -4,7 +4,7 @@ from accounts.schemas import UserDTO
 from products.models import Product
 
 from payments.application.models.order import OrderDTO
-from payments.infrastructure.db.models import Order
+from payments.infrastructure.db.models import Order, PromoCode
 
 
 class PaymentRepositoryInterface:
@@ -13,6 +13,7 @@ class PaymentRepositoryInterface:
         amount: int,
         data: OrderDTO,
         user_account: UserDTO,
+        promo_code: PromoCode | None,
     ) -> Order:
         raise NotImplementedError
 
@@ -31,6 +32,9 @@ class PaymentRepositoryInterface:
         raise NotImplementedError
 
     def get_order_by_uuid(self, uuid: str) -> Order | None:
+        raise NotImplementedError
+
+    def get_promo_code(self, promo_code: str) -> PromoCode | None:
         raise NotImplementedError
 
     def delete_order(self, uuid: str) -> None:

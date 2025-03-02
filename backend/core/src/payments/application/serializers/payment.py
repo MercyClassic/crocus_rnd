@@ -5,6 +5,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
 from payments.application.validators import phone_validator
+from payments.infrastructure.db.models import PromoCode
 
 
 class PaymentCreateSerializer(serializers.Serializer):
@@ -24,6 +25,7 @@ class PaymentCreateSerializer(serializers.Serializer):
     note = serializers.CharField(max_length=300, allow_blank=True)
     cash = serializers.BooleanField()
     delivering = serializers.BooleanField()
+    promo_code = serializers.CharField(max_length=25, allow_blank=True)
 
     def validate_delivery_date(self, value):
         if value.date() < datetime.utcnow().date():
@@ -42,3 +44,21 @@ class PaymentCreateSerializer(serializers.Serializer):
         if not data.get('cash') and not data.get('customer_email'):
             raise ValidationError
         return data
+
+
+class GetPromoCodeDiscountSerializer(serializers.Serializer):
+    promo_code = serializers.CharField(max_length=25)
+    amount = serializers.DecimalField(
+        max_value=Decimal(1000000), max_digits=9, decimal_places=2
+    )
+
+    def validate(self, data):
+        try:
+            promo_code = PromoCode.objects.get(code=data['promo_code'], is_active=True)
+        except PromoCode.DoesNotExist:
+            raise ValidationError
+        return {
+            'promo_code': promo_code.code,
+            'value': promo_code.value,
+            'amount': data['amount'] * (1 - promo_code.value / 100),
+        }

@@ -4,8 +4,10 @@ from accounts.schemas import UserDTO
 from products.models import Product
 
 from payments.application.models.order import OrderDTO
-from payments.infrastructure.db.interfaces.repositories.order import PaymentRepositoryInterface
-from payments.infrastructure.db.models import Order, OrderProduct
+from payments.infrastructure.db.interfaces.repositories.order import (
+    PaymentRepositoryInterface,
+)
+from payments.infrastructure.db.models import Order, OrderProduct, PromoCode
 
 
 class PaymentRepository(PaymentRepositoryInterface):
@@ -14,6 +16,7 @@ class PaymentRepository(PaymentRepositoryInterface):
         amount: int,
         data: OrderDTO,
         user_account: UserDTO,
+        promo_code: PromoCode | None,
     ) -> Order:
         return Order.objects.create(
             user_id=user_account.id,
@@ -29,18 +32,15 @@ class PaymentRepository(PaymentRepositoryInterface):
             cash=data.cash,
             is_paid=False,
             delivering=data.delivering,
+            promo_code=promo_code,
         )
 
     def get_order_products(
         self,
         products_slug: Iterable[str],
     ) -> Iterable[Product]:
-        return (
-            Product.objects
-            .only('title', 'slug', 'price')
-            .filter(
-                slug__in=[*products_slug],
-            )
+        return Product.objects.only('title', 'slug', 'price').filter(
+            slug__in=[*products_slug],
         )
 
     def create_order_products(
@@ -65,6 +65,13 @@ class PaymentRepository(PaymentRepositoryInterface):
         except Order.DoesNotExist:
             return None
         return order
+
+    def get_promo_code(self, promo_code: str) -> PromoCode | None:
+        try:
+            promo_code = PromoCode.objects.get(code=promo_code, is_active=True)
+        except PromoCode.DoesNotExist:
+            return None
+        return promo_code
 
     def delete_order(self, uuid: str) -> None:
         Order.objects.filter(uuid=uuid).delete()
