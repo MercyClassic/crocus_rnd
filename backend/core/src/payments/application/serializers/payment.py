@@ -54,11 +54,16 @@ class GetPromoCodeDiscountSerializer(serializers.Serializer):
 
     def validate(self, data):
         try:
-            promo_code = PromoCode.objects.get(code=data['promo_code'], is_active=True)
+            promo_code = PromoCode.objects.get(
+                code=data['promo_code'], is_active=True
+            )
         except PromoCode.DoesNotExist:
             raise ValidationError
+
         return {
             'promo_code': promo_code.code,
             'value': promo_code.value,
-            'amount': data['amount'] * (1 - promo_code.value / 100),
+            'amount': (
+                data['amount'] * promo_code.get_discount_coefficient(data['amount'])
+            ),
         }

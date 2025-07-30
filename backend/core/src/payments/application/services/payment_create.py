@@ -65,9 +65,13 @@ class PaymentCreateService(PaymentCreateServiceInterface):
             return False
         return True
 
-    def get_discount_percent(self, promo_code: PromoCode) -> Decimal:
+    def get_discount_coefficient(
+        self,
+        promo_code: PromoCode,
+        amount: Decimal | int,
+    ) -> Decimal:
         if promo_code:
-            return Decimal(1 - promo_code.value / 100)
+            return promo_code.get_discount_coefficient(amount)
         return Decimal(1)
 
     def create_payment(self, order_data: OrderDTO) -> str | bool:
@@ -82,13 +86,16 @@ class PaymentCreateService(PaymentCreateServiceInterface):
             order_data.products.keys()
         )
 
-        promo_code = self.payment_repo.get_promo_code(order_data.promo_code)
-        discount_coefficient = self.get_discount_percent(promo_code)
-
         calculated_amount = sum(
             product.price * int(order_data.products.get(product.slug))
             for product in order_products
         )
+
+        promo_code = self.payment_repo.get_promo_code(order_data.promo_code)
+        discount_coefficient = self.get_discount_coefficient(
+            promo_code, calculated_amount
+        )
+
         calculated_amount *= discount_coefficient
 
         if order_data.delivering:
