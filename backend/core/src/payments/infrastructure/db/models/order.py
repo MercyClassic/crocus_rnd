@@ -1,5 +1,7 @@
 import uuid
+from decimal import Decimal
 
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -120,9 +122,13 @@ class OrderProduct(models.Model):
 class PromoCode(models.Model):
     code = models.CharField(max_length=25, verbose_name='Промо-код', unique=True)
     value = models.DecimalField(
-        max_digits=5,
+        max_digits=7,
         decimal_places=2,
-        verbose_name='Скидка в процентах',
+        verbose_name='Значение скидки',
+    )
+    is_percent = models.BooleanField(
+        default=False,
+        verbose_name='Скидка указана в процентах',
     )
     is_active = models.BooleanField(default=True, verbose_name='Активность')
 
@@ -131,4 +137,20 @@ class PromoCode(models.Model):
         verbose_name_plural = 'Промо коды'
 
     def __str__(self):
-        return f'Промокод: {self.code} ({self.value}%)'
+        return (
+            f'Промокод: {self.code} ({self.value}'
+            f'{"%" if self.is_percent else "руб"})'
+        )
+
+    def clean(self):
+        super().clean()
+        if self.is_percent and self.value > 100:
+            raise ValidationError(
+                {'value': 'Процентная скидка не может быть больше 100%!'}
+            )
+
+    def get_discount_coefficient(self, amount: Decimal | int):
+        if self.is_percent:
+            return Decimal(1 - self.value / 100)
+        else:
+            return Decimal(1 - self.value / amount)
