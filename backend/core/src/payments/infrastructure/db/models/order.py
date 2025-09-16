@@ -146,7 +146,7 @@ class PromoCode(models.Model):
         super().clean()
         if self.is_percent and self.value > 100:
             raise ValidationError(
-                {'value': 'Процентная скидка не может быть больше 100%!'}
+                {'value': 'Процентная скидка не может быть больше 100%!'},
             )
 
     def get_discount_coefficient(self, amount: Decimal | int):

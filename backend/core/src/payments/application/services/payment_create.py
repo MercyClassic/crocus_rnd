@@ -6,9 +6,11 @@ from decimal import Decimal
 from accounts.repositories import UserRepository
 from django.db import transaction
 from notification_bus.interfaces.sender import NotificationBusInterface
-from payments.infrastructure.db.models import PromoCode
 from products.models import Product
 
+from payments.application.interfaces.repositories.base import (
+    PaymentUrlGatewayInterface,
+)
 from payments.application.interfaces.services.payment_create import (
     PaymentCreateServiceInterface,
 )
@@ -16,9 +18,7 @@ from payments.application.models.order import OrderDTO
 from payments.infrastructure.db.interfaces.repositories.order import (
     PaymentRepositoryInterface,
 )
-from payments.application.interfaces.repositories.base import (
-    PaymentUrlGatewayInterface,
-)
+from payments.infrastructure.db.models import PromoCode
 
 
 class PaymentCreateService(PaymentCreateServiceInterface):
@@ -76,14 +76,14 @@ class PaymentCreateService(PaymentCreateServiceInterface):
 
     def create_payment(self, order_data: OrderDTO) -> str | bool:
         order_data.customer_phone_number = self.normalize_phone_number(
-            order_data.customer_phone_number
+            order_data.customer_phone_number,
         )
         order_data.receiver_phone_number = self.normalize_phone_number(
-            order_data.receiver_phone_number
+            order_data.receiver_phone_number,
         )
 
         order_products = self.payment_repo.get_order_products(
-            order_data.products.keys()
+            order_data.products.keys(),
         )
 
         calculated_amount = sum(
@@ -93,7 +93,7 @@ class PaymentCreateService(PaymentCreateServiceInterface):
 
         promo_code = self.payment_repo.get_promo_code(order_data.promo_code)
         discount_coefficient = self.get_discount_coefficient(
-            promo_code, calculated_amount
+            promo_code, calculated_amount,
         )
 
         calculated_amount *= discount_coefficient

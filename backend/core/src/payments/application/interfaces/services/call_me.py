@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
 
-from rest_framework.request import Request
-
 
 class CallMeServiceInterface(ABC):
     @abstractmethod

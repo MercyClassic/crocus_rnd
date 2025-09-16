@@ -15,13 +15,13 @@ from payments.application.interfaces.services.payment_accept import (
 from payments.application.interfaces.services.payment_create import (
     PaymentCreateServiceInterface,
 )
+from payments.application.models.order import OrderDTO
 from payments.application.pause import is_user_paused, set_pause_timer
 from payments.application.serializers.call_me import CallMeSerializer
 from payments.application.serializers.payment import (
-    PaymentCreateSerializer,
     GetPromoCodeDiscountSerializer,
+    PaymentCreateSerializer,
 )
-from payments.application.models.order import OrderDTO
 
 
 class CreatePaymentAPIView(APIView):
@@ -88,10 +88,9 @@ class AcceptPaymentAPIView(APIView):
     ) -> Response:
         if self.check_ip_addr(
             request.headers.get('X-Real-Ip')
-            or request.META.get('HTTP_X_FORWARDED_FOR')
-        ):
-            if payment_service.handle_webhook(request_data=request.data):
-                return Response(status=status.HTTP_200_OK)
+            or request.META.get('HTTP_X_FORWARDED_FOR'),
+        ) and payment_service.handle_webhook(request_data=request.data):
+            return Response(status=status.HTTP_200_OK)
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def check_ip_addr(self, ip: str) -> bool:

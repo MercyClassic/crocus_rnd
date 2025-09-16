@@ -24,8 +24,8 @@ logger = logging.getLogger('main')
 
 
 async def main() -> None:
-    tg_config = load_config()
-    bot = Bot(tg_config.bot_token)
+    app_config = load_config()
+    bot = Bot(app_config.bot_token)
     storage = MemoryStorage()
     dp = Dispatcher(storage=storage)
 

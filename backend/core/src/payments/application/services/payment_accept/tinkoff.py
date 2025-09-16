@@ -3,10 +3,7 @@ import logging
 import os
 from hashlib import sha256
 
-
-from payments.application.interfaces.services.payment_accept import (
-    PaymentAcceptServiceInterface
-)
+from payments.application.interfaces.services.payment_accept import PaymentAcceptServiceInterface
 from payments.infrastructure.db.repositories.order import PaymentRepository
 
 logger = logging.getLogger(__name__)

@@ -9,8 +9,8 @@ from .managers import ProductManager
 class PhotoMixin:
     def thumbnail(self):
         return mark_safe(  # noqa: S308
-            '<img src="%s" width = "150" height = "150" '
-            'style="object-fit: contain;" />' % self.image.url,
+            f'<img src="{self.image.url}" width = "150" height = "150" '
+            'style="object-fit: contain;" />',
         )
 
     thumbnail.short_description = 'Изображение'
@@ -29,7 +29,12 @@ class Product(PhotoMixin, models.Model):
         ('basket', 'Корзинка'),
     ]
     title = models.CharField('Название', max_length=128)
-    slug = models.SlugField('URL параметр', max_length=128, unique=True, db_index=True)
+    slug = models.SlugField(
+        'URL параметр',
+        max_length=128,
+        unique=True,
+        db_index=True,
+    )
     description = models.TextField('Описание', blank=True, null=True)
     image = models.ImageField('Изображение', upload_to='images/')
     price = models.DecimalField('Цена', max_digits=8, decimal_places=2)

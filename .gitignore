@@ -1,4 +1,5 @@
 .env
+.env.sentry
 node_modules
 .idea
 dist
@@ -8,5 +9,5 @@ backend/tg_bot/src/logs
 frontend/build
 dev
 __pycache__
-venv
+venv/
 .venv

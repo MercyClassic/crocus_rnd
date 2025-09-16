@@ -11,7 +11,9 @@ from payments.infrastructure.db.models import PromoCode
 class PaymentCreateSerializer(serializers.Serializer):
     items = serializers.DictField(allow_empty=False)
     amount = serializers.DecimalField(
-        max_value=Decimal(1000000), max_digits=9, decimal_places=2
+        max_value=Decimal(1000000),
+        max_digits=9,
+        decimal_places=2,
     )
     customer_name = serializers.CharField(max_length=150)
     customer_email = serializers.CharField(max_length=300, allow_blank=True)
@@ -49,16 +51,19 @@ class PaymentCreateSerializer(serializers.Serializer):
 class GetPromoCodeDiscountSerializer(serializers.Serializer):
     promo_code = serializers.CharField(max_length=25)
     amount = serializers.DecimalField(
-        max_value=Decimal(1000000), max_digits=9, decimal_places=2
+        max_value=Decimal(1000000),
+        max_digits=9,
+        decimal_places=2,
     )
 
     def validate(self, data):
         try:
             promo_code = PromoCode.objects.get(
-                code=data['promo_code'], is_active=True
+                code=data['promo_code'],
+                is_active=True,
             )
-        except PromoCode.DoesNotExist:
-            raise ValidationError
+        except PromoCode.DoesNotExist as e:
+            raise ValidationError from e
 
         return {
             'promo_code': promo_code.code,

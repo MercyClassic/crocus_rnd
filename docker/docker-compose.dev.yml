@@ -1,0 +1,130 @@
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:15-alpine
+    restart: unless-stopped
+    env_file:
+      - ../backend/core/.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -d postgres' || exit 1" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 1s
+    networks:
+      - main
+  nginx:
+    image: nginx
+    restart: unless-stopped
+    container_name: nginx
+    depends_on:
+      - market
+    ports:
+      - "80:80"
+    volumes:
+      - ../frontend/build:/app/frontend/build
+      - ../backend/core/src/media:/app/backend/core/src/media/
+      - ../backend/core/src/logs:/app/backend/core/src/logs/
+      - ./nginx.dev..conf:/etc/nginx/conf.d/default.conf
+    healthcheck:
+      test: [ "CMD", "service", "nginx", "status" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 1s
+    networks:
+      - main
+  redis:
+    container_name: redis
+    hostname: redis
+    image: redis
+    restart: unless-stopped
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: bash -c 'redis-server --requirepass $REDIS_PASSWORD'
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 3s
+      timeout: 10s
+      retries: 30
+      start_period: 1s
+    networks:
+      - main
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    restart: unless-stopped
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - main
+  market:
+    container_name: market
+    restart: unless-stopped
+    build:
+      context: ../backend/core
+    env_file:
+      - ../backend/core/.env
+    volumes:
+      - ../backend/core/src/media:/app/backend/core/src/media
+      - ../backend/core/src/logs:/app/backend/core/src/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - main
+  telegram_bot:
+    container_name: telegram_bot
+    restart: unless-stopped
+    entrypoint: python main.py
+    build:
+      context: ../backend/tg_bot
+    env_file:
+      - ../backend/tg_bot/.env
+    volumes:
+      - ../backend/core/src/media:/app/backend/core/src/media
+      - ../frontend/build/static/img/jpg:/app/frontend/build/static/img/jpg
+    networks:
+      - main
+  notifier:
+    container_name: notifier
+    restart: unless-stopped
+    entrypoint: faststream run notifier:app
+    build:
+      context: ../backend/tg_bot
+    env_file:
+      - ../backend/tg_bot/.env
+    depends_on:
+      - rabbitmq
+    networks:
+      - main
+  market-migrate:
+    container_name: market-migrate
+    restart: no
+    build:
+      context: ../backend/core
+    env_file:
+      - ../backend/core/.env
+    entrypoint: python manage.py migrate
+    networks:
+      - main
+    profiles:
+      - migrate
+networks:
+  main:
+    driver: bridge
+volumes:
+  postgres_data:

@@ -43,7 +43,7 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
                         'value': str(
                             float(product.price)
                             * int(products_count[product.slug])
-                            * float(discount_coefficient)
+                            * float(discount_coefficient),
                         ),
                         'currency': 'RUB',
                     },
@@ -66,7 +66,7 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
                     'vat_code': '1',
                     'payment_mode': 'full_prepayment',
                     'payment_subject': 'service',
-                }
+                },
             )
         return receipt
 

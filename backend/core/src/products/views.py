@@ -45,9 +45,9 @@ class FavouriteListAPIView(FilterQueryMixin, ProductResponseMixin):
 class CartAPIView(APIView):
     @inject
     def get(
-            self,
-            request,
-            cart_service: CartServiceInterface = Provide[Container.cart_service],
+        self,
+        request,
+        cart_service: CartServiceInterface = Provide[Container.cart_service],
     ) -> Response:
         data = cart_service.get_cart(request)
         return Response(data, status=status.HTTP_200_OK)
@@ -56,10 +56,10 @@ class CartAPIView(APIView):
 class AddToSessionAPIView(APIView):
     @inject
     def post(
-            self,
-            request,
-            slug: str,
-            cart_service: CartServiceInterface = Provide[Container.cart_service],
+        self,
+        request,
+        slug: str,
+        cart_service: CartServiceInterface = Provide[Container.cart_service],
     ) -> Response:
         code = cart_service.add_to_cart(request, slug)
         if code == 201:

@@ -4,43 +4,52 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+import sentry_sdk
+
 logs_path = Path(__file__).parent / 'logs'
 if not logs_path.exists():
     logs_path.mkdir()
 
-logging.config.dictConfig({
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'main': {
-            'format': '[{levelname}] {asctime} - {message}',
-            'style': '{',
-            'datefmt': '%Y-%m-%d %H:%M:%S',
+sentry_sdk.init(
+    dsn=os.environ['SENTRY_DSN'],
+    environment=os.environ['SENTRY_ENVIRONMENT'],
+)
+
+logging.config.dictConfig(
+    {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'main': {
+                'format': '[{levelname}] {asctime} - {message}',
+                'style': '{',
+                'datefmt': '%Y-%m-%d %H:%M:%S',
+            },
+        },
+        'handlers': {
+            'file': {
+                'level': 'ERROR',
+                'class': 'logging.handlers.RotatingFileHandler',
+                'maxBytes': 1_048_576,
+                'backupCount': 50,
+                'formatter': 'main',
+                'filename': f'{logs_path}/telegram_error.log',
+            },
+            'console': {
+                'level': 'INFO',
+                'formatter': 'main',
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'main': {
+                'handlers': ['file', 'console'],
+                'level': 'INFO',
+                'propagate': True,
+            },
         },
     },
-    'handlers': {
-        'file': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'maxBytes': 1_048_576,
-            'backupCount': 50,
-            'formatter': 'main',
-            'filename': f'{logs_path}/telegram_error.log',
-        },
-        'console': {
-            'level': 'INFO',
-            'formatter': 'main',
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'main': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-    },
-})
+)
 
 logger = logging.getLogger(__name__)
 
@@ -49,8 +58,7 @@ logger = logging.getLogger(__name__)
 class Config:
     db_uri: str
     bot_token: str
-    rabbitmq_host: str
-    rabbitmq_port: str
+    broker_host_uri: str
     to_notificate_telegram_ids: list[int]
 
     domain: str
@@ -80,14 +88,12 @@ def parse_from_env(key: str) -> str:
 
 def load_config() -> Config:
     return Config(
-        db_uri=parse_from_env('db_uri'),
+        db_uri=parse_from_env('DB_URI'),
         bot_token=parse_from_env('BOT_TOKEN'),
-        rabbitmq_host=parse_from_env('RABBITMQ_HOST'),
-        rabbitmq_port=parse_from_env('RABBITMQ_PORT'),
+        broker_host_uri=parse_from_env('RABBITMQ_URI'),
         domain=parse_from_env('DOMAIN'),
         to_notificate_telegram_ids=[
-            int(t_id)
-            for t_id in json.loads(os.environ['TO_NOTIFICATE_TELEGRAM_ID'])
+            int(t_id) for t_id in json.loads(os.environ['TO_NOTIFICATE_TELEGRAM_ID'])
         ],
         admin_panel_product_url=parse_from_env('ADMIN_PANEL_PRODUCT_URL'),
         admin_panel_order_url=parse_from_env('ADMIN_PANEL_ORDER_URL'),
