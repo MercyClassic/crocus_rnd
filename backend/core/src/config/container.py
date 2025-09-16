@@ -6,7 +6,9 @@ from dependency_injector import providers
 from dependency_injector.containers import DeclarativeContainer
 from notification_bus.services.sender import NotificationBus
 from payments.application.services.call_me import CallMeService
-from payments.application.services.payment_accept.yookassa import PaymentAcceptService
+from payments.application.services.payment_accept.yookassa import (
+    PaymentAcceptService,
+)
 from payments.application.services.payment_create import PaymentCreateService
 from payments.infrastructure.db.repositories.order import PaymentRepository
 from payments.application.repositories.yookassa import PaymentUrlGateway
@@ -16,10 +18,9 @@ from products.services.cart import CartService
 class Container(DeclarativeContainer):
     user_repo = providers.Factory(UserRepository)
     payment_repo = providers.Factory(PaymentRepository)
-    notification_bus = providers.Factory(
+    notification_bus = providers.Resource(
         NotificationBus,
-        host=os.environ['RABBITMQ_HOST'],
-        port=os.environ['RABBITMQ_PORT'],
+        broker_host_uri=os.environ['RABBITMQ_URI'],
     )
     payment_url_gateway = providers.Factory(
         PaymentUrlGateway,
@@ -48,3 +49,4 @@ class Container(DeclarativeContainer):
 
 
 container = Container()
+container.init_resources()

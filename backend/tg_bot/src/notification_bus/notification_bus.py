@@ -1,64 +1,27 @@
-import asyncio
-
-import pika
-
+from faststream import Context
+from faststream.rabbit import RabbitExchange, RabbitQueue, ExchangeType
+from faststream.rabbit.router import RabbitRouter
 from notification_bus.sender import NotificationSender
 
+router = RabbitRouter()
 
-class NotificationBus:
-    def __init__(
-        self,
-        host: str,
-        port: int,
-        notification_sender: NotificationSender,
-    ) -> None:
-        self.notification_sender = notification_sender
-        self.__connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=host, port=port),
-        )
-        self._channel = self.__connection.channel()
-        self._channel.exchange_declare(
-            exchange='notifications',
-            exchange_type='direct',
-        )
+exchange = RabbitExchange('notifications', type=ExchangeType.DIRECT)
 
-    def receive_notification(self) -> None:
-        callme_queue = self._channel.queue_declare(queue='call_me_notifications')
-        order_queue = self._channel.queue_declare(queue='order_notifications')
-        self._channel.queue_bind(
-            exchange='notifications',
-            queue=callme_queue.method.queue,
-            routing_key='call_me',
-        )
-        self._channel.queue_bind(
-            exchange='notifications',
-            queue=order_queue.method.queue,
-            routing_key='order',
-        )
-        self._channel.basic_consume(order_queue.method.queue, self.order_callback)
-        self._channel.basic_consume(callme_queue.method.queue, self.call_me_callback)
-        self._channel.start_consuming()
+queue_order = RabbitQueue('order')
+queue_call_me = RabbitQueue('call_me')
 
-    def order_callback(
-        self,
-        channel,
-        method,
-        properties,
-        body: bytes,
-    ) -> None:
-        loop = asyncio.get_event_loop()
-        coro = self.notification_sender.new_order_notification(int(body.decode('utf-8')))
-        loop.run_until_complete(coro)
-        channel.basic_ack(delivery_tag=method.delivery_tag)
 
-    def call_me_callback(
-        self,
-        channel,
-        method,
-        properties,
-        body: bytes,
-    ) -> None:
-        loop = asyncio.get_event_loop()
-        coro = self.notification_sender.new_call_me_request_notification(body.decode('utf-8'))
-        loop.run_until_complete(coro)
-        channel.basic_ack(delivery_tag=method.delivery_tag)
+@router.subscriber(queue=queue_order, exchange=exchange)
+async def order_handler(
+    order_id: int,
+    notification_sender: NotificationSender = Context(),
+):
+    await notification_sender.new_order_notification(order_id)
+
+
+@router.subscriber(queue=queue_call_me, exchange=exchange)
+async def call_me_handler(
+    phone_number: str,
+    notification_sender: NotificationSender = Context(),
+):
+    await notification_sender.new_call_me_request_notification(phone_number)

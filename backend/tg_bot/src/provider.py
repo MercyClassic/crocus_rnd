@@ -17,7 +17,7 @@ class CoreProvider(Provider):
     @provide(scope=Scope.APP)
     async def get_async_session_maker(self) -> async_sessionmaker:
         engine = create_async_engine(
-            os.environ['db_uri'],
+            os.environ['DB_URI'],
             isolation_level='REPEATABLE READ',
         )
         return async_sessionmaker(

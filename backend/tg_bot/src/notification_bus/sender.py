@@ -1,19 +1,28 @@
 from aiogram import Bot, types
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from config import Config
 
 
 class NotificationSender:
-    def __init__(self, bot: Bot, config: Config):
+    def __init__(
+        self,
+        bot: Bot,
+        domain: str,
+        admin_panel_order_url: str,
+        notification_receivers: list[int],
+    ):
         self.bot = bot
-        self.config = config
+        self.domain = domain
+        self.admin_panel_order_url = admin_panel_order_url
+        self.notification_receivers = notification_receivers
 
     async def new_order_notification(self, order_id: int) -> None:
         markup = InlineKeyboardBuilder()
-        url = f'{self.config.domain}{self.config.admin_panel_order_url % order_id}'
-        markup.add(types.InlineKeyboardButton(text='Посмотреть детали заказа', url=url))
+        url = f'{self.domain}{self.admin_panel_order_url % order_id}'
+        markup.add(
+            types.InlineKeyboardButton(text='Посмотреть детали заказа', url=url)
+        )
 
-        for telegram_id in self.config.to_notificate_telegram_ids:
+        for telegram_id in self.notification_receivers:
             await self.bot.send_message(
                 telegram_id,
                 'У вас новый заказ!',
@@ -21,7 +30,7 @@ class NotificationSender:
             )
 
     async def new_call_me_request_notification(self, phone_number: str) -> None:
-        for telegram_id in self.config.to_notificate_telegram_ids:
+        for telegram_id in self.notification_receivers:
             await self.bot.send_message(
                 telegram_id,
                 f'Посетитель сайта попросил перезвонить ему на номер: {phone_number}',

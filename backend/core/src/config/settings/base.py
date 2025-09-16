@@ -2,17 +2,26 @@ import json
 import os
 from pathlib import Path
 
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-DEBUG = os.environ['DEBUG'] == 'True'
+DEBUG = bool(os.environ['DEBUG'])
 
 REDIS_HOST = os.environ['REDIS_HOST']
-
-RABBITMQ_HOST = os.environ['RABBITMQ_HOST']
 
 SECRET_KEY = os.environ['SECRET_KEY']
 
 ALLOWED_HOSTS = json.loads(os.environ['ALLOWED_HOSTS'])
+
+
+sentry_sdk.init(
+    dsn=os.environ['SENTRY_DSN'],
+    environment=os.environ['SENTRY_ENVIRONMENT'],
+    integrations=[DjangoIntegration()],
+)
 
 
 INSTALLED_APPS = [

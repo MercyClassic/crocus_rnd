@@ -1,121 +1,53 @@
 services:
-  postgres:
-    container_name: postgres
-    image: postgres:15-alpine
-    restart: always
-    ports:
-      - "5432:5432"
-    env_file:
-      - ../backend/core/.env
-    volumes:
-      - postgres_data:/var/lib/postgresql/data/
-    healthcheck:
-      test: [ "CMD-SHELL", "sh -c 'pg_isready -d postgres' || exit 1" ]
-      interval: 5s
-      timeout: 10s
-      retries: 10
-      start_period: 1s
-    networks:
-      - main
   market:
     container_name: market
-    restart: always
-    build:
-      context: ../backend/core
+    image: market:latest
+    restart: unless-stopped
     env_file:
       - ../backend/core/.env
-    volumes:
-      - ../backend/core/src/media:/market/backend/core/src/media
-      - ../backend/core/src/logs:/market/backend/core/src/logs
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - main
-  rabbitmq:
-    image: rabbitmq
-    container_name: rabbitmq
-    restart: always
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 5s
     ports:
-      - "5672:5672"
+      - "8000:8000"
+    volumes:
+      - ../backend/core/src/media:/app/backend/core/src/media
+      - ../backend/core/src/logs:/app/backend/core/src/logs
     networks:
       - main
+
+  market-migrate:
+    container_name: market-migrate
+    image: market:latest
+    restart: no
+    env_file:
+      - ../backend/core/.env
+    entrypoint: python manage.py migrate
+    networks:
+      - main
+    profiles:
+      - migrate
+
   telegram_bot:
     container_name: telegram_bot
-    restart: always
-    command: python main.py
-    build:
-      context: ../backend/tg_bot
+    image: market-bot:latest
+    restart: unless-stopped
     env_file:
       - ../backend/tg_bot/.env
+    entrypoint: python main.py
     volumes:
-      - ../backend/core/src/media:/market/backend/core/src/media
-      - ../frontend/build/static/img/jpg:/market/frontend/build/static/img/jpg
+      - ../backend/core/src/media:/app/backend/core/src/media
+      - ../frontend/build/static/img/jpg:/app/frontend/build/static/img/jpg
     networks:
       - main
-  rabbitmq_consumer:
-    container_name: rabbitmq_consumer
-    restart: always
-    command: python start_consuming.py
-    build:
-      context: ../backend/tg_bot
+
+  notifier:
+    container_name: notifier
+    image: market-bot:latest
+    restart: unless-stopped
     env_file:
       - ../backend/tg_bot/.env
-    depends_on:
-      - rabbitmq
+    entrypoint: faststream run notifier:app
     networks:
       - main
-  nginx:
-    image: nginx
-    restart: always
-    container_name: nginx
-    depends_on:
-      - market
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ../frontend/build:/market/frontend/build
-      - ../backend/core/src/media:/market/backend/core/src/media/
-      - ../backend/core/src/logs:/market/backend/core/src/logs/
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - /etc/letsencrypt:/etc/letsencrypt
-    healthcheck:
-      test: [ "CMD", "service", "nginx", "status" ]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 1s
-    networks:
-      - main
-  redis:
-    container_name: redis
-    hostname: redis
-    image: redis
-    restart: always
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-    command: bash -c 'redis-server --requirepass $REDIS_PASSWORD'
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 3s
-      timeout: 10s
-      retries: 30
-      start_period: 1s
-    networks:
-      - main
+
 networks:
   main:
     driver: bridge
-volumes:
-  postgres_data:

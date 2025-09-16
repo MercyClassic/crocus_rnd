@@ -1,30 +1,37 @@
-import pika
+from faststream.rabbit import RabbitBroker
+
+from async_to_sync.run_with_loop import run_with_loop
+from notification_bus.interfaces.sender import NotificationBusInterface
 
 
-class NotificationBus:
-    def __init__(self, host: str, port: int):
-        self.__connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=host, port=port),
+
+class NotificationBus(NotificationBusInterface):
+    def __init__(self, broker_host_uri: str):
+        self._broker = RabbitBroker(broker_host_uri)
+
+    def __enter__(self):
+        self.connect()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
+    @run_with_loop
+    async def connect(self) -> None:
+        await self._broker.connect()
+
+    @run_with_loop
+    async def close(self) -> None:
+        await self._broker.close()
+
+    @run_with_loop
+    async def send_order_notification(self, order_id: int) -> None:
+        await self._broker.publish(
+            str(order_id), exchange='notifications', queue='order'
         )
-        self.__channel = self.__connection.channel()
-        self.__channel.exchange_declare(
-            exchange='notifications',
-            exchange_type='direct',
-        )
 
-    def __del__(self):
-        self.__connection.close()
-
-    def send_order_notification(self, order_id: int) -> None:
-        self.__channel.basic_publish(
-            exchange='notifications',
-            routing_key='order',
-            body=str(order_id).encode('utf-8'),
-        )
-
-    def send_call_me_request_notification(self, phone_number: str) -> None:
-        self.__channel.basic_publish(
-            exchange='notifications',
-            routing_key='call_me',
-            body=phone_number.encode('utf-8'),
+    @run_with_loop
+    async def send_call_me_request_notification(self, phone_number: str) -> None:
+        await self._broker.publish(
+            phone_number, exchange='notifications', queue='call_me'
         )

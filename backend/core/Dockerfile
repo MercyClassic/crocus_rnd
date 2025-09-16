@@ -1,28 +1,32 @@
-FROM python:3.11-slim-buster
+FROM python:3.11-slim-bookworm AS builder
 
-ENV PYTHONDONTWRITEBYTEDECODE 1
-ENV PYTHONUNBUFFERED 1
-
-RUN mkdir -p /market/backend/core
-
-COPY ./pyproject.toml /market/backend/core/pyproject.toml
+COPY pyproject.toml poetry.lock ./
 
 RUN apt update \
-    && pip install poetry \
-    && apt install -y vim \
-    && apt install -y libmagic1 \
-    && useradd -U app \
-    && chown -R app:app /market/backend/core \
-    && chdir /market/backend/core \
+    && pip install poetry==1.8.3 \
+    && apt install -y build-essential libmagic1 libmagic-dev \
     && poetry config virtualenvs.create false \
-    && poetry install --only main
+    && poetry install --only main \
+    && rm -rf /var/lib/apt/lists/* /root/.cache
 
-WORKDIR /market/backend/core/src
+FROM python:3.11-slim-bookworm AS runtime
 
-COPY --chown=app:app . /market/backend/core/
+ENV PYTHONDONTWRITEBYTEDECODE=1
+ENV PYTHONUNBUFFERED=1
+
+RUN useradd -U app \
+    && mkdir -p /app/backend/core/src \
+    && chown -R app:app /app
+
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin/gunicorn /usr/local/bin/
+
+COPY --chown=app:app . /app/backend/core/
+
+WORKDIR /app/backend/core/src
 
 EXPOSE 8000
 
 USER app
 
-CMD ["sh", "/market/backend/core/entrypoint.sh"]
+ENTRYPOINT ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi"]
