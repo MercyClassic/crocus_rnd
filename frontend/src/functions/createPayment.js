@@ -1,12 +1,18 @@
 import PaymentCreateRequest from '../API/PaymentCreateRequest';
 
 
-const createPayment = async (event, oneclick=false) => {
+const createPayment = async (event) => {
     event.preventDefault();
     const form = event.target.closest('form');
     const isMobilePhone = (str) => /^\+?[7, 8]-?\s*-?\(?\d{3}\)?-?\s*-?\d{3}-?\s*-?\d{2}-?\s*-?\d{2}$/.test(str);
+
+    if (!form.customer_is_receiver.checked && !form.receiver_phone_number.value) {
+        alert('Не заполнена информация о получателе заказа. Если вы являетесь получателем, то нажмите на соответствующую галочку!') ;
+        return null;
+    }
+
     if ((isMobilePhone(form.customer_phone_number.value) === false) ||
-     (isMobilePhone(form.receiver_phone_number.value) === false)){
+     (isMobilePhone(form.receiver_phone_number.value) === false)) {
         alert('Телефон не соответствует СНГ формату, убедитесь в том, что номер написан верно');
         return null;
     }

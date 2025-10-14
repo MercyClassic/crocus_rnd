@@ -66,7 +66,7 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
                     Email
                     <p>
                 <span style={{fontSize: "14px"}}>
-                    (Для отправки чека на email)
+                    Для отправки чека на email
                 </span>
                     </p>
                 </label>
@@ -79,7 +79,7 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
                     Адрес доставки
                     <p>
                     <span style={{fontSize: "14px"}}>
-                        (Выберите пункт "С доставкой" для редактирования)
+                        Выберите пункт "С доставкой" для редактирования (галочка снизу)
                     </span>
                     </p>
                 </label>
@@ -98,7 +98,7 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
                     Время доставки
                     <p>
                     <span style={{fontSize: "14px"}}>
-                        (Выберите пункт "С доставкой" для редактирования)
+                        Выберите пункт "С доставкой" для редактирования (галочка снизу)
                     </span>
                     </p>
                 </label>
@@ -111,14 +111,6 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
                     <option value="18:00 - 21:00">18:00 - 21:00</option>
                     <option value="21:00 - 00:00">21:00 - 00:00</option>
                 </select>
-            </div>
-            <div className="popup-cart__checkbox-wrapper">
-                <label className="popup-cart__checkbox-label">
-                    <input onClick={(e) => setReceiver(e.target.closest('form'))}
-                           type="checkbox" name="customer_is_receiver"
-                           className="popup-cart__checkbox-input"/>
-                    Заказчик является получателем заказа
-                </label>
             </div>
             <div className="popup-cart__input-name-wrapper">
                 <label className="popup-cart__name-label _label">Имя
@@ -135,6 +127,14 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
                        className="popup-cart__phone-input _input"
                        name="receiver_phone_number" required
                        maxLength="20" minLength="11"/>
+            </div>
+            <div className="popup-cart__checkbox-wrapper">
+                <label className="popup-cart__checkbox-label">
+                    <input onClick={(e) => setReceiver(e.target.closest('form'))}
+                           type="checkbox" name="customer_is_receiver"
+                           className="popup-cart__checkbox-input"/>
+                    Заказчик является получателем заказа
+                </label>
             </div>
             <div className="popup-cart__checkbox-wrapper">
                 <label className="popup-cart__checkbox-label">
@@ -187,7 +187,8 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
                     заказ
                 </button>
             </div>
-            <div className="popup-cart__time-label _label" style={{marginTop: "30px"}}>
+            <div className="popup-cart__time-label _label"
+                 style={{marginTop: "30px"}}>
                 Нажимая на кнопку "Оформить заказ" вы автоматически соглашаетесь
                 <Link to={`/privacy_policy`}>
                     <span> на обработку персональных данных и с политикой конфиденциальности </span>
