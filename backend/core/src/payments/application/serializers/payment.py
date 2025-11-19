@@ -16,7 +16,7 @@ class PaymentCreateSerializer(serializers.Serializer):
         decimal_places=2,
     )
     customer_name = serializers.CharField(max_length=150)
-    customer_email = serializers.CharField(max_length=300, allow_blank=True)
+    customer_email = serializers.EmailField(max_length=300, allow_blank=True)
     receiver_name = serializers.CharField(max_length=150, allow_blank=True)
     customer_phone_number = serializers.CharField(max_length=20)
     receiver_phone_number = serializers.CharField(max_length=20, allow_blank=True)
