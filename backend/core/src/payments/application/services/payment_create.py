@@ -1,3 +1,4 @@
+import logging
 import re
 from collections.abc import Iterable
 from datetime import datetime
@@ -19,6 +20,8 @@ from payments.infrastructure.db.interfaces.repositories.order import (
     PaymentRepositoryInterface,
 )
 from payments.infrastructure.db.models import PromoCode
+
+logger = logging.getLogger(__name__)
 
 
 class PaymentCreateService(PaymentCreateServiceInterface):
@@ -129,18 +132,31 @@ class PaymentCreateService(PaymentCreateServiceInterface):
                 products_count=order_data.products,
             )
 
-        self.notification_bus.send_order_notification(order.pk)
+            if order_data.cash:
+                result = 'OK'
+            else:
+                try:
+                    result = self.payment_url_gateway.get_payment_url(
+                        order_uuid=str(order.uuid),
+                        amount=calculated_amount,
+                        products=order_products,
+                        products_count=order_data.products,
+                        with_delivery=order_data.delivering,
+                        customer_phone_number=order_data.customer_phone_number,
+                        customer_email=order_data.customer_email,
+                        discount_coefficient=discount_coefficient,
+                    )
+                except Exception as exc:
+                    logger.error(
+                        f'Возникла ошибка при попытке получить ссылку на оплату: {exc}',
+                    )
+                    raise exc
 
-        if order_data.cash:
-            return 'OK'
-        else:
-            return self.payment_url_gateway.get_payment_url(
-                order_uuid=str(order.uuid),
-                amount=calculated_amount,
-                products=order_products,
-                products_count=order_data.products,
-                with_delivery=order_data.delivering,
-                customer_phone_number=order_data.customer_phone_number,
-                customer_email=order_data.customer_email,
-                discount_coefficient=discount_coefficient,
+        try:
+            self.notification_bus.send_order_notification(order.pk)
+        except Exception as exc:
+            logger.error(
+                f'Возникла ошибка при попытке отправить уведомление: {exc}',
             )
+
+        return result
