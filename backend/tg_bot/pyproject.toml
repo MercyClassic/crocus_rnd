@@ -4,6 +4,10 @@ version = "0.1.0"
 description = ""
 authors = []
 
+[tool.black]
+line-length = 85
+skip-string-normalization = true
+
 [tool.ruff]
 line-length = 100
 src = ["src"]
