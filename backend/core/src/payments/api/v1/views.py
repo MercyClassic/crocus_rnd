@@ -2,29 +2,26 @@ import ipaddress
 import json
 import os
 
-from django.db import transaction
-
 from config.container import Container
 from dependency_injector.wiring import Provide, inject
+from django.db import transaction
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from payments.application.interfaces.services.call_me import CallMeServiceInterface
-from payments.application.interfaces.services.payment_accept import (
+from payments.application.dto.order import OrderDTO
+from payments.application.interactors.call_me import CallMeInteractor
+from payments.application.interactors.create_order import CreateOrderInteractor
+from payments.application.interactors.payment_accept.interface import (
     PaymentAcceptServiceInterface,
 )
-from payments.application.interfaces.services.payment_create import (
-    PaymentCreateServiceInterface,
-)
-from payments.application.dto.order import OrderDTO
-from payments.application.interactors.payment_create import CreateOrderInteractor
 from payments.application.pause import is_user_paused, set_pause_timer
 from payments.application.serializers.call_me import CallMeSerializer
 from payments.application.serializers.payment import (
     GetPromoCodeDiscountSerializer,
     PaymentCreateSerializer,
 )
+from payments.domain.exceptions.validation import ValidationError
 
 
 class CreatePaymentAPIView(APIView):
@@ -33,7 +30,7 @@ class CreatePaymentAPIView(APIView):
         self,
         request,
         create_order: CreateOrderInteractor = Provide[
-            Container.payment_create_interactor
+            Container.create_order_interactor
         ],
     ) -> Response:
         serializer = PaymentCreateSerializer(data=request.data)
@@ -68,17 +65,19 @@ class CreatePaymentAPIView(APIView):
             note=serialized_data['note'],
             cash=serialized_data['cash'],
             delivering=serialized_data['delivering'],
-            promo_code=serialized_data['promo_code'],
+            promo_code=serialized_data.get('promo_code'),
         )
         with transaction.atomic():
-            payment_url = create_order(order_data=order_data)
-
-        if not payment_url:
+            try:
+                payment_url = create_order(order_data=order_data)
+            except ValidationError:
+                return Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data='Данные введены неверно, обновите страничку и попробуйте ещё раз',
+                )
             return Response(
-                status=status.HTTP_400_BAD_REQUEST,
-                data='Данные введены неверно, обновите страничку и попробуйте ещё раз',
+                {'payment_url': payment_url}, status=status.HTTP_201_CREATED,
             )
-        return Response({'payment_url': payment_url}, status=status.HTTP_201_CREATED)
 
 
 class AcceptPaymentAPIView(APIView):
@@ -109,7 +108,7 @@ class CallMeAPIView(APIView):
     def post(
         self,
         request,
-        call_me_service: CallMeServiceInterface = Provide[Container.call_me_service],
+        call_me_interactor: CallMeInteractor = Provide[Container.call_me_interactor],
     ) -> Response:
         serializer = CallMeSerializer(data=request.data)
 
@@ -121,9 +120,7 @@ class CallMeAPIView(APIView):
                     data='Вы уже заказывали звонок недавно, '
                     'подождите немного, прежде, чем заказать ещё один',
                 )
-            call_me_service.create_call_me_request(
-                serialized_data.get('phone_number'),
-            )
+            call_me_interactor(serialized_data.get('phone_number'))
             set_pause_timer(request, 'call_me')
             return Response(
                 status=status.HTTP_200_OK,

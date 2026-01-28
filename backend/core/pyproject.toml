@@ -4,6 +4,15 @@ version = "0.1.0"
 description = ""
 authors = []
 
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = "test*.py"
+pythonpath = ". src"
+
+[tool.black]
+line-length = 85
+skip-string-normalization = true
+
 [tool.ruff]
 line-length = 100
 src = ["src"]
@@ -23,7 +32,8 @@ exclude = [
     "build",
     "dist",
     "node_modules",
-    "venv"
+    "venv",
+    "tests"
 ]
 
 [tool.ruff.lint]
@@ -47,6 +57,11 @@ ignore = [
     "TRY400",
     "TRY201",
     "BLE001",
+    "S101",
+    "PT006",
+    "TRY003",
+    "EM101",
+    "A002"
 ]
 fixable = ["ALL"]
 unfixable = []
@@ -90,3 +105,5 @@ faststream = {extras = ["rabbit"], version = "^0.5.48"}
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.1"
+pytest-django = "^4.11.1"
+pytest = "^9.0.2"

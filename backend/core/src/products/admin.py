@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.sessions.models import Session
 
-from products.models import Category, Product, ProductCategory, ProductImage
+from products.db.models import Category, Product, ProductCategory, ProductImage
 
 
 class ProductImageInline(admin.StackedInline):
@@ -9,7 +9,12 @@ class ProductImageInline(admin.StackedInline):
     readonly_fields = ['thumbnail']
 
     def get_queryset(self, request):
-        return super().get_queryset(request).select_related('product').only('image', 'product_id')
+        return (
+            super()
+            .get_queryset(request)
+            .select_related('product')
+            .only('image', 'product_id')
+        )
 
 
 class ProductCategoryInline(admin.StackedInline):

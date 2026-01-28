@@ -1,11 +1,12 @@
+import re
 from datetime import datetime
 from decimal import Decimal
 
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from payments.application.validators import phone_validator
-from payments.infrastructure.db.models import PromoCode
+from payments.application.serializers.validators import phone_validator
+from payments.db.models import PromoCode
 
 
 class PaymentCreateSerializer(serializers.Serializer):
@@ -27,22 +28,30 @@ class PaymentCreateSerializer(serializers.Serializer):
     note = serializers.CharField(max_length=300, allow_blank=True)
     cash = serializers.BooleanField()
     delivering = serializers.BooleanField()
-    promo_code = serializers.CharField(max_length=25, allow_blank=True)
+    promo_code = serializers.CharField(
+        max_length=25, allow_blank=True, required=False,
+    )
 
     def validate_delivery_date(self, value):
         if value.date() < datetime.utcnow().date():
             raise ValidationError
         return value
 
+    def normalize_phone_number(self, phone_number: str) -> str:
+        phone_number = re.sub(r'[() -]*', '', phone_number)
+        if phone_number[0] != '+':
+            phone_number = f'+{phone_number}'
+        return f'+7{phone_number[2:]}'
+
     def validate(self, data):
-        phone_numbers = [data.get('customer_phone_number')]
-        receiver_phone_number = data.get('receiver_phone_number')
-        if receiver_phone_number:
-            phone_numbers.append(receiver_phone_number)
-        for value in phone_numbers:
-            phone = phone_validator(value)
-            if not phone:
+        phone_fields = [
+            ('customer_phone_number', data['customer_phone_number']),
+            ('receiver_phone_number', data.get('receiver_phone_number')),
+        ]
+        for field_name, phone_number in phone_fields:
+            if not phone_validator(phone_number or ''):
                 raise ValidationError
+            data[field_name] = self.normalize_phone_number(phone_number)
         if not data.get('cash') and not data.get('customer_email'):
             raise ValidationError
         return data

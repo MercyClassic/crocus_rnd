@@ -1,6 +1,6 @@
 from django.urls import path
 
-from payments.presentators.api.v1 import views
+from payments.api.v1 import views
 
 urlpatterns = [
     path(

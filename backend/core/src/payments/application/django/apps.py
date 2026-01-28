@@ -8,4 +8,4 @@ class PaymentsConfig(AppConfig):
 
     def ready(self):
         from config.container import container
-        container.wire(modules=['payments.presentators.api.v1.views'])
+        container.wire(modules=['payments.api.v1.views'])

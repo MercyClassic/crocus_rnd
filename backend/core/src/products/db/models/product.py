@@ -1,9 +1,21 @@
 from PIL import Image
 from django.db import models
+from django.db.models import Manager, QuerySet
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
-from .managers import ProductManager
+
+class ProductQuerySet(QuerySet):
+    def active(self):
+        return self.filter(is_active=True)
+
+
+class ProductManager(Manager):
+    def get_queryset(self):
+        return ProductQuerySet(self.model)
+
+    def active(self):
+        return self.get_queryset().active()
 
 
 class PhotoMixin:

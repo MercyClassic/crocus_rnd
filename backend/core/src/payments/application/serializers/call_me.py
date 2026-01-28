@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from payments.application.validators import phone_validator
+from payments.application.serializers.validators import phone_validator
 
 
 class CallMeSerializer(serializers.Serializer):

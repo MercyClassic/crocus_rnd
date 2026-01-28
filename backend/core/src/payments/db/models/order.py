@@ -107,6 +107,7 @@ class OrderProduct(models.Model):
     order = models.ForeignKey(
         Order,
         on_delete=models.DO_NOTHING,
+        related_name='order_products',
         verbose_name='Заказ',
     )
     count = models.IntegerField('Количество', default=1)

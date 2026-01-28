@@ -1,24 +1,23 @@
 import copy
 import json
-from collections.abc import Iterable
 from decimal import Decimal
 from hashlib import sha256
 
 import requests
-from products.models import Product
 
-from payments.application.interfaces.repositories.base import PaymentUrlGatewayInterface
+from payments.application.gateways.interface import PaymentUrlGatewayInterface
+from payments.entities.order import OrderProduct
 
 
 class PaymentUrlGateway(PaymentUrlGatewayInterface):
     def __init__(
-            self,
-            terminal_key: str,
-            password: str,
-            taxation: str,
-            tax: str,
-            delivery_price: int,
-            payment_url: str,
+        self,
+        terminal_key: str,
+        password: str,
+        taxation: str,
+        tax: str,
+        delivery_price: int,
+        payment_url: str,
     ):
         self.terminal_key = terminal_key
         self.taxation = taxation
@@ -36,7 +35,7 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
 
     def generate_receipt(
         self,
-        products: Iterable[Product],
+        products: list[OrderProduct],
         products_count: dict[str, int],
         customer_phone_number: str,
         with_delivery: bool,
@@ -49,9 +48,11 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
         for product in products:
             item = {}
             item.setdefault('Name', product.title)
-            item.setdefault('Quantity', products_count[product.slug])
+            item.setdefault('Quantity', products_count[product.id])
             item.setdefault('Price', int(product.price))
-            item.setdefault('Amount', int(product.price) * 100 * int(products_count[product.slug]))
+            item.setdefault(
+                'Amount', int(product.price) * 100 * int(products_count[product.id]),
+            )
             item.setdefault('Tax', self.tax)
             receipt_items.append(item)
         if with_delivery:
@@ -69,21 +70,21 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
         return receipt
 
     def get_payment_url(
-            self,
-            order_uuid: str,
-            amount: int,
-            customer_phone_number: str,
-            products: Iterable[Product],
-            products_count: dict[str, int],
-            with_delivery: bool,
-            discount_coefficient: Decimal,
-            customer_email: str | None = None,
+        self,
+        order_uuid: str,
+        amount: int,
+        customer_phone_number: str,
+        products: list[OrderProduct],
+        products_count: dict[str, int],
+        with_delivery: bool,
+        discount_coefficient: Decimal,
+        customer_email: str | None = None,
     ) -> str | None:
         headers = {'Content-Type': 'application/json'}
         data = {
             'TerminalKey': self.terminal_key,
             'Amount': int(amount) * 100,
-            'OrderId': order_uuid,
+            'OrderId': str(order_uuid),
             'DATA': {'Phone': customer_phone_number},
         }
         token = self.generate_payment_token(data)

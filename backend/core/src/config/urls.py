@@ -5,8 +5,8 @@ from django.urls import include, path
 
 urlpatterns = [
     path('secretadminpanel/', admin.site.urls),
-    path('', include('products.urls')),
-    path('', include(('payments.presentators.api.v1.urls', 'payments'), namespace='payments')),
+    path('', include(('products.api.v1.urls', 'products'), namespace='products')),
+    path('', include(('payments.api.v1.urls', 'payments'), namespace='payments')),
 ]
 
 

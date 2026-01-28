@@ -1,10 +1,9 @@
 import logging
 import uuid
-from decimal import Decimal
 
 from accounts.repositories import UserRepository
-from notification_bus.interfaces.sender import NotificationBusInterface
-
+from notification_bus.sender import NotificationBusInterface
+from products.db.repositories.product import ProductRepository
 
 from payments.application.dto.order import OrderDTO
 from payments.application.gateways.interface import PaymentUrlGatewayInterface
@@ -12,10 +11,9 @@ from payments.db.repositories.order import (
     OrderRepository,
     PromoCodeRepository,
 )
-from payments.db.repositories.product import ProductRepository
-from payments.entities.order import Order, OrderProduct, PromoCode
-from payments.entities.order_id import OrderId
-from payments.entities.value_objects import Money
+from payments.domain.entities.order import Order, OrderProduct, PromoCode
+from payments.domain.entities.order_id import OrderId
+from payments.domain.entities.value_objects import Money
 
 logger = logging.getLogger(__name__)
 
@@ -42,11 +40,11 @@ class CreateOrderInteractor:
     def _get_order(self, order_data: OrderDTO) -> Order:
         order_products = self._get_order_products(order_data.products)
         promo_code = self._get_promo_code(order_data.promo_code)
-        user_account = self._user_repo.get_or_create_customer(
+        user_account = self._user_repo.get_or_create(
             order_data.customer_phone_number,
             order_data.customer_name,
         )
-        order = Order(
+        return Order(
             id=OrderId(uuid.uuid4()),
             user_id=user_account.id,
             amount=order_data.amount,
@@ -62,26 +60,23 @@ class CreateOrderInteractor:
             note=order_data.note,
             cash=order_data.cash,
             products=order_products,
+            products_count=order_data.products,
             promo_code=promo_code,
             delivery_price=self._delivery_price,
             is_paid=False,
         )
-        return order
 
     def _get_payment_url(self, order: Order) -> str:
         try:
-            result = self._payment_url_gateway.get_payment_url(
-                order_uuid=str(order.id),
+            return self._payment_url_gateway.get_payment_url(
+                order_id=order.id,
                 amount=order.amount,
                 products=order.products,
+                products_count=order.products_count,
                 with_delivery=order.delivering,
                 customer_phone_number=order.customer_phone_number,
                 customer_email=order.customer_email,
-                discount_coefficient=(
-                    order.promo_code.get_discount_coefficient(order.amount)
-                    if order.promo_code
-                    else Decimal(1)
-                ),
+                discount_coefficient=order.discount_coefficient,
             )
         except Exception as exc:
             logger.error(f'Ошибка при получении ссылки на оплату: {exc}')
@@ -89,16 +84,13 @@ class CreateOrderInteractor:
 
     def _order_created(self, order: Order) -> None:
         try:
-            self._notification_bus.order_created(order.order_id)
+            self._notification_bus.order_created(order.id)
         except Exception as exc:
             logger.error(f'Ошибка при отправке уведомления: {exc}')
 
     def __call__(self, order_data: OrderDTO) -> str:
         order = self._get_order(order_data)
-        if order.cash:
-            result = 'OK'
-        else:
-            result = self._get_payment_url(order)
+        result = 'OK' if order.cash else self._get_payment_url(order)
         self._order_repo.save(order)
         self._order_created(order)
         return result
@@ -106,7 +98,7 @@ class CreateOrderInteractor:
     def _get_order_products(self, products: dict) -> list[OrderProduct]:
         return [
             OrderProduct(
-                product_id=product_data.id,
+                id=product_data.id,
                 slug=product_data.slug,
                 count=int(products.get(product_data.slug, 0)),
                 title=product_data.title,
@@ -119,12 +111,14 @@ class CreateOrderInteractor:
         if not code:
             return None
 
-        promo_code_data = self._promo_code_repo.get(code)
-        if not promo_code_data:
+        promo_code = self._promo_code_repo.get(code)
+        if not promo_code:
             return None
 
         return PromoCode(
-            code=promo_code_data.code,
-            discount_percent=promo_code_data.discount_percent,
-            is_active=promo_code_data.is_active,
+            id=promo_code.id,
+            code=promo_code.code,
+            value=promo_code.value,
+            is_percent=promo_code.is_percent,
+            is_active=promo_code.is_active,
         )

@@ -50,7 +50,7 @@ def mock_container():
 
 
 @pytest.fixture(autouse=True)
-def setup_db_entities():
+def _setup_db_entities():
     mock_image = Image.new('RGB', (100, 100))
     image_io = BytesIO()
     mock_image.save(image_io, format='JPEG')
