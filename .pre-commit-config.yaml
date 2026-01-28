@@ -13,7 +13,6 @@ repos:
       - id: ruff
         files: ^backend/core
         args: [backend/core, --config, backend/core/pyproject.toml]
-        staged_only: true
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.4.1
@@ -21,4 +20,3 @@ repos:
       - id: ruff
         files: ^backend/tg_bot
         args: [backend/tg_bot, --ignore, INP001, --config, backend/tg_bot/pyproject.toml]
-        staged_only: true

@@ -1,15 +1,13 @@
 import logging
 import os
 import uuid
-from collections.abc import Iterable
 from decimal import Decimal
 
-from products.models import Product
 from yookassa import Configuration, Payment
 
-from payments.application.interfaces.repositories.base import (
-    PaymentUrlGatewayInterface,
-)
+from payments.application.gateways.interface import PaymentUrlGatewayInterface
+from payments.domain.entities.order import OrderProduct
+from payments.domain.entities.order_id import OrderId
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +21,7 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
 
     def generate_receipt(
         self,
-        products: Iterable[Product],
+        products: list[OrderProduct],
         products_count: dict[str, int],
         customer_phone_number: str,
         customer_email: str,
@@ -40,11 +38,7 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
                     'description': product.title,
                     'quantity': products_count[product.slug],
                     'amount': {
-                        'value': str(
-                            float(product.price)
-                            * int(products_count[product.slug])
-                            * float(discount_coefficient),
-                        ),
+                        'value': product.total_price * Decimal(discount_coefficient),
                         'currency': 'RUB',
                     },
                     'vat_code': '1',
@@ -72,10 +66,10 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
 
     def get_payment_url(
         self,
-        order_uuid: str,
+        order_id: OrderId,
         amount: int,
         customer_phone_number: str,
-        products: Iterable[Product],
+        products: list[OrderProduct],
         products_count: dict[str, int],
         with_delivery: bool,
         customer_email: str | None,
@@ -86,7 +80,7 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
                 'value': amount,
                 'currency': 'RUB',
             },
-            'metadata': {'order_id': order_uuid},
+            'metadata': {'order_id': str(order_id)},
             'confirmation': {'type': 'redirect', 'return_url': os.environ['DOMAIN']},
             'capture': True,
         }
@@ -103,3 +97,5 @@ class PaymentUrlGateway(PaymentUrlGatewayInterface):
         if payment.status == 'pending':
             logger.info(f'Создан заказ. Входные данные: {payment.json()}')
             return payment.confirmation.confirmation_url
+        else:
+            logger.warning(f'Заказ не создан. Входные данные: {payment.json()}')

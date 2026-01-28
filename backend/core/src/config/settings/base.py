@@ -44,7 +44,7 @@ INSTALLED_APPS += THIRD_PARTY_APPS
 
 LOCAL_APPS = [
     'payments.application.django.apps.PaymentsConfig',
-    'products.apps.ProductsConfig',
+    'products.application.django.apps.ProductsConfig',
     'accounts.apps.AccountsConfig',
 ]
 
@@ -116,7 +116,8 @@ AUTH_USER_MODEL = 'accounts.AuthUser'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MIGRATION_MODULES = {
-    'payments': 'payments.infrastructure.db.migrations',
+    'payments': 'payments.db.migrations',
+    'products': 'products.db.migrations',
 }
 
 CORS_ALLOW_CREDENTIALS = True

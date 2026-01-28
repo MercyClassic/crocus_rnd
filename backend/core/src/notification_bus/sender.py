@@ -1,9 +1,19 @@
 import functools
+from abc import ABC, abstractmethod
 
 from async_to_sync.run_with_loop import run_with_loop
 from faststream.rabbit import RabbitBroker
+from payments.domain.entities.order_id import OrderId
 
-from notification_bus.interfaces.sender import NotificationBusInterface
+
+class NotificationBusInterface(ABC):
+    @abstractmethod
+    def order_created(self, order_id: OrderId) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    def call_me_requested(self, phone_number: str) -> None:
+        raise NotImplementedError
 
 
 def with_connection(func):
@@ -24,7 +34,7 @@ class NotificationBus(NotificationBusInterface):
 
     @run_with_loop
     @with_connection
-    async def order_created(self, order_id: int) -> None:
+    async def order_created(self, order_id: OrderId) -> None:
         await self._broker.publish(
             str(order_id),
             exchange='notifications',

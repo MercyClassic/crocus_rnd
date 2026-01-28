@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from products.models import Category, Product, ProductImage
+from products.db.models import Category, Product, ProductImage
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -11,7 +11,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 class ProductListSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name='api-product-detail',
+        view_name='products:api-product-detail',
         read_only=True,
         lookup_field='slug',
     )

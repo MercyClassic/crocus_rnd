@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from payments.infrastructure.db.models import Order, OrderProduct, PromoCode
+from payments.db.models import Order, OrderProduct, PromoCode
 
 
 class ProductInline(admin.StackedInline):

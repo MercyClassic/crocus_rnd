@@ -3,7 +3,7 @@
 import django.db.models.deletion
 from django.db import migrations, models
 
-import products.models
+from products.db.models import PhotoMixin
 
 
 class Migration(migrations.Migration):
@@ -24,15 +24,28 @@ class Migration(migrations.Migration):
                         verbose_name='ID',
                     ),
                 ),
-                ('image', models.ImageField(upload_to='images/', verbose_name='Изображение')),
-                ('name', models.CharField(db_index=True, max_length=50, verbose_name='Название')),
-                ('is_active', models.BooleanField(default=True, verbose_name='Активно')),
+                (
+                    'image',
+                    models.ImageField(
+                        upload_to='images/', verbose_name='Изображение'
+                    ),
+                ),
+                (
+                    'name',
+                    models.CharField(
+                        db_index=True, max_length=50, verbose_name='Название'
+                    ),
+                ),
+                (
+                    'is_active',
+                    models.BooleanField(default=True, verbose_name='Активно'),
+                ),
             ],
             options={
                 'verbose_name': 'Категория',
                 'verbose_name_plural': 'Категории',
             },
-            bases=(products.models.PhotoMixin, models.Model),
+            bases=(PhotoMixin, models.Model),
         ),
         migrations.CreateModel(
             name='Product',
@@ -49,29 +62,46 @@ class Migration(migrations.Migration):
                 ('title', models.CharField(max_length=128, verbose_name='Название')),
                 (
                     'slug',
-                    models.SlugField(max_length=128, unique=True, verbose_name='URL параметр'),
+                    models.SlugField(
+                        max_length=128, unique=True, verbose_name='URL параметр'
+                    ),
                 ),
-                ('description', models.TextField(blank=True, null=True, verbose_name='Описание')),
-                ('image', models.ImageField(upload_to='images/', verbose_name='Изображение')),
+                (
+                    'description',
+                    models.TextField(blank=True, null=True, verbose_name='Описание'),
+                ),
+                (
+                    'image',
+                    models.ImageField(
+                        upload_to='images/', verbose_name='Изображение'
+                    ),
+                ),
                 ('price', models.IntegerField(verbose_name='Цена')),
                 (
                     'type',
                     models.CharField(
                         blank=True,
-                        choices=[('bouquet', 'Букет'), ('box', 'Коробка'), ('basket', 'Корзинка')],
+                        choices=[
+                            ('bouquet', 'Букет'),
+                            ('box', 'Коробка'),
+                            ('basket', 'Корзинка'),
+                        ],
                         db_index=True,
                         max_length=7,
                         null=True,
                         verbose_name='Тип товара',
                     ),
                 ),
-                ('is_active', models.BooleanField(default=True, verbose_name='В продаже')),
+                (
+                    'is_active',
+                    models.BooleanField(default=True, verbose_name='В продаже'),
+                ),
             ],
             options={
                 'verbose_name': 'Товар',
                 'verbose_name_plural': 'Товары',
             },
-            bases=(products.models.PhotoMixin, models.Model),
+            bases=(PhotoMixin, models.Model),
         ),
         migrations.CreateModel(
             name='ProductImage',
@@ -85,7 +115,12 @@ class Migration(migrations.Migration):
                         verbose_name='ID',
                     ),
                 ),
-                ('image', models.ImageField(upload_to='images/', verbose_name='Изображение')),
+                (
+                    'image',
+                    models.ImageField(
+                        upload_to='images/', verbose_name='Изображение'
+                    ),
+                ),
                 (
                     'product',
                     models.ForeignKey(
@@ -99,7 +134,7 @@ class Migration(migrations.Migration):
                 'verbose_name': 'Дополнительное изоражение',
                 'verbose_name_plural': 'Дополнительные изоражения',
             },
-            bases=(products.models.PhotoMixin, models.Model),
+            bases=(PhotoMixin, models.Model),
         ),
         migrations.CreateModel(
             name='ProductCategory',

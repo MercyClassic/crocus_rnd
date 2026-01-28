@@ -6,14 +6,14 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from products.interfaces.cart import CartServiceInterface
-from products.mixins import FilterQueryMixin, ProductResponseMixin
-from products.models import Category, Product
-from products.serializers import (
+from products.application.mixins import FilterQueryMixin, ProductResponseMixin
+from products.application.serializers import (
     CategorySerializer,
     ProductDetailSerializer,
     ProductListSerializer,
 )
+from products.application.services.cart import CartServiceInterface
+from products.db.models import Category, Product
 
 
 class ProductListAPIView(FilterQueryMixin, ProductResponseMixin):

@@ -8,4 +8,5 @@ class ProductsConfig(AppConfig):
 
     def ready(self):
         from config.container import container
-        container.wire(modules=['.views'])
+
+        container.wire(modules=['products.api.v1.views'])

@@ -1,16 +1,28 @@
+from abc import ABC, abstractmethod
 from contextlib import suppress
 from typing import Literal
 
 from rest_framework.request import Request
 
-from products.interfaces.cart import CartServiceInterface
-from products.models import Product
-from products.serializers import ProductListSerializer
+from products.application.serializers import ProductListSerializer
+from products.db.models.product import Product
+
+
+class CartServiceInterface(ABC):
+    @abstractmethod
+    def add(self, request: Request, product_slug: str) -> Literal[201, 204]:
+        raise NotImplementedError
+
+    @abstractmethod
+    def get(self, request: Request) -> dict:
+        raise NotImplementedError
 
 
 class CartService(CartServiceInterface):
     def add(self, request: Request, product_slug: str) -> Literal[201, 204]:
-        add_to = 'cart_products' if request.data.get('type') == 'cart' else 'favourites'
+        add_to = (
+            'cart_products' if request.data.get('type') == 'cart' else 'favourites'
+        )
 
         products = request.session.get(add_to)
         if not isinstance(products, list):

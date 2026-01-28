@@ -1,1 +1,1 @@
-from payments.infrastructure.db.models.order import Order, OrderProduct, PromoCode
+from payments.db.models.order import Order, OrderProduct, PromoCode
