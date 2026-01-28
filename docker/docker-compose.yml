@@ -31,7 +31,7 @@ services:
     restart: unless-stopped
     env_file:
       - ../backend/tg_bot/.env
-    entrypoint: python main.py
+    entrypoint: python -m main.bot
     volumes:
       - ../backend/core/src/media:/app/backend/core/src/media
       - ../frontend/build/static/img/jpg:/app/frontend/build/static/img/jpg
@@ -44,7 +44,7 @@ services:
     restart: unless-stopped
     env_file:
       - ../backend/tg_bot/.env
-    entrypoint: faststream run notifier:app
+    entrypoint: faststream run main:notifier:app
     networks:
       - main
 

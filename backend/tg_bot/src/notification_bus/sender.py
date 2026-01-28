@@ -10,28 +10,28 @@ class NotificationSender:
         admin_panel_order_url: str,
         notification_receivers: list[int],
     ):
-        self.bot = bot
-        self.domain = domain
-        self.admin_panel_order_url = admin_panel_order_url
-        self.notification_receivers = notification_receivers
+        self._bot = bot
+        self._domain = domain
+        self._admin_panel_order_url = admin_panel_order_url
+        self._notification_receivers = notification_receivers
 
-    async def new_order_notification(self, order_id: int) -> None:
+    async def order_created(self, order_id: int) -> None:
         markup = InlineKeyboardBuilder()
-        url = f'{self.domain}{self.admin_panel_order_url % order_id}'
+        url = f'{self._domain}{self._admin_panel_order_url % order_id}'
         markup.add(
             types.InlineKeyboardButton(text='Посмотреть детали заказа', url=url),
         )
 
-        for telegram_id in self.notification_receivers:
-            await self.bot.send_message(
+        for telegram_id in self._notification_receivers:
+            await self._bot.send_message(
                 telegram_id,
                 'У вас новый заказ!',
                 reply_markup=markup.as_markup(),
             )
 
-    async def new_call_me_request_notification(self, phone_number: str) -> None:
-        for telegram_id in self.notification_receivers:
-            await self.bot.send_message(
+    async def call_me_requested(self, phone_number: str) -> None:
+        for telegram_id in self._notification_receivers:
+            await self._bot.send_message(
                 telegram_id,
                 f'Посетитель сайта попросил перезвонить ему на номер: {phone_number}',
             )

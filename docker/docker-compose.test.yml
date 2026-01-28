@@ -47,4 +47,4 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: python manage.py test
+    command: pytest -s -v
