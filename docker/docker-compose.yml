@@ -44,7 +44,7 @@ services:
     restart: unless-stopped
     env_file:
       - ../backend/tg_bot/.env
-    entrypoint: faststream run main:notifier:app
+    entrypoint: faststream run main.notifier:app
     networks:
       - main
 

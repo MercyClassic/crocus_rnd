@@ -157,8 +157,8 @@ const ProductDetailPage = ({data, setCartVisible}) => {
                                 Быстрая доставка
                             </li>
                             <li className="value__item">
-                                <img src={require("../static/img/png/whatsappBlack.png")} alt="delivery" />
-                                Свежее фото в Whatsapp
+                                <img style={{width: "40px", height: "40px", marginRight: "10px"}} src={require("../static/img/png/maxBlack.png")} alt="delivery" />
+                                Свежее фото в Max
                             </li>
                             <li className="value__item">
                                 <img style={{width: "50px", height: "50px"}} src={require("../static/img/png/quality.png")} alt="delivery" />

@@ -14,16 +14,21 @@ const ContactInformation = () => {
                         <div style={{textAlign: "center", fontSize: "26px", lineHeight: "1.5"}} className="creator-letter__body _letter">
                             <ul className="item-footer__sub-list">
                                 <li className="menu__sub-item">
-                                    <Link to="https://wa.me/79185212571/" className="catalog__link">Whatsapp: +7 (993) 446-17-02</Link>
+                                    <Link to="tel: +7 (993) 446-17-02"
+                                          className="catalog__link">Мессенджеры: +7
+                                        (993) 446-17-02</Link>
                                 </li>
                                 <li className="menu__sub-item">
-                                    <Link to="tel: +7 (918) 521-25-71" className="catalog__link">Звонок: +7 (993) 446-17-02</Link>
+                                    <Link to="tel: +7 (993) 446-17-02"
+                                          className="catalog__link">Звонок: +7 (993)
+                                        446-17-02</Link>
                                 </li>
                                 <li className="menu__sub-item">
-                                    <Link to="https://instagram.com/crocusrnd/" className="catalog__link">Instagram: @crocusrnd</Link>
+                                    <Link to="https://max.ru/u/f9LHodD0cOJK18O_kYrguhCsb1GtmdmcN6afC1jJSJYZSQ2DsV9JLOcpFBI" className="catalog__link">Макс: +7 (993) 446-17-02</Link>
                                 </li>
                                 <li className="menu__sub-item">
-                                    <Link className="catalog__link">Email: crocusrnd@mail.ru</Link>
+                                    <Link className="catalog__link">Почта:
+                                        crocusrnd@mail.ru</Link>
                                 </li>
                                 <li className="menu__sub-item">
                                     <Link className="catalog__link">
@@ -37,7 +42,7 @@ const ContactInformation = () => {
                     </div>
                 </section>
             </main>
-        <Footer />
+            <Footer/>
         </>
     );
 }

@@ -87,18 +87,18 @@ const Header = () => {
                     </Link>
                     <div className="header__actions actions">
                         <div className="actions__contact">
-                            <Link to="https://wa.me/79934451702" className="actions__whatsapp-icon">
-                                <img src={require("../static/img/png/whatsapp.png")} alt="Whatsapp"/>
+                            <Link to="https://max.ru/u/f9LHodD0cOJK18O_kYrguhCsb1GtmdmcN6afC1jJSJYZSQ2DsV9JLOcpFBI" className="actions__max-icon">
+                                <img src={require("../static/img/png/max.png")} alt="Max"/>
                             </Link>
-                            <Link to="https://wa.me/79934461702" className="actions__tel ">+7 (993) 446-17-02</Link>
-                            <Link to="https://wa.me/79934461702" className="actions__whatsapp-text">Написать в Whatsapp</Link>
+                            <Link to="https://max.ru/u/f9LHodD0cOJK18O_kYrguhCsb1GtmdmcN6afC1jJSJYZSQ2DsV9JLOcpFBI" className="actions__tel ">+7 (993) 446-17-02</Link>
+                            <Link to="https://max.ru/u/f9LHodD0cOJK18O_kYrguhCsb1GtmdmcN6afC1jJSJYZSQ2DsV9JLOcpFBI" className="actions__max-text">Написать в Max</Link>
                             <Link className="icon-menu">
                                 <span></span>
                                 <span></span>
                                 <span></span>
                             </Link>
                         </div>
-                        <Link to="https://wa.me/79934451702" className="actions__fast-call">Перейти в Whatsapp</Link>
+                        <Link to="https://max.ru/u/f9LHodD0cOJK18O_kYrguhCsb1GtmdmcN6afC1jJSJYZSQ2DsV9JLOcpFBI" className="actions__fast-call">Перейти в Max</Link>
                     </div>
                 </div>
             </div>

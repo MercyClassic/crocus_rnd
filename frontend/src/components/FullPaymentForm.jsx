@@ -154,7 +154,7 @@ const FullPaymentForm = ({form, amount, setAmount}) => {
                 <label className="popup-cart__checkbox-label">
                     <input type='checkbox' name='without_calling'
                            className="popup-cart__checkbox-input"/>
-                    <span> Напишите мне в whatsapp/telegram (Не звонить) </span>
+                    <span> Напишите мне в max (Не звонить) </span>
                 </label>
             </div>
             <div className="popup-cart__input-name-wrapper">
