@@ -4,8 +4,7 @@ node_modules
 .idea
 dist
 backend/core/src/media
-backend/core/src/logs
-backend/tg_bot/src/logs
+logs
 frontend/build
 dev
 __pycache__
