@@ -21,7 +21,7 @@ exclude = [
     ".ruff_cache",
     ".tox",
     ".venv",
-    "__pychache__",
+    "__pycache__",
     "build",
     "dist",
     "node_modules",
@@ -64,7 +64,7 @@ convention = "google"
 inline-quotes = "single"
 
 [tool.poetry.dependencies]
-python = "~3.11"
+python = ">=3.11,<3.13"
 pillow = "^9.4.0"
 pre-commit = "^3.3.3"
 sqlalchemy = "^2.0.22"

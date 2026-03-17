@@ -28,7 +28,7 @@ exclude = [
     ".ruff_cache",
     ".tox",
     ".venv",
-    "__pychache__",
+    "__pycache__",
     "build",
     "dist",
     "node_modules",
@@ -85,8 +85,8 @@ convention = "google"
 inline-quotes = "single"
 
 [tool.poetry.dependencies]
-python = "~3.11"
-django = "^4.1.6"
+python = ">=3.11,<3.13"
+django = "^4.2"
 django-cachalot = "^2.5.3"
 djangorestframework = "^3.14.0"
 gunicorn = "^20.1.0"
