@@ -134,9 +134,6 @@ class Order(Entity):
         if self._amount != amount:
             raise ValidationError('Requested amount not equals calculated amount')
 
-        if self._delivery_date.date() < datetime.utcnow().date():
-            raise ValidationError('Delivery date cannot be in the past')
-
         max_amount = Money(50000) + (
             self._delivery_price if self._delivering else Money(0)
         )
